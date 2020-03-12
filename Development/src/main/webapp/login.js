@@ -1,12 +1,29 @@
 function login(){
-    var username = document.getElementById("login_username").value;
-    var password = document.getElementById("login_password").value;
+    var username = document.loginForm.username.value;
+    var password = document.loginForm.password.value;
 
-    if(localStorage.getItem('register_username') === username &&
-        localStorage.getItem('register_password') === password){
-        alert("Login Success");
+    let displayMessage = document.getElementById("message");
+
+    // Grab username and password from the database and do a check.
+    // if(localStorage.getItem('username') === username &&
+    //     localStorage.getItem('password') === password){
+    if(true){
+        /**
+         * Cookies:
+         * Expires
+         * Domain
+         * Path
+         * Secure
+         * Name = Value
+         */
+        Cookies.set("username", username);
+        Cookies.set("password", password);
+
         window.location.href = "chat_room.html";
     } else {
-        alert("Incorrect credential.")
+        displayMessage.innerText = "Incorrect credential.";
     }
 }
+
+
+

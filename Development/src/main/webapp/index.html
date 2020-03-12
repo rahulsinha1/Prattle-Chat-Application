@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Prattle Messages</title>
-</head>
-<body>
-<h1>Welcome To Prattle Messages</h1>
-<button type="button"><a href="login.html">Log In</a></button>
-<button type="button"><a href="register.html">Register</a></button>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Prattle Messages</title>
+    </head>
+    <body>
+    <h1>Welcome To Prattle Messages</h1>
+    <h1>Login</h1>
+        <form name="loginForm">
+            Username : <input type="text" name="username" />
+            <br>
+            Password : <input type="password" name="password" />
+            <br>
+            <input type="button" value="Login" onclick="login()" />
+            <input type="button" value="Register" onclick="window.location.href = 'register.html';" />
+        </form>
+        <div id="message"></div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="websocket.js"></script>
+    <script src="login.js"></script>
+
 </html>

@@ -1,4 +1,4 @@
-package com.neu.prattle;
+package com.neu.prattle.mainTest;
 
 import com.neu.prattle.main.PrattleApplication;
 

@@ -1,4 +1,4 @@
-package com.neu.prattle;
+package com.neu.prattle.controllerTest;
 
 import com.neu.prattle.controller.GroupController;
 import com.neu.prattle.model.Group;

@@ -1,4 +1,4 @@
-package com.neu.prattle;
+package com.neu.prattle.modelTest;
 
 import com.neu.prattle.model.Message;
 

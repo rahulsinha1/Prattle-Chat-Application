@@ -1,4 +1,4 @@
-package com.neu.prattle;
+package com.neu.prattle.serviceTest;
 
 
 import static org.junit.Assert.assertEquals;

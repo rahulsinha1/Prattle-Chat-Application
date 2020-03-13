@@ -1,4 +1,4 @@
-package com.neu.prattle;
+package com.neu.prattle.serviceTest;
 
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;

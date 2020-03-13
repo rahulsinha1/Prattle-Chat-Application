@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
@@ -34,6 +36,8 @@ import com.neu.prattle.service.UserServiceImpl;
  */
 @ServerEndpoint(value = "/chat/{username}", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class ChatEndpoint {
+
+  private static final Logger logger = Logger.getLogger(ChatEndpoint.class.getName());
     
     /** The account service. */
     private UserService accountService = UserServiceImpl.getInstance();
@@ -172,7 +176,7 @@ public class ChatEndpoint {
                 	/* note: in production, who exactly is looking at the console.  This exception's
                 	 *       output should be moved to a logger.
                 	 */
-                    e.printStackTrace();
+                  logger.log(Level.SEVERE,e.getMessage());
                 }
             }
         });

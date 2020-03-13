@@ -10,6 +10,7 @@ public class PrattleApplicationTest {
 
   @Test
   public void testGetClasses(){
+    
     prattleApplication.getClasses();
   }
 }

@@ -32,12 +32,12 @@ public class GroupModelTest {
   @Test
   public void testGroupModel(){
     Group g = new Group ("GROUP1");
-    Moderator m = new Moderator("Moderator8");
+    Moderator m = new Moderator("Moderator800");
     userService.addUser(m);
     List<Moderator> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User("testuser8");
+    User u = new User("testuser800");
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setUsers(users);

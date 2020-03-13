@@ -222,7 +222,7 @@ public class ChatEndpoint {
             /* note: in production, who exactly is looking at the console.  This exception's
              *       output should be moved to a logger.
              */
-            e.printStackTrace();
+            logger.log(Level.SEVERE,e.getMessage());
           }
         }
       });

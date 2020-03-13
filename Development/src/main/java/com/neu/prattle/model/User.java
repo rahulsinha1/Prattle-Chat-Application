@@ -1,5 +1,7 @@
 package com.neu.prattle.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /***
@@ -9,6 +11,16 @@ import java.util.Objects;
  * @version dated 2019-10-06
  */
 public class User {
+
+  private List<String> groupParticipant;
+
+  public List getGroupParticipant() {
+    return groupParticipant;
+  }
+
+  public void setGroupParticipant(List<String> groupParticipant) {
+    this.groupParticipant.addAll(groupParticipant);
+  }
 
 	public String getName() {
 		return name;
@@ -21,11 +33,12 @@ public class User {
 	private String name;
 
 	public User() {
-
-	}
+    groupParticipant = new ArrayList();
+  }
 
     public User(String name) {
         this.name = name;
+      groupParticipant = new ArrayList();
     }
 
     /***

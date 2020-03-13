@@ -2,6 +2,7 @@ package com.neu.prattle.service;
 
 import com.neu.prattle.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /***
@@ -32,4 +33,10 @@ public interface UserService {
      *
      */
     void addUser(User user);
+
+    User findUserByUsername(String name);
+
+    List findGroupsByName(String name);
+
+    void updateUser(User user);
 }

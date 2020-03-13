@@ -10,4 +10,9 @@ public class UserModelTest {
   public void testUserModel() {
     new User();
   }
+
+    @Test
+    public void testUser(){
+
+    }
 }

@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public User findUserByUsername(String name) {
     for (User user : userSet) {
-      if (user.getName().equals(name)) {
+      if (user.getUsername().equals(name)) {
         return user;
       }
     }
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public List findGroupsByName(String name) {
     for (User user : userSet) {
-      if (user.getName().equals(name)) {
+      if (user.getUsername().equals(name)) {
         return user.getGroupParticipant();
       }
     }

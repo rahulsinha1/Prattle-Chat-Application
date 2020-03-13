@@ -143,13 +143,13 @@ public class GroupServiceImpl implements GroupService {
   }
 
   private void checkUserAndAddToGroup(Group group, User user) {
-    if (userService.findUserByName(user.getName()).isPresent()) {
+    if (userService.findUserByName(user.getUsername()).isPresent()) {
       List groupParticipant = user.getGroupParticipant();
       groupParticipant.add(group.getName());
-      User currentUser = userService.findUserByUsername(user.getName());
+      User currentUser = userService.findUserByUsername(user.getUsername());
       currentUser.setGroupParticipant(user.getGroupParticipant());
     } else {
-      throw new UserDoesNotExist("User " + user.getName() + " does not exist in system.");
+      throw new UserDoesNotExist("User " + user.getUsername() + " does not exist in system.");
     }
   }
 }

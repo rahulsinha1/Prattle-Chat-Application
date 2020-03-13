@@ -47,8 +47,8 @@ public class UserServiceImpl implements UserService {
      * @return An optional wrapper supplying the user.
      */
     @Override
-    public Optional<User> findUserByName(String name) {
-        final User user = new User(name);
+    public Optional<User> findUserByName(String username) {
+        final User user = new User(username);
         if (userSet.contains(user))
             return Optional.of(user);
         else
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public synchronized void addUser(User user) {
         if (userSet.contains(user))
-            throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getName()));
+            throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
 
         userSet.add(user);
     }

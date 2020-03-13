@@ -1,13 +1,4 @@
 /**
- * Delays the next line.
- * @param ms millisecond.
- * @returns {Promise<unknown>}
- */
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
  * Validates that the information is not empty.
  * @param first_name is the first name of the user.
  * @param last_name is the last name of the user.
@@ -25,7 +16,7 @@ function fieldsNotEmpty(first_name, last_name, username, confirm_password, passw
  * Registers the user.
  * @returns {Promise<void>}
  */
-async function register(){
+function register(){
     let first_name = document.registerForm.fname.value;
     let last_name = document.registerForm.lname.value;
     let username = document.registerForm.username.value;
@@ -37,20 +28,36 @@ async function register(){
 
     displayMessage.innerText = "";
 
-     if(fieldsNotEmpty(first_name, last_name, username, confirm_password, password)){
-         if(password === confirm_password){
+    if(fieldsNotEmpty(first_name, last_name, username, confirm_password, password)){
+        if(password === confirm_password){
 
-             // Send information to the database.
-             localStorage.setItem(username, username);
-             localStorage.setItem(password, password);
+            const user_data = {
+                "firstName": first_name,
+                "lastName": last_name,
+                "username": username,
+                "timezone": timezone,
+                "password": password
+            };
 
-             displayMessage.innerText = "Successfully Registered";
-             await sleep(2000);
-             // window.location.href = "index.html"
-         } else {
-             displayMessage.innerText = "Password and Confirm Password are not the same.";
-         }
-     } else {
-         displayMessage.innerText = "Field(s) cannot be empty.";
-     }
+            fetch('http://localhost:8080/prattle/rest/user/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user_data),
+            })
+                .then((data) => {
+                    displayMessage.innerText = "Successfully Registered";
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    displayMessage.innerText = "Unsuccessfully Registered";
+                    console.log('Error:', error);
+                });
+        } else {
+            displayMessage.innerText = "Password and Confirm Password are not the same.";
+        }
+    } else {
+        displayMessage.innerText = "Field(s) cannot be empty.";
+    }
 }

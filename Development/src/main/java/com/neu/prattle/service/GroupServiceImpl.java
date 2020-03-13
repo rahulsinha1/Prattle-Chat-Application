@@ -78,9 +78,6 @@ public class GroupServiceImpl implements GroupService {
       List<User> userList = userGroupList.get(group.getId());
       userList.remove(user);
       userGroupList.put(group.getId(), userList);
-    } else {
-      throw new IllegalStateException("Requested user " + user.getName() +
-              " not found to be deleted in group " + group.getName());
     }
   }
 
@@ -104,9 +101,6 @@ public class GroupServiceImpl implements GroupService {
       List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
       moderatorList.remove(moderator);
       moderatorGroupList.put(group.getId(), moderatorList);
-    } else {
-      throw new IllegalStateException("Requested user " + moderator.getName() +
-              " not found to be deleted in group " + group.getName());
     }
   }
 
@@ -126,8 +120,6 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public List getAllGroups() {
-    Group g = new Group();
-    groupSet.add(g);
     return Arrays.asList(groupSet.toArray());
   }
 

@@ -19,36 +19,26 @@ public interface GroupService {
 
   /**
    * create a group based on group model. Group name based be unique.
-   *
-   * @throws com.neu.prattle.exceptions.GroupAlreadyPresentException if group already present
    */
   void createGroup(Group group);
 
   /**
    * adds user to existing group
-   *
-   * @throws com.neu.prattle.exceptions.UserDoesNotExist if user is not found in system
    */
   void addUser(Group group, User user);
 
   /**
    * removes user from existing group
-   *
-   * @throws com.neu.prattle.exceptions.UserDoesNotExist if user is not found in system
    */
   void removeUser(Group group, User user);
 
   /**
    * adds moderator to existing group
-   *
-   * @throws com.neu.prattle.exceptions.UserDoesNotExist if user is not found in system
    */
   void addModerator(Group group, Moderator moderator);
 
   /**
    * removes moderator from existing group
-   *
-   * @throws com.neu.prattle.exceptions.UserDoesNotExist if user is not found in system
    */
   void removeModerator(Group group, Moderator moderator);
 

@@ -51,5 +51,5 @@ public class GroupModelTest {
     assertFalse(g.isPrivate());
     assertFalse(g.equals(new Group("GROUP2")));
   }
-  
+
 }

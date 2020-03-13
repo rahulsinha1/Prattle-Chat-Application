@@ -8,6 +8,6 @@ public class UserModelTest {
 
   @Test
   public void testUserModel() {
-    User u = new User();
+    new User();
   }
 }

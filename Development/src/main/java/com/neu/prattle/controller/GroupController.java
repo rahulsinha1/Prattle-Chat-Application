@@ -1,7 +1,5 @@
 package com.neu.prattle.controller;
 
-import com.neu.prattle.exceptions.GroupAlreadyPresentException;
-import com.neu.prattle.exceptions.UserDoesNotExist;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
@@ -40,26 +38,16 @@ public class GroupController {
   @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response createGroup(Group group) {
-    try {
-      groupService.createGroup(group);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
-    catch (UserDoesNotExist u) {
-      return Response.status(409,u.getMessage()).build();
-    }    return Response.ok().build();
+    groupService.createGroup(group);
+    return Response.ok().build();
   }
 
   @POST
   @Path("/addUser/{groupName}")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response addUser(@PathParam("groupName") String groupName, User user) {
-    try {
-      Group group = groupService.getGroupByName(groupName);
-      groupService.addUser(group,user);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+    Group group = groupService.getGroupByName(groupName);
+    groupService.addUser(group, user);
     return Response.ok().build();
   }
 
@@ -67,11 +55,7 @@ public class GroupController {
   @Path("/removeUser")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response removeUser(Group group, User user) {
-    try {
-      groupService.removeUser(group,user);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+    groupService.removeUser(group, user);
     return Response.ok().build();
   }
 
@@ -79,12 +63,10 @@ public class GroupController {
   @Path("/addModerator/{groupName}")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response addModerator(@PathParam("groupName") String groupName, Moderator moderator) {
-    try {
-      Group group = groupService.getGroupByName(groupName);
-      groupService.addModerator(group,moderator);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+
+    Group group = groupService.getGroupByName(groupName);
+    groupService.addModerator(group, moderator);
+
     return Response.ok().build();
   }
 
@@ -92,11 +74,9 @@ public class GroupController {
   @Path("/removeModerator")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response removeModerator(Group group, Moderator moderator) {
-    try {
-      groupService.removeModerator(group,moderator);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+
+    groupService.removeModerator(group, moderator);
+
     return Response.ok().build();
   }
 
@@ -104,11 +84,9 @@ public class GroupController {
   @Path("/updateGroup")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response updateGroup(Group group) {
-    try {
-      groupService.updateGroup(group);
-    } catch (GroupAlreadyPresentException | UserDoesNotExist ex) {
-      return Response.status(409).build();
-    }
+
+    groupService.updateGroup(group);
+
     return Response.ok().build();
   }
 
@@ -116,11 +94,9 @@ public class GroupController {
   @Path("/deleteGroup")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response deleteGroup(Group group) {
-    try {
-      groupService.deleteGroup(group);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+
+    groupService.deleteGroup(group);
+
     return Response.ok().build();
   }
 
@@ -129,13 +105,12 @@ public class GroupController {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getAllGroups() {
-    try {
-      groupService.getAllGroups();
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+
+    groupService.getAllGroups();
+
     List<Response> responses = new ArrayList<>();
-    GenericEntity<List> list = new GenericEntity<List> (responses) {};
+    GenericEntity<List> list = new GenericEntity<List>(responses) {
+    };
     list.getEntity().add(groupService.getAllGroups());
     return Response.status(200).entity(list).build();
   }
@@ -146,13 +121,12 @@ public class GroupController {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getAllUserGroups(@PathParam("username") String username) {
-    try {
-      groupService.getAllGroupsByUsername(username);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+
+    groupService.getAllGroupsByUsername(username);
+
     List<Response> responses = new ArrayList<>();
-    GenericEntity<List> list = new GenericEntity<List> (responses) {};
+    GenericEntity<List> list = new GenericEntity<List>(responses) {
+    };
     list.getEntity().add(groupService.getAllGroupsByUsername(username));
     return Response.status(200).entity(list).build();
   }
@@ -162,13 +136,12 @@ public class GroupController {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGroupDetails(@PathParam("groupName") String groupName) {
-    try {
-      groupService.getGroupByName(groupName);
-    } catch (GroupAlreadyPresentException e) {
-      return Response.status(409).build();
-    }
+
+    groupService.getGroupByName(groupName);
+
     List<Response> responses = new ArrayList<>();
-    GenericEntity<List> list = new GenericEntity<List> (responses) {};
+    GenericEntity<List> list = new GenericEntity<List>(responses) {
+    };
     list.getEntity().add(groupService.getGroupByName(groupName));
     return Response.status(200).entity(list).build();
   }

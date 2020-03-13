@@ -63,29 +63,6 @@ public class GroupServiceImplTest {
     groupService.addUser(g,u1);
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void testRemoveUser() {
-    Group g = new Group();
-    g.setName("TESTGROUP2");
-    User u = new User("test4");
-    userService.addUser(u);
-    groupService.addUser(g,u);
-    groupService.removeUser(g,u);
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void testRemoveModerator() {
-    Group g = new Group();
-    g.setName("TESTGROUP3");
-    Moderator m = new Moderator("Moderator3");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    groupService.createGroup(g);
-    groupService.removeModerator(g,m);
-  }
-
   @Test
   public void testUpdateGroup () {
     Group g = new Group();
@@ -181,12 +158,12 @@ public class GroupServiceImplTest {
   public void testGetGroupByName(){
     Group g = new Group();
     g.setName("TESTGROUP10");
-    Moderator m = new Moderator("Moderator10");
+    Moderator m = new Moderator("Moderator10000000");
     userService.addUser(m);
     List<Moderator> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User("testuser10");
+    User u = new User("testuser10000000");
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setUsers(users);

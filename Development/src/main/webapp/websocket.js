@@ -24,11 +24,3 @@ function send() {
 
     ws.send(json);
 }
-
-function creategroup() {
-    var username = document.getElementById("username").value;
-
-    var host = document.location.host;
-    var pathname = document.location.pathname;
-    alert(username);
-}

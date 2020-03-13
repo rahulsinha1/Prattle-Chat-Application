@@ -1,24 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Prattle Messages</title>
-    </head>
-    <body>
-    <h1>Welcome To Prattle Messages</h1>
-    <h1>Login</h1>
-        <form name="loginForm">
-            Username : <input type="text" name="username" />
-            <br>
-            Password : <input type="password" name="password" />
-            <br>
-            <input type="button" value="Login" onclick="login()" />
-            <input type="button" value="Register" onclick="window.location.href = 'register.html';" />
-        </form>
-        <div id="message"></div>
-    </body>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-    <script src="websocket.js"></script>
-    <script src="login.js"></script>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+<h1 id="welcoming">Welcome </h1>
+<table>
+    <tr>
+        <td colspan="2">
+            <input type="text" id="username" placeholder="Username"/>
+            <button type="button" onclick="connect();" >Connect</button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <textarea readonly="true" rows="10" cols="80" id="log"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input type="text" size="51" id="msg" placeholder="Message"/>
+            <button type="button" onclick="send();" >Send</button>
+        </td>
+    </tr>
+</table>
+</body>
+
+<script src="websocket.js"></script>
 
 </html>

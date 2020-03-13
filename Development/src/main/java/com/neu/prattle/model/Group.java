@@ -4,16 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 /***
  * A Group object represents a basic group information.
  *
  */
-@Entity(name="Group")
 public class Group {
 
   private String name;
@@ -21,8 +16,6 @@ public class Group {
   private List<User> users = new LinkedList<>();
   private boolean isPrivate;
   private String description;
-  @Id
-  @GeneratedValue(strategy= GenerationType.IDENTITY)
   private String id;
   private String createdOn;
 

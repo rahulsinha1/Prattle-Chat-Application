@@ -6,7 +6,6 @@ import com.neu.prattle.model.User;
 import com.neu.prattle.service.GroupService;
 import com.neu.prattle.service.GroupServiceImpl;
 
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path(value = "/group")
-@RestController
 public class GroupController {
 
   // Usually Dependency injection will be used to inject the service at run-time

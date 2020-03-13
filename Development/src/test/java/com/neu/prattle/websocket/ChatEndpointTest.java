@@ -3,8 +3,8 @@ package com.neu.prattle.websocket;
 import com.neu.prattle.model.Message;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.UserService;
-import com.neu.prattle.service.UserServiceImpl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,5 +79,37 @@ public class ChatEndpointTest {
     message.setContent("What is the time?");
     when(userService.findUserByName(username)).thenReturn(Optional.of(user));
     chatEndpoint.onMessage(session,message);
+  }
+
+  @Test
+  public void testOnMessageDirect() throws IOException, EncodeException {
+    when(userService.findUserByName(username)).thenReturn(Optional.of(user));
+    when(session.getBasicRemote()).thenReturn(basic);
+    when(session.getId()).thenReturn("1234");
+    doNothing().when(basic).sendObject(any());
+    chatEndpoint.onOpen(session,username);
+    message = new Message();
+    message.setFrom(username);
+    message.setTo(username);
+    message.setContent(username + ":What is the time?");
+    when(userService.findUserByName(username)).thenReturn(Optional.of(user));
+    chatEndpoint.onMessage(session,message);
+  }
+
+  @Test
+  public void testOnMessageDirectNotPresent() throws IOException, EncodeException {
+    message = new Message();
+    message.setFrom(username);
+    message.setTo(username);
+    message.setContent(username + ":What is the time?");
+    when(session.getBasicRemote()).thenReturn(basic);
+    doNothing().when(basic).sendObject(any());
+    when(userService.findUserByName(username)).thenReturn(Optional.ofNullable(null));
+    chatEndpoint.onMessage(session,message);
+  }
+
+  @After
+  public void cleanup() {
+    chatEndpoint.onClose(session);
   }
 }

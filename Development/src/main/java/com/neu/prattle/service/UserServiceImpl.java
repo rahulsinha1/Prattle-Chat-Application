@@ -3,7 +3,9 @@ package com.neu.prattle.service;
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.model.User;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,48 +20,74 @@ import java.util.Set;
  */
 public class UserServiceImpl implements UserService {
 
-    /***
-     * UserServiceImpl is a Singleton class.
-     */
-    private UserServiceImpl() {
+  private static UserService accountService;
 
+  static {
+    accountService = new UserServiceImpl();
+  }
+
+  private Set<User> userSet = new HashSet<>();
+
+  /***
+   * UserServiceImpl is a Singleton class.
+   */
+  protected UserServiceImpl() {
+
+  }
+
+  /**
+   * Call this method to return an instance of this service.
+   *
+   * @return this
+   */
+  public static UserService getInstance() {
+    return accountService;
+  }
+
+  /***
+   *
+   * @param name -> The name of the user.
+   * @return An optional wrapper supplying the user.
+   */
+  @Override
+  public Optional<User> findUserByName(String name) {
+    final User user = new User(name);
+    if (userSet.contains(user))
+      return Optional.of(user);
+    else
+      return Optional.empty();
+  }
+
+  @Override
+  public synchronized void addUser(User user) {
+    if (userSet.contains(user))
+      throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getName()));
+
+    userSet.add(user);
+  }
+
+  @Override
+  public User findUserByUsername(String name) {
+    for (User user : userSet) {
+      if (user.getName().equals(name)) {
+        return user;
+      }
     }
+    return null;
+  }
 
-    private static UserService accountService;
-
-    static {
-        accountService = new UserServiceImpl();
+  @Override
+  public List findGroupsByName(String name) {
+    for (User user : userSet) {
+      if (user.getName().equals(name)) {
+        return user.getGroupParticipant();
+      }
     }
+    return Collections.emptyList();
+  }
 
-    /**
-     * Call this method to return an instance of this service.
-     * @return this
-     */
-    public static UserService getInstance() {
-        return accountService;
-    }
-
-    private Set<User> userSet = new HashSet<>();
-
-    /***
-     *
-     * @param name -> The name of the user.
-     * @return An optional wrapper supplying the user.
-     */
-    @Override
-    public Optional<User> findUserByName(String name) {
-        final User user = new User(name);
-        if (userSet.contains(user))
-            return Optional.of(user);
-        else
-            return Optional.empty();
-    }
-
-    @Override
-    public synchronized void addUser(User user) {
-        if (userSet.contains(user))
-            throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getName()));
-
-        userSet.add(user);
-    }
+  @Override
+  public void updateUser(User user) {
+    userSet.add(user);
+  }
 }

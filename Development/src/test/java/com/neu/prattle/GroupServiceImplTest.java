@@ -180,19 +180,19 @@ public class GroupServiceImplTest {
   @Test
   public void testGetGroupByName(){
     Group g = new Group();
-    g.setName("TESTGROUP8");
-    Moderator m = new Moderator("Moderator8");
+    g.setName("TESTGROUP10");
+    Moderator m = new Moderator("Moderator10");
     userService.addUser(m);
     List<Moderator> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User("testuser8");
+    User u = new User("testuser10");
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setUsers(users);
     userService.addUser(u);
     groupService.createGroup(g);
-    groupService.getGroupByName("TESTGROUP8");
+    groupService.getGroupByName("TESTGROUP10");
   }
 
   @Test

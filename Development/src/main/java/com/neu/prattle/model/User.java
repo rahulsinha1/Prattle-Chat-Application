@@ -10,22 +10,61 @@ import java.util.Objects;
  */
 public class User {
 
-	public String getName() {
-		return name;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	private String name;
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public String getPassword() { return password; }
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+	private String username;
+	private String firstName;
+	private String lastName;
+	private String password;
+	private String timezone;
 
 	public User() {
 
 	}
 
-    public User(String name) {
-        this.name = name;
+    public User(String username) {
+        this.username = username;
+    }
+
+    public User(String firstName, String lastName, String username, String password, String timezone) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.timezone = timezone;
     }
 
     /***
@@ -40,7 +79,7 @@ public class User {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(username);
     }
 
     /***
@@ -57,6 +96,6 @@ public class User {
             return false;
 
         User user = (User) obj;
-        return user.name.equals(this.name);
+        return user.username.equals(this.username);
     }
 }

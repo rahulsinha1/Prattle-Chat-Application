@@ -23,8 +23,8 @@ import javax.ws.rs.core.Response;
 @Path(value = "/user")
 public class UserController {
 
-    // Usually Dependency injection will be used to inject the service at run-time
-    private UserService accountService = UserServiceImpl.getInstance();
+  // Usually Dependency injection will be used to inject the service at run-time
+  private UserService accountService = UserServiceImpl.getInstance();
 
     /***
      * Handles a HTTP POST request for user creation
@@ -43,5 +43,5 @@ public class UserController {
         }
 
         return Response.ok().build();
-    }
+  }
 }

@@ -1,5 +1,7 @@
 package com.neu.prattle.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /***
@@ -10,9 +12,19 @@ import java.util.Objects;
  */
 public class User {
 
-	public String getUsername() {
-		return username;
-	}
+    private List<String> groupParticipant;
+
+  public List getGroupParticipant() {
+    return groupParticipant;
+  }
+
+  public void setGroupParticipant(List<String> groupParticipant) {
+    this.groupParticipant.addAll(groupParticipant);
+  }
+
+    public String getUsername() {
+        return username;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -52,12 +64,8 @@ public class User {
 	private String timezone;
 
 	public User() {
-
-	}
-
-    public User(String username) {
-        this.username = username;
-    }
+    groupParticipant = new ArrayList();
+  }
 
     public User(String firstName, String lastName, String username, String password, String timezone) {
         this.firstName = firstName;
@@ -65,6 +73,11 @@ public class User {
         this.username = username;
         this.password = password;
         this.timezone = timezone;
+    }
+
+    public User(String name) {
+        this.username = username;
+      groupParticipant = new ArrayList();
     }
 
     /***

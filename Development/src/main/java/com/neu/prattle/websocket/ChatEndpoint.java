@@ -9,9 +9,12 @@ package com.neu.prattle.websocket;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
@@ -34,6 +37,8 @@ import com.neu.prattle.service.UserServiceImpl;
  */
 @ServerEndpoint(value = "/chat/{username}", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class ChatEndpoint {
+
+  private static final Logger logger = Logger.getLogger(ChatEndpoint.class.getName());
     
     /** The account service. */
     private UserService accountService = UserServiceImpl.getInstance();
@@ -117,9 +122,35 @@ public class ChatEndpoint {
      * @param message the text of the inbound message
      */
     @OnMessage
-    public void onMessage(Session session, Message message) {
-        message.setFrom(users.get(session.getId()));
+    public void onMessage(Session session, Message message) throws IOException, EncodeException {
+      String messageContent = message.getContent();
+      String[] splitMessage = messageContent.split(":");
+      String username = "";
+      String content;
+      if(messageContent.contains(":")) {
+        username = splitMessage[0];
+        content = splitMessage[1];
+        Optional<User> user = accountService.findUserByName(username);
+        if (!user.isPresent()) {
+          Message error = Message.messageBuilder()
+                  .setMessageContent(String.format("User %s could not be found", username))
+                  .build();
+
+          session.getBasicRemote().sendObject(error);
+          return;
+        }
+        message.setTo(username);
+      } else {
+        content = splitMessage[0];
+      }
+      message.setContent(content);
+      message.setFrom(users.get(session.getId()));
+
+      if(username.equals("")) {
         broadcast(message);
+      } else {
+        sendOneMessage(message);
+      }
     }
 
     /**
@@ -172,10 +203,38 @@ public class ChatEndpoint {
                 	/* note: in production, who exactly is looking at the console.  This exception's
                 	 *       output should be moved to a logger.
                 	 */
-                    e.printStackTrace();
+                  logger.log(Level.SEVERE,e.getMessage());
                 }
             }
         });
+    }
+
+    private static void sendOneMessage(Message message) {
+      chatEndpoints.forEach(endpoint -> {
+        synchronized (endpoint) {
+          try {
+            if(endpoint.session.getId().equals(getSessionForUser(message.getTo())) ||
+                    endpoint.session.getId().equals(getSessionForUser(message.getFrom()))) {
+              endpoint.session.getBasicRemote()
+                      .sendObject(message);
+            }
+          } catch (IOException | EncodeException e) {
+            /* note: in production, who exactly is looking at the console.  This exception's
+             *       output should be moved to a logger.
+             */
+            logger.log(Level.SEVERE,e.getMessage());
+          }
+        }
+      });
+    }
+
+    private static String getSessionForUser(String username) {
+      for(Map.Entry<String, String> e: users.entrySet()) {
+        if(e.getValue().equals(username)) {
+          return e.getKey();
+        }
+      }
+      return "no session for user";
     }
 }
 

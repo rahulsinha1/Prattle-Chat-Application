@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
   /***
      *
-     * @param name -> The name of the user.
+     * @param username -> The name of the user.
      * @return An optional wrapper supplying the user.
      */
     @Override

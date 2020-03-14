@@ -6,7 +6,9 @@ function connect() {
     var username = document.getElementById("username").value;
 
     var host = document.location.host;
-    // var pathname = document.location.pathname;
+    var pathname = document.location.pathname;
+
+    console.log(pathname)
 
     ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
 

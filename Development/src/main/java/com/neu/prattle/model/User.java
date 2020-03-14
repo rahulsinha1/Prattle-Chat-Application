@@ -75,7 +75,7 @@ public class User {
         this.timezone = timezone;
     }
 
-    public User(String name) {
+    public User(String username) {
         this.username = username;
       groupParticipant = new ArrayList();
     }

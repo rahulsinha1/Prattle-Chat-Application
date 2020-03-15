@@ -102,7 +102,8 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<configuration>
+                        <version>0.8.4</version>
+                        <configuration>
 							<append>true</append>
 						</configuration>
 						<executions>
@@ -149,17 +150,5 @@
 				</plugins>
 			</build>
 		</profile>
-        <profile>
-            <id>sonar</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <sonar.host.url>https://5500sonar-2.khourycloud.com/</sonar.host.url>
-                <sonar.organization>default-organization</sonar.organization>
-                <sonar.login>36dd614be62056cdf5368cb92b0cf651b66594ad</sonar.login>
-            </properties>
-        </profile>
-
 	</profiles>
 </project>

@@ -139,16 +139,26 @@
 				</pluginManagement>
 				<plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.21.0</version>
+                        <configuration>
+                            <testFailureIgnore>true</testFailureIgnore>
+                            <skip>false</skip>
+                            <reuseForks>false</reuseForks>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+                            <argLine>-Dfile.encoding=UTF-8</argLine>
+                            <useSystemClassLoader>false</useSystemClassLoader>
+                            <includes>
+                                <!--Test* classes for the app testing -->
+                                <include>**/directory/Test*.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>sonar-maven-plugin</artifactId>
                         <version>3.0.2</version>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
-                        </configuration>
                     </plugin>
 					<plugin>
 						<groupId>org.jacoco</groupId>

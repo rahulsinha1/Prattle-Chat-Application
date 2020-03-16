@@ -85,6 +85,12 @@ public class Group {
     this.name = name;
   }
 
+  public Group(String name,List<User> users,List<Moderator> moderators){
+    this.name = name;
+    this.users = users;
+    this.moderators = moderators;
+  }
+
   /***
    * Returns the hashCode of this object.
    *

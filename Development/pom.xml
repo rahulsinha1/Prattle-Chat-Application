@@ -89,12 +89,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>3.2.3.RELEASE</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.5.3</version>
@@ -110,11 +104,6 @@
 			<version>3.0.16.Final</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>2.2.4.RELEASE</version>
-		</dependency>
-		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.45</version>
@@ -124,12 +113,6 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.45</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<version>2.2.4.RELEASE</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<properties>
@@ -189,6 +172,7 @@
 									<!--
                                      Sets the output directory for the code coverage report.
                                     -->
+
 									<outputDirectory>target/jacoco-ut</outputDirectory>
 								</configuration>
 							</execution>

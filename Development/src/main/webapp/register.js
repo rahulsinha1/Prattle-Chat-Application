@@ -8,8 +8,8 @@
  * @returns {boolean} true if fields are not empty.
  */
 function fieldsNotEmpty(first_name, last_name, username, confirm_password, password) {
-    return first_name.length !== 0 || last_name.length !== 0 || username.length !== 0 ||
-        confirm_password.length !== 0 || password.length !== 0;
+    return first_name == null || last_name  == null || username  == null||
+        confirm_password  == null || password  == null;
 }
 
 /**

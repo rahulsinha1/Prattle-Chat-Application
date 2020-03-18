@@ -1,6 +1,6 @@
 package com.neu.prattle.service;
 
-import com.neu.prattle.exceptions.UserDoesNotExist;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
@@ -143,13 +143,13 @@ public class GroupServiceImpl implements GroupService {
   }
 
   private void checkUserAndAddToGroup(Group group, User user) {
-    if (userService.findUserByName(user.getName()).isPresent()) {
+    if (userService.findUserByName(user.getUsername()).isPresent()) {
       List groupParticipant = user.getGroupParticipant();
       groupParticipant.add(group.getName());
-      User currentUser = userService.findUserByUsername(user.getName());
+      User currentUser = userService.findUserByUsername(user.getUsername());
       currentUser.setGroupParticipant(user.getGroupParticipant());
     } else {
-      throw new UserDoesNotExist("User " + user.getName() + " does not exist in system.");
+      throw new UserDoesNotExistException(String.format("User %s does not exist in system.", user.getUsername()));
     }
   }
 }

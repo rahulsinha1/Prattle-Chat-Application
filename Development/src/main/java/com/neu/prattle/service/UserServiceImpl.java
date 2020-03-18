@@ -45,31 +45,30 @@ public class UserServiceImpl implements UserService {
   }
 
   /***
-   *
-   * @param name -> The name of the user.
-   * @return An optional wrapper supplying the user.
-   */
-  @Override
-  public Optional<User> findUserByName(String name) {
-    final User user = new User(name);
-    if (userSet.contains(user))
-      return Optional.of(user);
-    else
-      return Optional.empty();
-  }
+     *
+     * @param username -> The name of the user.
+     * @return An optional wrapper supplying the user.
+     */
+    @Override
+    public Optional<User> findUserByName(String username) {
+        final User user = new User(username);
+        if (userSet.contains(user))
+            return Optional.of(user);
+        else
+            return Optional.empty();
+    }
 
-  @Override
-  public synchronized void addUser(User user) {
-    if (userSet.contains(user))
-      throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getName()));
-
+    @Override
+    public synchronized void addUser(User user) {
+        if (userSet.contains(user))
+            throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
     userSet.add(user);
   }
 
   @Override
   public User findUserByUsername(String name) {
     for (User user : userSet) {
-      if (user.getName().equals(name)) {
+      if (user.getUsername().equals(name)) {
         return user;
       }
     }
@@ -79,7 +78,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public List findGroupsByName(String name) {
     for (User user : userSet) {
-      if (user.getName().equals(name)) {
+      if (user.getUsername().equals(name)) {
         return user.getGroupParticipant();
       }
     }

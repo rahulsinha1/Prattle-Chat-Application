@@ -1,6 +1,6 @@
 var ws;
 
-document.getElementById("welcoming").innerText = "Welcome";
+document.getElementById("welcoming").innerText = "Welcome " + localStorage.getItem('username');
 
 function connect() {
     var username = document.getElementById("username").value;
@@ -13,7 +13,7 @@ function connect() {
     ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
 
     ws.onmessage = function(event) {
-    var log = document.getElementById("log");
+        var log = document.getElementById("log");
         console.log(event.data);
         var message = JSON.parse(event.data);
         //TODO: Issue with textbox.
@@ -29,3 +29,10 @@ function send() {
 
     ws.send(json);
 }
+
+function logout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+}
+
+

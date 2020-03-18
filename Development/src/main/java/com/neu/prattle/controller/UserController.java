@@ -5,11 +5,12 @@ import com.neu.prattle.model.User;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  * A Resource class responsible for handling CRUD operations
@@ -42,4 +43,26 @@ public class UserController {
 
         return Response.ok().build();
   }
+
+    /**
+     * Handles a HTTP GET request for user information.
+     *
+     * @param username -> The User's username.
+     * @return -> A Response indicating the user's information.
+     */
+    @GET
+    @Path("/getUser/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getUser(@PathParam("username") String username) {
+
+        accountService.findUserByUsername(username);
+
+        List<Response> responses = new ArrayList<>();
+        GenericEntity<List> list = new GenericEntity<List>(responses) {
+        };
+
+        list.getEntity().add(accountService.findUserByUsername(username));
+        return Response.status(200).entity(list).build();
+    }
 }

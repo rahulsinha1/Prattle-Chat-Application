@@ -24,29 +24,29 @@ public class UserServiceImplTest {
 	private UserService as;
 	private static final String MIKE4 = "Mike4";
 	private static final String MIKE1 = "Mike1";
-	
+
 	@Before
 	public void setUp() {
 		as = UserServiceImpl.getInstance();
 	}
-	
-	
-	// This method just tries to add 
+
+
+	// This method just tries to add
 	@Test
 	public void setUserTest(){
 		setMocksForUserService("Mike5");
 	}
-	
-	// This method just tries to add 
+
+	// This method just tries to add
 	@Test
 	public void getUserTest(){
 		Optional<User> user = as.findUserByName(MIKE1);
 		assertTrue(user.isPresent());
 	}
-	
-	// Performance testing to benchmark our number of users that can be added 
-	// in 1 sec	
-	
+
+	// Performance testing to benchmark our number of users that can be added
+	// in 1 sec
+
 	@Test(timeout = 1000)
 	public void checkPrefTest(){
 		for(int i=1000; i < 2000; i++) {
@@ -58,7 +58,7 @@ public class UserServiceImplTest {
 	public void testFindUserByUsername() {
 		setMocksForUserService(MIKE4);
 		User user = as.findUserByUsername(MIKE4);
-		assertEquals(MIKE4,user.getName());
+		assertEquals(MIKE4,user.getUsername());
 	}
 
 	@Test
@@ -73,10 +73,10 @@ public class UserServiceImplTest {
 		setMocksForUserService(MIKE1);
 		Optional<User> user = as.findUserByName(MIKE1);
 		if(user.isPresent()){
-			user.get().setName("Mikeupdate");
+			user.get().setUsername("Mikeupdate");
 			as.updateUser(user.get());
 		}
-		user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getName()));
+		user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getUsername()));
 	}
 
 	@Test
@@ -102,6 +102,7 @@ public class UserServiceImplTest {
 		List g = as.findGroupsByName("Test93");
 		assertEquals(0,g.size());
 	}
+
 
 	private void setMocksForUserService(String name){
 		List<String> groups = new ArrayList<>();

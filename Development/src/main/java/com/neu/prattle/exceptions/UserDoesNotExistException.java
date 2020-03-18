@@ -8,8 +8,9 @@ package com.neu.prattle.exceptions;
  *
  */
 
-public class UserDoesNotExist extends RuntimeException {
-  public UserDoesNotExist(String message) {
+public class UserDoesNotExistException extends RuntimeException {
+
+  public UserDoesNotExistException(String message) {
     super(message);
   }
 }

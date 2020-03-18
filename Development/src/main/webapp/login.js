@@ -1,33 +1,32 @@
 function fieldsNotEmpty(username, password) {
-    return username  == null || password  == null;
+    return username.trim() !== "" || password.trim()  !== "";
 }
 
 function login(){
     var username = document.loginForm.username.value;
     var password = document.loginForm.password.value;
+    console.log(username)
 
     let displayMessage = document.getElementById("message");
 
-    if(fieldsNotEmpty){
-        // Grab username and password from the database and do a check.
-        // if(localStorage.getItem('username') === username &&
-        //     localStorage.getItem('password') === password){
-        if(true){
-            /**
-             * Cookies:
-             * Expires
-             * Domain
-             * Path
-             * Secure
-             * Name = Value
-             */
-            Cookies.set("username", username);
-            Cookies.set("password", password);
+    console.log(fieldsNotEmpty(username,password))
+    if(fieldsNotEmpty(username,password)){
 
-            window.location.href = "chat_room.html";
-        } else {
-            displayMessage.innerText = "Incorrect credential.";
-        }
+        fetch('http://localhost:8080/prattle/rest/user/getUser/'+ username)
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                if(data[0].password === password){
+                    localStorage.setItem("username", username)
+                    window.location.href = "index.html";
+                } else {
+                    throw new Error();
+                }
+            })
+            .catch((error)=> {
+                console.log("Invalid credential.")
+            })
     } else {
         displayMessage.innerText = "Field(s) must not be empty.";
     }

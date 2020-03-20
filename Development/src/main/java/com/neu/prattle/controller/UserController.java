@@ -1,18 +1,16 @@
 package com.neu.prattle.controller;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ws.rs.POST;
 import javax.ws.rs.GET;
 import javax.ws.rs.Consumes;
@@ -58,16 +56,18 @@ public class UserController {
     @GET
     @Path("/getUser/{username}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("username") String username) {
+        User user;
+        try{
+            user = accountService.findUserByUsername(username);
 
-        accountService.findUserByUsername(username);
+            if(user == null){
+                throw new UserDoesNotExistException("User does not exist.");
+            }
+        }catch (UserDoesNotExistException e ){
+            return Response.status(409).build();
+        }
 
-        List<Response> responses = new ArrayList<>();
-        GenericEntity<List> list = new GenericEntity<List>(responses) {
-        };
-
-        list.getEntity().add(accountService.findUserByUsername(username));
-        return Response.status(200).entity(list).build();
+        return Response.ok().entity(user).build();
     }
 }

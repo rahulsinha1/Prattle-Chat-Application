@@ -16,7 +16,6 @@ function connect() {
         var log = document.getElementById("log");
         console.log(event.data);
         var message = JSON.parse(event.data);
-        //TODO: Issue with textbox.
         log.innerHTML += message.from + " : " + message.content + "\n";
     };
 }

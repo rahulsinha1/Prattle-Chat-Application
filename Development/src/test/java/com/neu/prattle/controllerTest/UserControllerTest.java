@@ -5,7 +5,6 @@ import com.neu.prattle.model.User;
 
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
-import net.sf.json.JSON;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +12,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 
 import javax.ws.rs.core.Response;
-
-import java.util.ArrayList;
-
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)

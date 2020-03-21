@@ -5,19 +5,16 @@ function fieldsNotEmpty(username, password) {
 function login(){
     var username = document.loginForm.username.value;
     var password = document.loginForm.password.value;
-    console.log(username)
 
     let displayMessage = document.getElementById("message");
 
-    console.log(fieldsNotEmpty(username,password))
     if(fieldsNotEmpty(username,password)){
-
         fetch('http://localhost:8080/prattle/rest/user/getUser/'+ username)
             .then((response) => {
                 return response.json();
             })
             .then((data) => {
-                if(data[0].password === password){
+                if(data.password === password){
                     localStorage.setItem("username", username)
                     window.location.href = "index.html";
                 } else {
@@ -25,7 +22,8 @@ function login(){
                 }
             })
             .catch((error)=> {
-                console.log("Invalid credential.")
+                console.log(error)
+                displayMessage.innerText = "Invalid credential.";
             })
     } else {
         displayMessage.innerText = "Field(s) must not be empty.";

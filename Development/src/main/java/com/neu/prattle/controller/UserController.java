@@ -56,6 +56,7 @@ public class UserController {
     @GET
     @Path("/getUser/{username}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("username") String username) {
         User user;
         try{

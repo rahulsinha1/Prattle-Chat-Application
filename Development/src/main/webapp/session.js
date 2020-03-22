@@ -1,3 +1,3 @@
 if(localStorage.getItem('username') === null){
-    window.location.href = 'login.html';
+    window.location.href = '404.html';
 }

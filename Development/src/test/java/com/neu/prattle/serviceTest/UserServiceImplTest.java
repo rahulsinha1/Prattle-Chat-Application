@@ -97,6 +97,13 @@ public class UserServiceImplTest {
 		as.addUser(new User("Test1"));
 	}
 
+    @Test(expected = UserAlreadyPresentException.class)
+    public void testUserAlreadyExistTwo() {
+        as.addUser(new User("Test", "Test","Test", "Test","Test"));
+        as.addUser(new User("Test", "Test","Test", "Test","Test"));
+        assertFalse(false);
+    }
+
 	@Test
 	public void testEmptyGroup() {
 		List g = as.findGroupsByName("Test93");

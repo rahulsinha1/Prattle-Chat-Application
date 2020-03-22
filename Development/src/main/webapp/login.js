@@ -22,7 +22,6 @@ function login(){
                 }
             })
             .catch((error)=> {
-                console.log(error)
                 displayMessage.innerText = "Invalid credential.";
             })
     } else {

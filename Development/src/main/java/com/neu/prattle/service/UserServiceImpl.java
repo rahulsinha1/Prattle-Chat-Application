@@ -60,12 +60,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public synchronized void addUser(User user) {
-        if (userSet.contains(user))
-            throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
-    userSet.add(user);
+        for(User userInSet : userSet){
+            if(userInSet.getUsername().equals(user.getUsername())){
+                throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
+            }
+        }
+        userSet.add(user);
   }
 
-  @Override
+    /**
+     * Validates field.
+     * @param user
+     */
+    private void validateFields(User user) {
+        if(user.getFirstName().isEmpty() || user.getLastName().isEmpty() || user.getPassword().isEmpty()
+            || user.getTimezone().isEmpty() || user.getUsername().isEmpty()){
+            throw new IllegalArgumentException("Field cannot be empty.");
+        }
+    }
+
+    @Override
   public User findUserByUsername(String name) {
     for (User user : userSet) {
       if (user.getUsername().equals(name)) {

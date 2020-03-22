@@ -12,16 +12,6 @@ import java.util.Objects;
  */
 public class User {
 
-    private List<String> groupParticipant;
-
-  public List getGroupParticipant() {
-    return groupParticipant;
-  }
-
-  public void setGroupParticipant(List<String> groupParticipant) {
-    this.groupParticipant.addAll(groupParticipant);
-  }
-
     public String getUsername() {
         return username;
     }
@@ -40,6 +30,14 @@ public class User {
 
     public String getPassword() { return password; }
 
+    public List getGroupParticipant() {
+        return groupParticipant;
+    }
+
+    public List getFollowers() {
+        return followers;
+    }
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -55,6 +53,12 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+    public void setGroupParticipant(List<String> groupParticipant) {
+        this.groupParticipant.addAll(groupParticipant);
+    }
+    public void setFollowers(List<String> followers) {
+        this.followers.addAll(followers);
+    }
 
 
 	private String username;
@@ -62,9 +66,12 @@ public class User {
 	private String lastName;
 	private String password;
 	private String timezone;
+	private List<String> groupParticipant;
+	private List<String> followers;
 
 	public User() {
-    groupParticipant = new ArrayList();
+	    groupParticipant = new ArrayList();
+	    followers = new ArrayList<>();
   }
 
     public User(String firstName, String lastName, String username, String password, String timezone) {
@@ -73,11 +80,14 @@ public class User {
         this.username = username;
         this.password = password;
         this.timezone = timezone;
+        groupParticipant = new ArrayList();
+        followers = new ArrayList<>();
     }
 
     public User(String username) {
         this.username = username;
-      groupParticipant = new ArrayList();
+        groupParticipant = new ArrayList();
+        followers = new ArrayList<>();
     }
 
     /***

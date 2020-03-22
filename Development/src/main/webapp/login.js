@@ -1,10 +1,10 @@
 function fieldsNotEmpty(username, password) {
-    return username.trim() !== "" || password.trim()  !== "";
+    return username.trim() !== "" && password.trim()  !== "";
 }
 
 function login(){
-    var username = document.loginForm.username.value;
-    var password = document.loginForm.password.value;
+    let username = document.loginForm.username.value;
+    let password = document.loginForm.password.value;
 
     let displayMessage = document.getElementById("message");
 

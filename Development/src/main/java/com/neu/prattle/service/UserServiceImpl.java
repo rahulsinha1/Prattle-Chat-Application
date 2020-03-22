@@ -68,17 +68,6 @@ public class UserServiceImpl implements UserService {
         userSet.add(user);
   }
 
-    /**
-     * Validates field.
-     * @param user
-     */
-    private void validateFields(User user) {
-        if(user.getFirstName().isEmpty() || user.getLastName().isEmpty() || user.getPassword().isEmpty()
-            || user.getTimezone().isEmpty() || user.getUsername().isEmpty()){
-            throw new IllegalArgumentException("Field cannot be empty.");
-        }
-    }
-
     @Override
   public User findUserByUsername(String name) {
     for (User user : userSet) {

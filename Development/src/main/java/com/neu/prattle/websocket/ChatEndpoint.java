@@ -8,10 +8,14 @@ package com.neu.prattle.websocket;
  */
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -139,10 +143,13 @@ public class ChatEndpoint {
           session.getBasicRemote().sendObject(error);
           return;
         }
+
+
         message.setTo(username);
       } else {
         content = splitMessage[0];
       }
+
       message.setContent(content);
       message.setFrom(users.get(session.getId()));
 

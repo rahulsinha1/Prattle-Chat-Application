@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
 /***
  * Implementation of {@link UserService}
  *
@@ -21,6 +27,8 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
   private static UserService accountService;
+  private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
+          .createEntityManagerFactory("fse");
 
   static {
     accountService = new UserServiceImpl();
@@ -51,28 +59,48 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Optional<User> findUserByName(String username) {
+
+      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+      EntityTransaction transaction = null;
+
+      final User user = manager.find(User.class,username);
+      if (user!=null)
+        return Optional.of(user);
+      else
+        return Optional.empty();
+
+
+      /**
         final User user = new User(username);
         if (userSet.contains(user))
             return Optional.of(user);
         else
             return Optional.empty();
+       **/
     }
 
     @Override
     public synchronized void addUser(User user) {
-        if (userSet.contains(user))
-            throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
-    userSet.add(user);
+        create(user);
   }
 
   @Override
   public User findUserByUsername(String name) {
+      /**
     for (User user : userSet) {
       if (user.getUsername().equals(name)) {
         return user;
       }
     }
     return null;
+       **/
+
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    final User user = manager.find(User.class,name);
+    if (user!=null)
+      return user;
+    else
+      return null;
   }
 
   @Override
@@ -88,5 +116,26 @@ public class UserServiceImpl implements UserService {
   @Override
   public void updateUser(User user) {
     userSet.add(user);
+  }
+
+  private void create(User user) {
+
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+
+    User exists = manager.find(User.class,user.getUsername());
+    if(exists!=null)
+    {
+      throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
+    }
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+
+
+    manager.persist(user);
+
+    transaction.commit();
+    manager.close();
   }
 }

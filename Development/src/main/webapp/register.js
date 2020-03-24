@@ -28,7 +28,6 @@ function register(){
 
     displayMessage.innerText = "";
 
-    if(fieldsNotEmpty(first_name, last_name, username, confirm_password, password)){
         if(password === confirm_password){
 
             const user_data = {
@@ -57,7 +56,5 @@ function register(){
         } else {
             displayMessage.innerText = "Password and Confirm Password are not the same.";
         }
-    } else {
-        displayMessage.innerText = "Field(s) cannot be empty.";
-    }
+
 }

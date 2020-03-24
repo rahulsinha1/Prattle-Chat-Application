@@ -20,12 +20,23 @@ public class Message {
      */
     private String content;
 
+  public String getTime() {
+    return time;
+  }
+
+  public void setTime(String time) {
+    this.time = time;
+  }
+
+  private String time;
+
     @Override
     public String toString() {
         return new StringBuilder()
                 .append("From: ").append(from)
                 .append("To: ").append(to)
                 .append("Content: ").append(content)
+                .append("Time: ").append(time)
                 .toString();
     }
 
@@ -85,6 +96,11 @@ public class Message {
             message.setContent(content);
             return this;
         }
+
+      public MessageBuilder setTime(String time)   {
+        message.setContent(time);
+        return this;
+      }
 
         public Message build()  {
             return message;

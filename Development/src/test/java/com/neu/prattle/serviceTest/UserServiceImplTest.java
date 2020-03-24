@@ -40,7 +40,7 @@ public class UserServiceImplTest {
 	// This method just tries to add
 	@Test
 	public void getUserTest(){
-		Optional<User> user = as.findUserByName(MIKE1);
+		Optional<User> user = as.findUserByName("abcd");
 		assertTrue(user.isPresent());
 	}
 
@@ -105,10 +105,10 @@ public class UserServiceImplTest {
 
 
 	private void setMocksForUserService(String name){
-		List<String> groups = new ArrayList<>();
+		List<Group> groups = new ArrayList<>();
 		Group g = new Group();
 		g.setName("test");
-		groups.add(g.getName());
+		groups.add(g);
 		User u = new User(name);
 		u.setGroupParticipant(groups);
 		as.addUser(u);

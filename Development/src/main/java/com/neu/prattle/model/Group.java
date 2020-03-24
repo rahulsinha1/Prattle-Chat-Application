@@ -4,19 +4,40 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
 
 /***
  * A Group object represents a basic group information.
  *
  */
+@Entity
+@Table(name = "groups")
 public class Group {
 
-  private String name;
-  private List<Moderator> moderators;
-  private List<User> users = new LinkedList<>();
-  private boolean isPrivate;
-  private String description;
+  @Id
+  @Column(name = "username", unique = true)
   private String id;
+  @Column(name = "name", unique = false)
+  private String name;
+  @ManyToMany
+  @JoinTable( name = "group_mods",
+          joinColumns = @JoinColumn(name = "id"),
+          inverseJoinColumns = @JoinColumn(name = "username"))
+  private List<Moderator> moderators;
+  @ManyToMany
+  private List<User> users = new LinkedList<>();
+  @Column(name = "isprivate", unique = false)
+  private boolean isPrivate;
+  @Column(name = "description", unique = false)
+  private String description;
+  @Column(name = "created_on", unique = false)
   private String createdOn;
 
   public void setModerators(List<Moderator> moderators) {

@@ -1,5 +1,11 @@
 package com.neu.prattle.model;
 
+import com.neu.prattle.service.UserService;
+import com.neu.prattle.service.UserServiceImpl;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -11,32 +17,36 @@ import java.util.Objects;
  */
 public class Group {
 
+    private UserService userService;
   private String name;
   private List<Moderator> moderators;
-  private List<User> users = new LinkedList<>();
-  private boolean isPrivate;
+  private List<User> members = new LinkedList<>();
+  private Boolean isGroupPrivate;
+  private String password;
   private String description;
-  private String id;
+  private int id = 0;
   private String createdOn;
+  private String createdBy;
 
   public void setModerators(List<Moderator> moderators) {
     this.moderators = moderators;
   }
 
-  public void setUsers(List<User> users) {
-    for(User user : users)
-      this.users.add(user);
+  public void setCreatedBy(String username){this.createdBy = username;}
+
+  public void setMembers(List<User> members) {
+      this.members.addAll(members);
   }
 
-  public void setPrivate(boolean aPrivate) {
-    isPrivate = aPrivate;
+  public void setIsGroupPrivate(Boolean isPrivate) {
+    this.isGroupPrivate = isPrivate;
   }
 
   public void setDescription(String description) {
     this.description = description;
   }
 
-  public void setId(String id) {
+  public void setId(int id) {
     this.id = id;
   }
 
@@ -44,23 +54,36 @@ public class Group {
     this.createdOn = createdOn;
   }
 
+    public void setPassword(String password){
+        this.password = password;
+    }
+
   public List<Moderator> getModerators() {
     return moderators;
   }
 
-  public List<User> getUsers() {
-    return users;
+
+  public String getCreatedBy(){ return this.createdBy;}
+
+  public List<User> getMembers() {
+    return members;
   }
 
-  public boolean isPrivate() {
-    return isPrivate;
+  public boolean getIsGroupPrivate() {
+    return isGroupPrivate;
   }
+
+
+  public String getPassword(){
+      return this.password;
+  }
+
 
   public String getDescription() {
     return description;
   }
 
-  public String getId() {
+  public int getId() {
     return id;
   }
 
@@ -78,20 +101,43 @@ public class Group {
 
 
   public Group() {
-
   }
 
-  public Group(String name) {
-    this.name = name;
+  public Group(String groupName) {
+    this.name = groupName;
   }
 
-  public Group(String name,List<User> users,List<Moderator> moderators){
-    this.name = name;
-    this.users = users;
-    this.moderators = moderators;
+  public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
+      userService = UserServiceImpl.getInstance();
+      String strDate = setTimestamp();
+
+      this.name = groupName;
+      this.description = description;
+      this.isGroupPrivate = isGroupPrivate;
+      this.password = password;
+
+      this.createdOn = strDate;
+      this.createdBy = createdBy;
+      this.id += id;
+      this.moderators = new ArrayList<>();
+      this.members = new ArrayList<>();
+
+
+      this.moderators.add(new Moderator(createdBy));
+      this.members.add(userService.findUserByUsername(createdBy));
   }
 
-  /***
+    /**
+     * Sets the timestamped.
+     * @return the time in the format yyyy-MM-dd HH:mm:ss
+     */
+    private String setTimestamp() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date now = new Date();
+        return sdfDate.format(now);
+    }
+
+    /***
    * Returns the hashCode of this object.
    *
    * As name can be treated as a sort of identifier for

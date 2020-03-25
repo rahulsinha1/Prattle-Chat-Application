@@ -53,10 +53,10 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    public void setGroupParticipant(List<String> groupParticipant) {
+    public void setGroupParticipant(List<Group> groupParticipant) {
         this.groupParticipant.addAll(groupParticipant);
     }
-    public void setFollowers(List<String> followers) {
+    public void setFollowers(List<User> followers) {
         this.followers.addAll(followers);
     }
 
@@ -66,8 +66,8 @@ public class User {
 	private String lastName;
 	private String password;
 	private String timezone;
-	private List<String> groupParticipant;
-	private List<String> followers;
+	private List<Group> groupParticipant;
+	private List<User> followers;
 
 	public User() {
 	    groupParticipant = new ArrayList();

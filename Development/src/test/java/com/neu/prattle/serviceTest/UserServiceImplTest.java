@@ -64,8 +64,8 @@ public class UserServiceImplTest {
 	@Test
 	public void findGroupsByName() {
 		setMocksForUserService("Mike3");
-		List<String> g = as.findGroupsByName("Mike3");
-		assertEquals("test",g.get(0));
+		List<Group> g = as.findGroupsByName("Mike3");
+		assertEquals("test",g.get(0).getName());
 	}
 
 	@Test
@@ -110,12 +110,11 @@ public class UserServiceImplTest {
 		assertEquals(0,g.size());
 	}
 
-
 	private void setMocksForUserService(String name){
-		List<String> groups = new ArrayList<>();
+		List<Group> groups = new ArrayList<>();
 		Group g = new Group();
 		g.setName("test");
-		groups.add(g.getName());
+		groups.add(g);
 		User u = new User(name);
 		u.setGroupParticipant(groups);
 		as.addUser(u);

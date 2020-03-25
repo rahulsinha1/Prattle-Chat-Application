@@ -11,7 +11,9 @@ function connect() {
 
     ws.onmessage = function(event) {
         var log = document.getElementById("log");
+        console.log(event);
         var message = JSON.parse(event.data);
+
         log.innerHTML += message.from + " : " + message.content + "\n";
     };
 }

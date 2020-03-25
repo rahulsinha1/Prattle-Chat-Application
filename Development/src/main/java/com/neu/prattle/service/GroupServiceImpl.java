@@ -1,5 +1,6 @@
 package com.neu.prattle.service;
 
+import com.neu.prattle.exceptions.GroupAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;
@@ -46,68 +47,66 @@ public class GroupServiceImpl implements GroupService {
   }
 
   @Override
-  public void createGroup(Group group) {
-    for (User user : group.getUsers()) {
-      checkUserAndAddToGroup(group, user);
-    }
-    group.setId("" + groupSet.size() + 1);
-    addModerator(group, group.getModerators().get(0));
-    Long currentTimeStamp = new Date().getTime();
-    group.setCreatedOn(currentTimeStamp.toString());
-    groupSet.add(group);
+  public void createGroup(Group group){
+      for (Group groupInSet : groupSet){
+          if(groupInSet.getName().equals(group.getName())){
+              throw new GroupAlreadyPresentException(String.format("Group already present with name: %s", group.getName()));
+          }
+      }
+      groupSet.add(group);
   }
 
   @Override
   public void addUser(Group group, User user) {
-    if (userGroupList.containsKey(group)) {
-      List<User> userList = userGroupList.get(group.getId());
-      userList.add(user);
-      userGroupList.put(group.getId(), userList);
-    } else {
-      List<User> userList = new ArrayList();
-      userList.add(user);
-      userGroupList.put(group.getId(), userList);
-    }
-    checkUserAndAddToGroup(group, user);
+//    if (userGroupList.containsKey(group)) {
+//      List<User> userList = userGroupList.get(group.getId());
+//      userList.add(user);
+//      userGroupList.put(group.getId(), userList);
+//    } else {
+//      List<User> userList = new ArrayList();
+//      userList.add(user);
+//      userGroupList.put(group.getId(), userList);
+//    }
+//    checkUserAndAddToGroup(group, user);
   }
 
 
   @Override
   public void removeUser(Group group, User user) {
-    if (userGroupList.containsKey(group)) {
-      List<User> userList = userGroupList.get(group.getId());
-      userList.remove(user);
-      userGroupList.put(group.getId(), userList);
-    }
+//    if (userGroupList.containsKey(group)) {
+//      List<User> userList = userGroupList.get(group.getId());
+//      userList.remove(user);
+//      userGroupList.put(group.getId(), userList);
+//    }
   }
 
   @Override
   public void addModerator(Group group, Moderator moderator) {
-    if (moderatorGroupList.containsKey(group)) {
-      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
-      moderatorList.add(moderator);
-      moderatorGroupList.put(group.getId(), moderatorList);
-    } else {
-      List<Moderator> moderatorList = new ArrayList();
-      moderatorList.add(moderator);
-      moderatorGroupList.put(group.getId(), moderatorList);
-    }
-    checkUserAndAddToGroup(group, moderator);
+//    if (moderatorGroupList.containsKey(group)) {
+//      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
+//      moderatorList.add(moderator);
+//      moderatorGroupList.put(group.getId(), moderatorList);
+//    } else {
+//      List<Moderator> moderatorList = new ArrayList();
+//      moderatorList.add(moderator);
+//      moderatorGroupList.put(group.getId(), moderatorList);
+//    }
+//    checkUserAndAddToGroup(group, moderator);
   }
 
   @Override
   public void removeModerator(Group group, Moderator moderator) {
-    if (moderatorGroupList.containsKey(group)) {
-      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
-      moderatorList.remove(moderator);
-      moderatorGroupList.put(group.getId(), moderatorList);
-    }
+//    if (moderatorGroupList.containsKey(group)) {
+//      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
+//      moderatorList.remove(moderator);
+//      moderatorGroupList.put(group.getId(), moderatorList);
+//    }
   }
 
   @Override
   public void updateGroup(Group group) {
     groupSet.add(group);
-    List<User> usersInGroup = group.getUsers();
+    List<User> usersInGroup = group.getMembers();
     for (User user : usersInGroup) {
       checkUserAndAddToGroup(group, user);
     }

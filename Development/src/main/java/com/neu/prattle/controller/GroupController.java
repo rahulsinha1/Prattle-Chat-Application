@@ -1,5 +1,7 @@
 package com.neu.prattle.controller;
 
+import com.neu.prattle.exceptions.GroupAlreadyPresentException;
+import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
@@ -35,9 +37,14 @@ public class GroupController {
   @POST
   @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response createGroup(Group group) {
-    groupService.createGroup(group);
-    return Response.ok().build();
+  public Response createGroup(Group group){
+      try {
+          groupService.createGroup(group);
+      } catch (GroupAlreadyPresentException e) {
+          return Response.status(409,e.getMessage()).build();
+      }
+
+      return Response.status(200,"Group Successfully Created.").build();
   }
 
   @POST

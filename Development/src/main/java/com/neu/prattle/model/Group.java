@@ -1,5 +1,6 @@
 package com.neu.prattle.model;
 
+import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
@@ -16,9 +17,7 @@ import java.util.Objects;
  *
  */
 public class Group {
-
-    private UserService userService;
-  private String name;
+    private String name;
   private List<Moderator> moderators;
   private List<User> members = new LinkedList<>();
   private Boolean isGroupPrivate;
@@ -108,8 +107,8 @@ public class Group {
   }
 
   public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
-      userService = UserServiceImpl.getInstance();
       String strDate = setTimestamp();
+
 
       this.name = groupName;
       this.description = description;
@@ -124,7 +123,6 @@ public class Group {
 
 
       this.moderators.add(new Moderator(createdBy));
-      this.members.add(userService.findUserByUsername(createdBy));
   }
 
     /**

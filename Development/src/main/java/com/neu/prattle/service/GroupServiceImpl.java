@@ -1,19 +1,13 @@
 package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.GroupAlreadyPresentException;
-import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.exceptions.GroupDoesNotExistException;
+import com.neu.prattle.exceptions.UserAlreadyPresentInGroupException;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * GroupServiceImpl implements groupservice.
@@ -26,10 +20,8 @@ public class GroupServiceImpl implements GroupService {
     groupService = new GroupServiceImpl();
   }
 
-  private UserService userService = UserServiceImpl.getInstance();
   private Set<Group> groupSet = new HashSet<>();
-  private Map<String, List<User>> userGroupList = new HashMap<>();
-  private Map<String, List<Moderator>> moderatorGroupList = new HashMap<>();
+
   /***
    * GroupServiceImpl is a Singleton class.
    */
@@ -56,76 +48,68 @@ public class GroupServiceImpl implements GroupService {
       groupSet.add(group);
   }
 
+    @Override
+    public List<Group> getAllGroups() {
+      return new ArrayList<>(groupSet);
+    }
+
+    @Override
+    public List getAllGroupsByUsername(String username) {
+        List<Group> groups = new ArrayList<>();
+
+                for(Group groupInSet : groupSet){
+                    for(Moderator moderator:groupInSet.getModerators()){
+                        if(moderator.getUsername().equals(username)){
+                            groups.add(groupInSet);
+                            return groups;
+                        }
+                    }
+                }
+        throw new GroupDoesNotExistException("User is not apart of any group.");
+    }
+
+    @Override
+    public void deleteGroup(Group group) {
+        groupSet.remove(group);
+    }
+
+
+
   @Override
   public void addUser(Group group, User user) {
-//    if (userGroupList.containsKey(group)) {
-//      List<User> userList = userGroupList.get(group.getId());
-//      userList.add(user);
-//      userGroupList.put(group.getId(), userList);
-//    } else {
-//      List<User> userList = new ArrayList();
-//      userList.add(user);
-//      userGroupList.put(group.getId(), userList);
-//    }
-//    checkUserAndAddToGroup(group, user);
+      if(group.getModerators().contains(user) || group.getMembers().contains(user)){
+          throw new UserAlreadyPresentInGroupException("User is already present in the group.");
+      } else {
+          group.getMembers().add(user);
+      }
   }
 
 
   @Override
   public void removeUser(Group group, User user) {
-//    if (userGroupList.containsKey(group)) {
-//      List<User> userList = userGroupList.get(group.getId());
-//      userList.remove(user);
-//      userGroupList.put(group.getId(), userList);
-//    }
+      group.getMembers().remove(user);
   }
 
   @Override
   public void addModerator(Group group, Moderator moderator) {
-//    if (moderatorGroupList.containsKey(group)) {
-//      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
-//      moderatorList.add(moderator);
-//      moderatorGroupList.put(group.getId(), moderatorList);
-//    } else {
-//      List<Moderator> moderatorList = new ArrayList();
-//      moderatorList.add(moderator);
-//      moderatorGroupList.put(group.getId(), moderatorList);
-//    }
-//    checkUserAndAddToGroup(group, moderator);
+        group.getModerators().add(moderator);
   }
 
   @Override
   public void removeModerator(Group group, Moderator moderator) {
-//    if (moderatorGroupList.containsKey(group)) {
-//      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
-//      moderatorList.remove(moderator);
-//      moderatorGroupList.put(group.getId(), moderatorList);
-//    }
+      group.getModerators().remove(moderator);
   }
 
   @Override
   public void updateGroup(Group group) {
-    groupSet.add(group);
-    List<User> usersInGroup = group.getMembers();
-    for (User user : usersInGroup) {
-      checkUserAndAddToGroup(group, user);
-    }
+      this.getGroupByName(group.getName()).setMembers(group.getMembers());
+      this.getGroupByName(group.getName()).setIsGroupPrivate(group.getIsGroupPrivate());
+      this.getGroupByName(group.getName()).setModerators(group.getModerators());
+      this.getGroupByName(group.getName()).setDescription(group.getDescription());
+      this.getGroupByName(group.getName()).setPassword(group.getPassword());
+
   }
 
-  @Override
-  public void deleteGroup(Group group) {
-    groupSet.remove(group);
-  }
-
-  @Override
-  public List getAllGroups() {
-    return Arrays.asList(groupSet.toArray());
-  }
-
-  @Override
-  public List getAllGroupsByUsername(String username) {
-    return userService.findGroupsByName(username);
-  }
 
   @Override
   public void notifyGroup() {
@@ -135,20 +119,12 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public Group getGroupByName(String name) {
     for (Group group : groupSet) {
-      if (group.getName().equals(name))
-        return group;
+      if (group.getName().equals(name)){
+          return group;
+      }
     }
-    return null;
+
+    throw new GroupDoesNotExistException(String.format("Group does not exist with name: %s", name));
   }
 
-  private void checkUserAndAddToGroup(Group group, User user) {
-    if (userService.findUserByName(user.getUsername()).isPresent()) {
-      List groupParticipant = user.getGroupParticipant();
-      groupParticipant.add(group.getName());
-      User currentUser = userService.findUserByUsername(user.getUsername());
-      currentUser.setGroupParticipant(user.getGroupParticipant());
-    } else {
-      throw new UserDoesNotExistException(String.format("User %s does not exist in system.", user.getUsername()));
-    }
-  }
 }

@@ -68,6 +68,16 @@ public class UserServiceImplTest {
 		assertEquals("test",g.get(0).getName());
 	}
 
+    @Test
+    public void findGroupsByNameTwo() {
+        User user = new User("testme","testme","testme","testme","GMT");
+        as.addUser(user);
+
+        Group group = new Group("test","This is a test", "testme","",false);
+        List<Group> g = as.findGroupsByName(user.getUsername());
+        assertEquals("test",g.get(0).getName());
+    }
+
 	@Test
 	public void updateUser() {
 		setMocksForUserService(MIKE1);

@@ -109,7 +109,6 @@ public class Group {
   public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
       String strDate = setTimestamp();
 
-
       this.name = groupName;
       this.description = description;
       this.isGroupPrivate = isGroupPrivate;
@@ -120,7 +119,6 @@ public class Group {
       this.id += id;
       this.moderators = new ArrayList<>();
       this.members = new ArrayList<>();
-
 
       this.moderators.add(new Moderator(createdBy));
   }

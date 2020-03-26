@@ -17,20 +17,15 @@ function viewGroup(){
     closeAllDisplay()
     viewGroup.style.display = "block";
 
-    fetch('http://localhost:8080/prattle/rest/group/getUser/'+ username)
+    fetch('http://localhost:8080/prattle/rest/group/getUser/'+ localStorage.getItem('username'))
         .then((response) => {
             return response.json();
         })
         .then((data) => {
-            if(data.password === password){
-                localStorage.setItem("username", username)
-                window.location.href = "index.html";
-            } else {
-                throw new Error();
-            }
+            console.log(data);
         })
         .catch((error)=> {
-            displayMessage.innerText = "Invalid credential.";
+            displayMessage.innerText = error;
         })
 }
 

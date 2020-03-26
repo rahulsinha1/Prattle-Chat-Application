@@ -1,6 +1,7 @@
 package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
 import java.util.Collections;
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List findGroupsByName(String name) {
+  public List<Group> findGroupsByName(String name) {
     for (User user : userSet) {
       if (user.getUsername().equals(name)) {
         return user.getGroupParticipant();

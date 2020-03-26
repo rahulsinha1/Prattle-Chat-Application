@@ -44,7 +44,7 @@ public class GroupModelTest {
     Group g = new Group ("GROUP1");
     Moderator m = new Moderator("Moderator800");
     userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
+    List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
     User u = new User("testuser800");
@@ -97,7 +97,7 @@ public class GroupModelTest {
 
     @Test
     public void testModerators(){
-        List<Moderator> moderators = new ArrayList<>();
+        List<User> moderators = new ArrayList<>();
         Moderator m = new Moderator("Moderator800");
         moderators.add(m);
         group.setModerators(moderators);

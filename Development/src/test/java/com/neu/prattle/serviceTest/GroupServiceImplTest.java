@@ -13,8 +13,10 @@ import com.neu.prattle.service.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertFalse;
 
@@ -54,21 +56,28 @@ public class GroupServiceImplTest {
   @Test
   public void testAddUserToGroup () {
     Group g = new Group();
-    User u = new User("test1");
+    g.setName(generateString());
+    User u = new User(generateString());
+    u.setFirstName(generateString());
     userService.addUser(u);
+    groupService.createGroup(g);
     groupService.addUser(g,u);
   }
 
   @Test
   public void testAddMultipleUserToGroup () {
     Group g = new Group();
-    g.setName("TESTGROUP1");
-    User u = new User("test2");
-    User u1 = new User("test3");
+    g.setName("TESTGROUP2");
+    User u = new User(generateString());
+    u.setFirstName("groupuser3");
+    User u1 = new User(generateString());
+    u1.setFirstName("groupuser4");
+
     userService.addUser(u);
     userService.addUser(u1);
-    List<Moderator> moderators = new ArrayList<>();
-    Moderator m = new Moderator("Moderator1");
+    List<User> moderators = new ArrayList<>();
+    User m = new User("Moderator149");
+    m.setFirstName("ModeratorGroup");
     moderators.add(m);
     userService.addUser(m);
     g.setModerators(moderators);
@@ -82,9 +91,9 @@ public class GroupServiceImplTest {
   public void testUpdateGroup () {
     Group g = new Group();
     g.setName("TESTGROUP4");
-    Moderator m = new Moderator("Moderator4");
+    User m = new User("Moderator4");
     userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
+    List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
     User u = new User("testuser4");
@@ -97,13 +106,15 @@ public class GroupServiceImplTest {
   }
 
   private void setMocksForGroupCreation() {
-    User u = new User(TESTUSER);
+    User u = new User(generateString());
+    u.setFirstName(generateString());
     userService.addUser(u);
-    Moderator m = new Moderator(TESTMODERATOR);
+    User m = new User(TESTMODERATOR+generateString());
+    m.setFirstName(generateString());
     userService.addUser(m);
     List<User> users = new ArrayList<>();
     users.add(u);
-    List<Moderator> moderators = new ArrayList<>();
+    List<User> moderators = new ArrayList<>();
     moderators.add(m);
     group.setMembers(users);
     group.setName(TESTGROUPNAME);
@@ -113,13 +124,13 @@ public class GroupServiceImplTest {
   @Test
   public void testDeleteGroup() {
     Group g = new Group();
-    g.setName("TESTGROUP5");
-    Moderator m = new Moderator("Moderator5");
+    g.setName(generateString());
+    User m = new User(generateString());
     userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
+    List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User("testuser5");
+    User u = new User(generateString());
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setMembers(users);
@@ -132,9 +143,9 @@ public class GroupServiceImplTest {
   public void testGetAllGroups(){
     Group g = new Group();
     g.setName("TESTGROUP6");
-    Moderator m = new Moderator("Moderator6");
+    User m = new User("Moderator6");
     userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
+    List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
     User u = new User("testuser6");
@@ -150,9 +161,9 @@ public class GroupServiceImplTest {
   public void testGetAllGroupsByUsername(){
     Group g = new Group();
     g.setName("TESTGROUP7");
-    Moderator m = new Moderator("Moderator7");
+    User m = new User("Moderator7");
     userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
+    List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
     User u = new User("testuser7");
@@ -173,9 +184,9 @@ public class GroupServiceImplTest {
   public void testGetGroupByName(){
     Group g = new Group();
     g.setName("TESTGROUP10");
-    Moderator m = new Moderator("Moderator10000000");
+    User m = new User("Moderator10000000");
     userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
+    List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
     User u = new User("testuser10000000");
@@ -190,5 +201,14 @@ public class GroupServiceImplTest {
   @Test
   public void testGetGroupByNameNull() {
     groupService.getGroupByName("TESTGROUP9");
+  }
+
+
+
+  private String generateString() {
+    byte[] array = new byte[7]; // length is bounded by 7
+    new Random().nextBytes(array);
+    String generatedString = new String(array, Charset.forName("UTF-8"));
+    return generatedString;
   }
 }

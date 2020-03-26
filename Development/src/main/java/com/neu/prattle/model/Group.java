@@ -49,6 +49,8 @@ public class Group {
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "group_id"),
           inverseJoinColumns = @JoinColumn(name = "user_id"))
+
+
   private List<User> members = new LinkedList<>();
   @Column(name = "is_private", unique = false)
   private Boolean isGroupPrivate;
@@ -149,6 +151,7 @@ public class Group {
     this.isGroupPrivate = isGroupPrivate;
     this.password = password;
 
+
     this.createdOn = strDate;
     this.createdBy = createdBy;
     this.id += id;
@@ -157,6 +160,7 @@ public class Group {
 
 
     this.moderators.add(new Moderator(createdBy));
+
   }
 
   /**

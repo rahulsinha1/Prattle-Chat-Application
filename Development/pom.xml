@@ -31,37 +31,22 @@
 		</plugins>
 	</build>
 	<dependencies>
-        <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.sii.sonar</groupId>
-            <artifactId>sonar-coverage-lcov</artifactId>
-            <version>2.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sonarsource.scanner.maven</groupId>
-            <artifactId>sonar-maven-plugin</artifactId>
-            <version>3.7.0.1746</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.sii.sonar</groupId>
-            <artifactId>sonar-report-core</artifactId>
-            <version>2.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.report</artifactId>
-            <version>0.8.5</version>
-        </dependency>
-        <dependency>
+		<dependency>
+			<groupId>fr.sii.sonar</groupId>
+			<artifactId>sonar-coverage-lcov</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sonarsource.scanner.maven</groupId>
+			<artifactId>sonar-maven-plugin</artifactId>
+			<version>3.7.0.1746</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.sii.sonar</groupId>
+			<artifactId>sonar-report-core</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>javax.websocket</groupId>
 			<artifactId>javax.websocket-api</artifactId>
 			<version>${javax.websocket-api.version}</version>
@@ -170,55 +155,50 @@
 							<artifactId>jacoco-maven-plugin</artifactId>
 							<version>0.7.8</version>
 						</plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.jacoco</groupId>
-                            <artifactId>jacoco-maven-plugin</artifactId>
-                            <configuration>
-                                <append>true</append>
-                            </configuration>
-                            <executions>
-                                <execution>
-                                    <id>prepare-agent</id>
-                                    <goals>
-                                        <goal>prepare-agent</goal>
-                                    </goals>
-                                </execution>
-                                <execution>
-                                    <id>report</id>
-                                    <phase>prepare-package</phase>
-                                    <goals>
-                                        <goal>report</goal>
-                                    </goals>
-                                </execution>
-                                <execution>
-                                    <id>post-unit-test</id>
-                                    <phase>test</phase>
-                                    <goals>
-                                        <goal>report</goal>
-                                    </goals>
-                                    <configuration>
-                                        <!--
-                                         Sets the path to the file which contains the execution data.
-                                        -->
-                                        <dataFile>target/jacoco.exec</dataFile>
-                                        <!--
-                                         Sets the output directory for the code coverage report.
-                                        -->
-
-                                        <outputDirectory>target/jacoco-ut</outputDirectory>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
 					</plugins>
 				</pluginManagement>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<append>true</append>
+						</configuration>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>report</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>post-unit-test</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<!--
+                                     Sets the path to the file which contains the execution data.
+                                    -->
+									<dataFile>target/jacoco.exec</dataFile>
+									<!--
+                                     Sets the output directory for the code coverage report.
+                                    -->
+
+									<outputDirectory>target/jacoco-ut</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
 			</build>
 		</profile>
 	</profiles>

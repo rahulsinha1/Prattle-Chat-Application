@@ -43,7 +43,6 @@ import com.neu.prattle.service.UserServiceImpl;
 public class ChatEndpoint {
 
   private static final Logger logger = Logger.getLogger(ChatEndpoint.class.getName());
-  private static final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
     
     /** The account service. */
     private UserService accountService = UserServiceImpl.getInstance();
@@ -98,20 +97,30 @@ public class ChatEndpoint {
      * @param username the username
      * @return Message
      */
-    private Message createConnectedMessage(String username) {
+    private Message createConnectedMessage(String username) throws IOException, EncodeException {
       Optional<User> user = accountService.findUserByName(username);
-      User obj =  user.get();
-      String timeFormat = "hh:mm:ss.SSS a zzzz";
-      DateFormat dateFormat = new SimpleDateFormat(timeFormat);
-      TimeZone timeZone = TimeZone.getTimeZone(obj.getTimezone());
-      Calendar cal = Calendar.getInstance(timeZone);
-      dateFormat.setTimeZone(cal.getTimeZone());
-      String currentTime = dateFormat.format(cal.getTime());
+      if(user.isPresent()) {
+        User obj =  user.get();
+        String timeFormat = "hh:mm:ss.SSS a zzzz";
+        DateFormat dateFormat = new SimpleDateFormat(timeFormat);
+        TimeZone timeZone = TimeZone.getTimeZone(obj.getTimezone());
+        Calendar cal = Calendar.getInstance(timeZone);
+        dateFormat.setTimeZone(cal.getTimeZone());
+        String currentTime = dateFormat.format(cal.getTime());
         return Message.messageBuilder()
                 .setFrom(username)
                 .setMessageContent("Connected!")
                 .setMessageTimestamp(currentTime)
                 .build();
+      }
+      else {
+        Message error = Message.messageBuilder()
+                .setMessageContent(String.format("User %s could not be found", username))
+                .build();
+
+        session.getBasicRemote().sendObject(error);
+        return error;
+      }
     }
 
     /**

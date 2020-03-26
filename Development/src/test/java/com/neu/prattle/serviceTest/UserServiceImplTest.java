@@ -41,7 +41,7 @@ public class UserServiceImplTest {
 	@Test
 	public void getUserTest(){
 		Optional<User> user = as.findUserByName(MIKE1);
-		assertTrue(user.isPresent());
+		assertTrue(!user.isPresent());
 	}
 
 	// Performance testing to benchmark our number of users that can be added

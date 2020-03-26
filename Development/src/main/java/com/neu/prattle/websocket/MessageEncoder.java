@@ -2,22 +2,16 @@ package com.neu.prattle.websocket;
 
 import com.google.gson.Gson;
 
-import javax.crypto.NoSuchPaddingException;
+import com.neu.prattle.model.Message;
+
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-
-import com.neu.prattle.model.Message;
-import org.codehaus.jackson.map.ObjectMapper;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The Class MessageEncoder.
@@ -27,10 +21,6 @@ import java.util.logging.Logger;
  */
 public class MessageEncoder implements Encoder.Text<Message> {
 
-	/** @see org.codehaus.jackson.map.ObjectMapper */
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final String KEY = "123";
     private static Gson gson = new Gson();
     
     /** The logger. */
@@ -49,13 +39,6 @@ public class MessageEncoder implements Encoder.Text<Message> {
     @Override
     public String encode(Message message) throws EncodeException {
         try {
-            String content = message.getContent();
-            byte[] keyData = (KEY).getBytes();
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyData,"Blowfish");
-            Cipher cipher = Cipher.getInstance("Blowfish");
-            cipher.init(Cipher.ENCRYPT_MODE,secretKeySpec);
-            byte[] hasil = cipher.doFinal(content.getBytes());
-            message.setContent(new String(Base64.getEncoder().encode(hasil)));
             return gson.toJson(message);
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage());

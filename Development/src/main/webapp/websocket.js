@@ -13,8 +13,12 @@ function connect() {
         var log = document.getElementById("log");
         console.log(event);
         var message = JSON.parse(event.data);
-
-        log.innerHTML += message.from + " : " + message.content + "\n";
+        var decryptedBytes = CryptoJS.AES.decrypt(message.content, "My Secret Passphrase");
+        var plaintext = decryptedBytes.toString(CryptoJS.enc.Utf8);
+        if (typeof message.timestamp !== 'undefined')
+            log.innerHTML += message.from + " : " + message.timestamp.toString().substring(0,5) + " : " + message.content + ":" + plaintext + "\n";
+        else
+            log.innerHTML += message.from + " : " + message.content + "\n";
     };
 }
 
@@ -36,6 +40,7 @@ function goOffline() {
 
 function send() {
     var content = document.getElementById("msg").value;
+    var encrypted = CryptoJS.AES.encrypt(content, "Secret Passphrase");
     var json = JSON.stringify({
         "content":content
     });

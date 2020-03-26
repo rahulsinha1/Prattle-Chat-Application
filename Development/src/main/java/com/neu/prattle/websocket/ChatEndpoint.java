@@ -8,10 +8,14 @@ package com.neu.prattle.websocket;
  */
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +43,7 @@ import com.neu.prattle.service.UserServiceImpl;
 public class ChatEndpoint {
 
   private static final Logger logger = Logger.getLogger(ChatEndpoint.class.getName());
+  private static final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
     
     /** The account service. */
     private UserService accountService = UserServiceImpl.getInstance();
@@ -94,9 +99,18 @@ public class ChatEndpoint {
      * @return Message
      */
     private Message createConnectedMessage(String username) {
+      Optional<User> user = accountService.findUserByName(username);
+      User obj =  user.get();
+      String timeFormat = "hh:mm:ss.SSS a zzzz";
+      DateFormat dateFormat = new SimpleDateFormat(timeFormat);
+      TimeZone timeZone = TimeZone.getTimeZone(obj.getTimezone());
+      Calendar cal = Calendar.getInstance(timeZone);
+      dateFormat.setTimeZone(cal.getTimeZone());
+      String currentTime = dateFormat.format(cal.getTime());
         return Message.messageBuilder()
                 .setFrom(username)
                 .setMessageContent("Connected!")
+                .setMessageTimestamp(currentTime)
                 .build();
     }
 
@@ -140,12 +154,18 @@ public class ChatEndpoint {
           return;
         }
         message.setTo(username);
+        String timeFormat = "hh:mm:ss.SSS a zzzz";
+        DateFormat dateFormat = new SimpleDateFormat(timeFormat);
+        TimeZone timeZone = TimeZone.getTimeZone(user.get().getTimezone());
+        Calendar cal = Calendar.getInstance(timeZone);
+        dateFormat.setTimeZone(cal.getTimeZone());
+        String currentTime = dateFormat.format(cal.getTime());
+        message.setTimestamp(currentTime);
       } else {
         content = splitMessage[0];
       }
       message.setContent(content);
       message.setFrom(users.get(session.getId()));
-
       if(username.equals("")) {
         broadcast(message);
       } else {

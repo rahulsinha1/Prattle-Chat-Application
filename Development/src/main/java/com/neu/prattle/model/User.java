@@ -49,11 +49,11 @@ public class User {
 
     public String getPassword() { return password; }
 
-    public List getGroupParticipant() {
+    public List<Group> getGroupParticipant() {
         return groupParticipant;
     }
 
-    public List getFollowers() {
+    public List<User> getFollowers() {
         return followers;
     }
 

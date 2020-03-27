@@ -1,3 +1,4 @@
+
 package com.neu.prattle.serviceTest;
 
 
@@ -101,7 +102,7 @@ public class UserServiceImplTest {
   /*
   Find a user which does not exist
    */
-  @Test
+  @Test(expected = UserDoesNotExistException.class)
   public void testFindUserByUsernameNotExisting() {
     User user = as.findUserByUsername("nouser");
     assertNull(user);
@@ -162,7 +163,7 @@ public class UserServiceImplTest {
     assertFalse(user.isPresent());
   }
 
-  @Test
+  @Test(expected = UserDoesNotExistException.class)
   public void testEmptyFindUserByName() {
     User user = as.findUserByUsername("Test94");
     assertNull(user);

@@ -4,18 +4,19 @@
 </head>
 <body>
 <h1 id="welcoming">Welcome </h1>
+<link rel="stylesheet" href="style.css">
 <script src="session.js"></script>
 <table>
     <tr>
         <td colspan="2">
             <input type="text" id="username" placeholder="Username"/>
-            <button type="button" onclick="connect();" >Connect</button>
         </td>
         <td colspan="2">
-            <button type="button" onclick="goOnline();" >Go Online</button>
-        </td>
-        <td colspan="2">
-            <button type="button" onclick="goOffline();" >Go Offline</button>
+            <!-- Rounded switch -->
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider round"></span>
+            </label>
         </td>
         <td colspan="2">
             <button type="button" onclick="logout();" >Logout</button>
@@ -59,4 +60,5 @@
 </body>
 <script src="websocket.js"></script>
 <script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 </html>

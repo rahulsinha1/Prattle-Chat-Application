@@ -3,10 +3,6 @@ package com.neu.prattle.modelTest;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
-import com.neu.prattle.service.GroupService;
-import com.neu.prattle.service.GroupServiceImpl;
-import com.neu.prattle.service.UserService;
-import com.neu.prattle.service.UserServiceImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,48 +14,14 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
-
 
 public class GroupModelTest {
-
-  private GroupService groupService;
-  private UserService userService;
-  private User user;
 
   private Group group;
 
   @Before
   public void setUp() {
-    groupService = GroupServiceImpl.getInstance();
-    userService = UserServiceImpl.getInstance();
-
-    user = new User("test","test","Test","Test","Test");
     group = new Group("Test","This is a test", "Test","password",true);
-  }
-
-  @Test
-  public void testGroupModel(){
-    Group g = new Group ("GROUP1");
-    Moderator m = new Moderator("Moderator800");
-    userService.addUser(m);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser800");
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setMembers(users);
-    userService.addUser(u);
-    g.setDescription("test");
-    g.setIsGroupPrivate(false);
-    Long currentTimeStamp = new Date().getTime();
-    g.setCreatedOn(currentTimeStamp.toString());
-    groupService.createGroup(g);
-    assertEquals("test",g.getDescription());
-    assertFalse(g.getIsGroupPrivate());
-    assertFalse(g.equals(new Group("GROUP2")));
   }
 
   @Test
@@ -106,19 +68,49 @@ public class GroupModelTest {
     }
 
     @Test
-    public void getCreatedBy(){
+    public void testGetCreatedBy(){
       assertEquals("Test", group.getCreatedBy());
     }
 
     @Test
-    public void setCreatedBy(){
+    public void testSetCreatedBy(){
       group.setCreatedBy("Jon");
         assertEquals("Jon", group.getCreatedBy());
     }
 
     @Test
-    public void setGroupId(){
+    public void testSetGroupId(){
         group.setId(100);
         assertEquals(100,group.getId());
+    }
+
+    @Test
+    public void testSetCreatedOn(){
+      group.setCreatedOn("Monday");
+        assertEquals("Monday",group.getCreatedOn());
+    }
+
+    @Test
+    public void testSetDescription(){
+        group.setDescription("This is Description");
+        assertEquals("This is Description",group.getDescription());
+    }
+
+    @Test
+    public void testSetIsGroupPrivate(){
+        group.setIsGroupPrivate(true);
+        assertTrue(group.getIsGroupPrivate());
+    }
+
+    @Test
+    public void testSetMembers(){
+        User user = new User("First", "Last", "firstlast",
+            "pass1234","GMT");
+      List<User> members = new ArrayList<>();
+
+      members.add(user);
+
+      group.setMembers(members);
+      assertEquals(user,group.getMembers().get(0));
     }
 }

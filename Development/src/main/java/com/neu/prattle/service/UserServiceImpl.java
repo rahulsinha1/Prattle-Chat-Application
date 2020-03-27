@@ -2,14 +2,13 @@ package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
+
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -17,6 +16,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.ws.rs.HEAD;
 
 /***
  * Implementation of {@link UserService}
@@ -36,8 +36,6 @@ public class UserServiceImpl implements UserService {
   static {
     accountService = new UserServiceImpl();
   }
-
-  private Set<User> userSet = new HashSet<>();
 
   /***
    * UserServiceImpl is a Singleton class.
@@ -65,10 +63,9 @@ public class UserServiceImpl implements UserService {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
 
-    if (isRecordExist(username) == true) {
+    if (isRecordExist(username)) {
       TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
-
 
       User user = (User) query.setParameter("name", username).getSingleResult();
       return Optional.of(user);
@@ -85,20 +82,18 @@ public class UserServiceImpl implements UserService {
   public User findUserByUsername(String name) {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
 
-    if (isRecordExist(name) == true) {
+    if (isRecordExist(name)) {
       TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
 
-
-      User user = (User) query.setParameter("name", name).getSingleResult();
-      return user;
+      return (User) query.setParameter("name", name).getSingleResult();
     } else
-      return null;
+      throw new UserDoesNotExistException("User does not exist.");
   }
 
   @Override
   public List findGroupsByName(String name) {
-    if (isRecordExist(name) == true) {
+    if (isRecordExist(name)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
@@ -113,13 +108,12 @@ public class UserServiceImpl implements UserService {
       return groupList;
     }
     return Collections.emptyList();
+
   }
 
   @Override
   public void updateUser(User user) {
-
-    if(!isRecordExist(user.getUsername()))
-    {
+    if (!isRecordExist(user.getUsername())) {
       throw new UserDoesNotExistException("User does not exist");
     }
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
@@ -143,7 +137,7 @@ public class UserServiceImpl implements UserService {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
 
-    //User exists = manager.find(User.class,user.getUsername());
+
     if (isRecordExist(user.getUsername())) {
       throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
     }
@@ -165,6 +159,6 @@ public class UserServiceImpl implements UserService {
 
 
     Long count = (Long) query.setParameter("name", username).getSingleResult();
-    return ((count.equals(0L)) ? false : true);
+    return (!count.equals(0L));
   }
 }

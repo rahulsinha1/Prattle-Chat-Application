@@ -1,9 +1,5 @@
 package com.neu.prattle.model;
 
-import com.neu.prattle.exceptions.UserDoesNotExistException;
-import com.neu.prattle.service.UserService;
-import com.neu.prattle.service.UserServiceImpl;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
@@ -22,6 +18,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.ws.rs.HEAD;
 
 
 /***
@@ -38,28 +35,34 @@ public class Group {
   @Column(name = "group_id", unique = true)
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
+
   @Column(name = "group_name", unique = true)
   private String name;
+
   @ManyToMany(cascade = {CascadeType.MERGE})
   @JoinTable( name = "group_mods",
           joinColumns = @JoinColumn(name = "group_id"),
           inverseJoinColumns = @JoinColumn(name = "moderator_id"))
   private List<User> moderators;
+
   @ManyToMany(cascade = {CascadeType.MERGE})
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "group_id"),
           inverseJoinColumns = @JoinColumn(name = "user_id"))
-
-
   private List<User> members = new LinkedList<>();
+
   @Column(name = "is_private", unique = false)
   private Boolean isGroupPrivate;
+
   @Column(name = "group_password", unique = false)
   private String password;
+
   @Column(name = "group_description", unique = false)
   private String description;
+
   @Column(name = "created_on", unique = false)
   private String createdOn;
+
   @Column(name = "created_by", unique = false)
   private String createdBy;
 
@@ -164,9 +167,7 @@ public class Group {
     this.moderators = new ArrayList<>();
     this.members = new ArrayList<>();
 
-
     this.moderators.add(new Moderator(createdBy));
-
   }
 
   /**

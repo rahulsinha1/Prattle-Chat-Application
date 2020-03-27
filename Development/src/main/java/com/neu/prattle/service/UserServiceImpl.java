@@ -16,7 +16,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import javax.ws.rs.HEAD;
 
 /***
  * Implementation of {@link UserService}

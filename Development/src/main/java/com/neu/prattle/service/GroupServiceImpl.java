@@ -1,6 +1,7 @@
 package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.GroupAlreadyPresentException;
+import com.neu.prattle.exceptions.GroupDoesNotExistException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Moderator;
@@ -69,6 +70,8 @@ public class GroupServiceImpl implements GroupService {
             .setParameter(1, user.getUser_id())
             .setParameter(2, group.getId())
             .executeUpdate();
+    transaction.commit();
+    manager.close();
   }
 
 
@@ -78,10 +81,12 @@ public class GroupServiceImpl implements GroupService {
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
-    manager.createNativeQuery("DELETE FROM group_users u WHERE u.user_id = :1 AND u.group_id = :2")
+    manager.createNativeQuery("DELETE FROM group_users WHERE user_id = ? AND group_id = ?")
             .setParameter(1, user.getUser_id())
             .setParameter(2, group.getId())
             .executeUpdate();
+    transaction.commit();
+    manager.close();
   }
 
   @Override
@@ -90,10 +95,12 @@ public class GroupServiceImpl implements GroupService {
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
-    manager.createNativeQuery("INSERT INTO group_mods (user_id, group_id) VALUES (?,?)")
+    manager.createNativeQuery("INSERT INTO group_mods (moderator_id, group_id) VALUES (?,?)")
             .setParameter(1, moderator.getUser_id())
             .setParameter(2, group.getId())
             .executeUpdate();
+    transaction.commit();
+    manager.close();
   }
 
 
@@ -103,10 +110,12 @@ public class GroupServiceImpl implements GroupService {
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
-    manager.createNativeQuery("DELETE FROM group_mods WHERE moderator_id = ? AND u.group_id = ?")
+    manager.createNativeQuery("DELETE FROM group_mods WHERE moderator_id = ? AND group_id = ?")
             .setParameter(1, moderator.getUser_id())
             .setParameter(2, group.getId())
             .executeUpdate();
+    transaction.commit();
+    manager.close();
   }
 
 
@@ -120,15 +129,30 @@ public class GroupServiceImpl implements GroupService {
     manager.createNativeQuery("DELETE FROM groups WHERE group_name =? ")
             .setParameter(1, group.getName())
             .executeUpdate();
+    transaction.commit();
+    manager.close();
   }
 
   @Override
   public void updateGroup(Group group) {
-    groupSet.add(group);
-    List<User> usersInGroup = group.getMembers();
-    for (User user : usersInGroup) {
-      checkUserAndAddToGroup(group, user);
+    if(!isRecordExist(group.getName()))
+    {
+      throw new GroupDoesNotExistException("Group does not exist");
     }
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    manager.createNativeQuery("UPDATE groups SET group_description = ?, group_password = ?, is_private = ?  WHERE group_name= ?")
+            .setParameter(1, group.getDescription())
+            .setParameter(2, group.getPassword())
+            .setParameter(3, group.getIsGroupPrivate())
+            .setParameter(4, group.getName())
+            .executeUpdate();
+
+    transaction.commit();
+    manager.close();
   }
 
   @Override
@@ -162,7 +186,7 @@ public class GroupServiceImpl implements GroupService {
       return group;
     }
     else
-      return null;
+      throw new GroupDoesNotExistException("Group does not exist");
   }
 
   private void checkUserAndAddToGroup(Group group, User user) {

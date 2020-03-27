@@ -110,7 +110,6 @@ public class UserServiceImpl implements UserService {
               .setParameter(1, user.getUser_id());
 
       List groupList = (List<Group>) query1.getResultList();
-      int b = 4;
       return groupList;
     }
     return Collections.emptyList();
@@ -119,12 +118,16 @@ public class UserServiceImpl implements UserService {
   @Override
   public void updateUser(User user) {
 
+    if(!isRecordExist(user.getUsername()))
+    {
+      throw new UserDoesNotExistException("User does not exist");
+    }
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
 
-    int query1 = manager.createNativeQuery("UPDATE users SET timezone = ?, first_name = ?, last_name = ?, user_password =? WHERE username= ?")
+    manager.createNativeQuery("UPDATE users SET timezone = ?, first_name = ?, last_name = ?, user_password =? WHERE username= ?")
             .setParameter(1, user.getTimezone())
             .setParameter(2, user.getFirstName())
             .setParameter(3, user.getLastName())
@@ -141,7 +144,7 @@ public class UserServiceImpl implements UserService {
     EntityTransaction transaction = null;
 
     //User exists = manager.find(User.class,user.getUsername());
-    if (isRecordExist(user.getUsername()) == true) {
+    if (isRecordExist(user.getUsername())) {
       throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
     }
     transaction = manager.getTransaction();

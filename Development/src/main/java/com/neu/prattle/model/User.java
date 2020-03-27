@@ -116,6 +116,10 @@ public class User {
 	public User() {
 	    groupParticipant = new ArrayList();
 	    followers = new ArrayList<>();
+    this.timezone="default";
+    this.firstName="first_name";
+    this.lastName="last_name";
+    this.password ="password";
   }
 
     public User(String firstName, String lastName, String username, String password, String timezone) {
@@ -131,6 +135,10 @@ public class User {
 
     public User(String username) {
         this.username = username;
+        this.timezone="default";
+        this.firstName="first_name";
+        this.lastName="last_name";
+        this.password ="password";
         groupParticipant = new ArrayList();
         followers = new ArrayList<>();
     }

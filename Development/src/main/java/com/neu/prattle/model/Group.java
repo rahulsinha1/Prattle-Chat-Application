@@ -136,10 +136,16 @@ public class Group {
 
 
   public Group() {
+    this.isGroupPrivate = false;
+    this.description= "Empty";
+    this.password = "";
   }
 
   public Group(String groupName) {
     this.name = groupName;
+    this.isGroupPrivate = false;
+    this.description= "Empty";
+    this.password = "";
   }
 
   public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){

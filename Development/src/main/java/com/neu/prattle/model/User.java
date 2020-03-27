@@ -126,7 +126,7 @@ public class User {
     this.timezone = "default";
     this.firstName = "first_name";
     this.lastName = "last_name";
-    this.password = "password";
+    this.password = getEncryptedPassword();
   }
 
   public User(String firstName, String lastName, String username, String password, String timezone) {
@@ -144,7 +144,7 @@ public class User {
     this.timezone = "default";
     this.firstName = "first_name";
     this.lastName = "last_name";
-    this.password = "password";
+    this.password = getEncryptedPassword();
     groupParticipant = new ArrayList();
     followers = new ArrayList<>();
   }
@@ -179,6 +179,11 @@ public class User {
 
     User user = (User) obj;
     return user.username.equals(this.username);
+  }
+
+  private String getEncryptedPassword() {
+    StringBuilder s = new StringBuilder("pass");
+    return s.reverse().toString();
   }
 
 }

@@ -1,7 +1,6 @@
 package com.neu.prattle.service;
 
 import com.neu.prattle.model.Group;
-import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
 
 import java.util.List;
@@ -35,12 +34,12 @@ public interface GroupService {
   /**
    * adds moderator to existing group
    */
-  void addModerator(Group group, Moderator moderator);
+  void addModerator(Group group, User moderator);
 
   /**
    * removes moderator from existing group
    */
-  void removeModerator(Group group, Moderator moderator);
+  void removeModerator(Group group, User moderator);
 
   /**
    * updates group information

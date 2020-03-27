@@ -36,7 +36,7 @@ public class ChatEndpointTest {
 
   private String username = "username";
 
-  private User user = new User();
+  private User user = new User("firstname","lastname","username","password","America/New_York");
 
   private ChatEndpoint chatEndpoint = new ChatEndpoint();
 
@@ -92,6 +92,7 @@ public class ChatEndpointTest {
     message.setFrom(username);
     message.setTo(username);
     message.setContent(username + ":What is the time?");
+    message.setTimestamp(username + ":1234567890");
     when(userService.findUserByName(username)).thenReturn(Optional.of(user));
     chatEndpoint.onMessage(session,message);
   }

@@ -1,7 +1,6 @@
 package com.neu.prattle.service;
 
 import com.neu.prattle.model.Group;
-import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
 
 import java.util.List;

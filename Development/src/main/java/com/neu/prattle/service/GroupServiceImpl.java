@@ -53,17 +53,12 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void addUser(Group group, User user) {
-
-//    System.out.println(user);
-//    if (group.getModerators().contains(user) || group.getMembers().contains(user)) {
-//      throw new UserAlreadyPresentInGroupException("User is already present in the group.");
-//    } else {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
       manager.createNativeQuery("INSERT INTO group_users (user_id, group_id) VALUES (?,?)")
-              .setParameter(1, user.getUser_id())
+              .setParameter(1, user.getUserId())
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
@@ -73,61 +68,45 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void removeUser(Group group, User user) {
-
-//    if (!group.getMembers().contains(user)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
-      manager.createNativeQuery("DELETE FROM group_users u WHERE u.user_id = :1 AND u.group_id = :2")
-              .setParameter(1, user.getUser_id())
+      manager.createNativeQuery("DELETE FROM group_users WHERE user_id = ? AND group_id = ?")
+              .setParameter(1, user.getUserId())
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
       manager.close();
-//    } else {
-//      throw new UserDoesNotExistException("User does not exist in the group.");
-//    }
   }
 
   @Override
   public void addModerator(Group group, User moderator) {
-
-//    if (!group.getModerators().contains(moderator)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
       manager.createNativeQuery("INSERT INTO group_mods (moderator_id, group_id) VALUES (?,?)")
-              .setParameter(1, moderator.getUser_id())
+              .setParameter(1, moderator.getUserId())
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
       manager.close();
-//    } else {
-//      throw new UserAlreadyPresentInGroupException("Moderator is already present in the group.");
-//    }
   }
 
 
   @Override
   public void removeModerator(Group group, User moderator) {
-
-//    if (group.getModerators().contains(moderator)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
-      manager.createNativeQuery("DELETE FROM group_mods WHERE moderator_id = ? AND u.group_id = ?")
-              .setParameter(1, moderator.getUser_id())
+      manager.createNativeQuery("DELETE FROM group_mods WHERE moderator_id = ? AND group_id = ?")
+              .setParameter(1, moderator.getUserId())
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
       manager.close();
-//    } else {
-//      throw new UserDoesNotExistException("Moderator does not exist.");
-//    }
-
   }
 
 
@@ -197,8 +176,9 @@ public class GroupServiceImpl implements GroupService {
       Group group = query.setParameter("name", name).getSingleResult();
       manager.close();
       return group;
-    } else
-    throw new GroupDoesNotExistException("Group does not exist");
+    } else {
+      throw new GroupDoesNotExistException("Group does not exist");
+    }
   }
 
 
@@ -229,7 +209,7 @@ public class GroupServiceImpl implements GroupService {
             "SELECT count(g) FROM Group g WHERE g.name = :name", Long.class);
 
 
-    Long count = (Long) query.setParameter("name", groupName).getSingleResult();
+    Long count = query.setParameter("name", groupName).getSingleResult();
 
     manager.close();
     return (!count.equals(0L));

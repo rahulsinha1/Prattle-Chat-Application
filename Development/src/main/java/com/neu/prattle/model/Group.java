@@ -17,9 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.ws.rs.HEAD;
-
 
 /***
  * A Group object represents a basic group information.

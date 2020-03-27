@@ -158,6 +158,74 @@ public class GroupControllerTest {
         assertEquals("OK",response.getStatusInfo().getReasonPhrase());
     }
 
+  @Test
+  public void testRemoveUser(){
+    String groupname = generateString();
+    Group group3 = new Group(groupname,"This is a group","test4","", false);
+    String moderatorname = generateString();
+    User m = new User(moderatorname);
+    userService.addUser(m);
+    List<User> moderators = new ArrayList<>();
+    moderators.add(m);
+    group3.setModerators(moderators);
+    String username = generateString();
+    User u = new User(username);
+    List<User> users = new ArrayList<>();
+    users.add(u);
+    group3.setMembers(users);
+    userService.addUser(u);
+    groupController.createGroup(group3);
+
+    groupController.addUser(groupname,username);
+    Response response = groupController.removeUser(groupname,moderatorname);
+    assertEquals("OK",response.getStatusInfo().getReasonPhrase());
+  }
+
+  @Test
+  public void testAddModerator(){
+    String groupname = generateString();
+    Group group3 = new Group(groupname,"This is a group","test4","", false);
+    User m = new User(generateString());
+    userService.addUser(m);
+    List<User> moderators = new ArrayList<>();
+    moderators.add(m);
+    group3.setModerators(moderators);
+    String username = generateString();
+    User u = new User(username);
+    List<User> users = new ArrayList<>();
+    users.add(u);
+    group3.setMembers(users);
+    userService.addUser(u);
+    groupController.createGroup(group3);
+
+    groupController.addUser(groupname,username);
+    Response response = groupController.addModerator(groupname,username);
+    assertEquals("OK",response.getStatusInfo().getReasonPhrase());
+  }
+
+  @Test
+  public void testRemoveModerator(){
+    String groupname = generateString();
+    Group group3 = new Group(groupname,"This is a group","test4","", false);
+    String moderatorname =  generateString();
+    User m = new User(moderatorname);
+    userService.addUser(m);
+    List<User> moderators = new ArrayList<>();
+    moderators.add(m);
+    group3.setModerators(moderators);
+    String username = generateString();
+    User u = new User(username);
+    List<User> users = new ArrayList<>();
+    users.add(u);
+    group3.setMembers(users);
+    userService.addUser(u);
+    groupController.createGroup(group3);
+
+    groupController.addUser(groupname,username);
+    Response response = groupController.removeModerator(groupname,moderatorname);
+    assertEquals("OK",response.getStatusInfo().getReasonPhrase());
+  }
+
   private String generateString () {
     int n = 8;
     {

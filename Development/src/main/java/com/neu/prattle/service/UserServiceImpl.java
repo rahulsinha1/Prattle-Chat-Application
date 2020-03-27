@@ -2,7 +2,6 @@ package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
-
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
@@ -29,6 +28,7 @@ import javax.persistence.TypedQuery;
 public class UserServiceImpl implements UserService {
 
   private static UserService accountService;
+  private static final String SELECT_QUERY = "SELECT u FROM User u WHERE u.username = :name";
   private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
           .createEntityManagerFactory("fse");
 
@@ -60,17 +60,16 @@ public class UserServiceImpl implements UserService {
   @Override
   public Optional<User> findUserByName(String username) {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-    EntityTransaction transaction = null;
-
     if (isRecordExist(username)) {
       TypedQuery<User> query = manager.createQuery(
-              "SELECT u FROM User u WHERE u.username = :name", User.class);
+              SELECT_QUERY, User.class);
 
-      User user = (User) query.setParameter("name", username).getSingleResult();
+      User user = query.setParameter("name", username).getSingleResult();
       manager.close();
       return Optional.of(user);
-    } else
+    } else {
       return Optional.empty();
+    }
   }
 
   @Override
@@ -84,13 +83,14 @@ public class UserServiceImpl implements UserService {
 
     if (isRecordExist(name)) {
       TypedQuery<User> query = manager.createQuery(
-              "SELECT u FROM User u WHERE u.username = :name", User.class);
+              SELECT_QUERY, User.class);
       User user = query.setParameter("name", name).getSingleResult();
       manager.close();
       return user;
 
-    } else
+    } else {
       throw new UserDoesNotExistException("User does not exist.");
+    }
   }
 
   @Override
@@ -98,15 +98,15 @@ public class UserServiceImpl implements UserService {
     if (isRecordExist(name)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       TypedQuery<User> query = manager.createQuery(
-              "SELECT u FROM User u WHERE u.username = :name", User.class);
+              SELECT_QUERY, User.class);
 
 
-      User user = (User) query.setParameter("name", name).getSingleResult();
+      User user = query.setParameter("name", name).getSingleResult();
 
       Query query1 = manager.createNativeQuery("Select * from groups where group_id in ( select group_id from group_users where user_id =?)", Group.class)
-              .setParameter(1, user.getUser_id());
+              .setParameter(1, user.getUserId());
 
-      List groupList = (List<Group>) query1.getResultList();
+      List groupList = query1.getResultList();
       manager.close();
       return groupList;
     }
@@ -136,20 +136,14 @@ public class UserServiceImpl implements UserService {
   }
 
   private void create(User user) {
-
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
-
-
     if (isRecordExist(user.getUsername())) {
       throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
     }
     transaction = manager.getTransaction();
     transaction.begin();
-
-
     manager.persist(user);
-
     transaction.commit();
     manager.close();
   }
@@ -161,7 +155,7 @@ public class UserServiceImpl implements UserService {
             "SELECT count(u) FROM User u WHERE u.username = :name", Long.class);
 
 
-    Long count = (Long) query.setParameter("name", username).getSingleResult();
+    Long count = query.setParameter("name", username).getSingleResult();
     manager.close();
     return (!count.equals(0L));
   }

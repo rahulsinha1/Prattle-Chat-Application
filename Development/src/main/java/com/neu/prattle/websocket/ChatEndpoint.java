@@ -9,6 +9,7 @@ package com.neu.prattle.websocket;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -25,8 +26,11 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Message;
 import com.neu.prattle.model.User;
+import com.neu.prattle.service.GroupService;
+import com.neu.prattle.service.GroupServiceImpl;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
@@ -42,6 +46,8 @@ public class ChatEndpoint {
     
     /** The account service. */
     private UserService accountService = UserServiceImpl.getInstance();
+
+    private GroupService groupService = GroupServiceImpl.getInstance();
     
     /** The session. */
     private Session session;
@@ -122,35 +128,27 @@ public class ChatEndpoint {
      * @param message the text of the inbound message
      */
     @OnMessage
-    public void onMessage(Session session, Message message) throws IOException, EncodeException {
-      String messageContent = message.getContent();
-      String[] splitMessage = messageContent.split(":");
-      String username = "";
-      String content;
-      if(messageContent.contains(":")) {
-        username = splitMessage[0];
-        content = splitMessage[1];
-        Optional<User> user = accountService.findUserByName(username);
-        if (!user.isPresent()) {
-          Message error = Message.messageBuilder()
-                  .setMessageContent(String.format("User %s could not be found", username))
-                  .build();
-
-          session.getBasicRemote().sendObject(error);
-          return;
+      public void onMessage(Session session, Message message) throws IOException, EncodeException {
+        String recipient = message.getTo();
+        message.setFrom(users.get(session.getId()));
+        if(recipient != null) {
+          Optional<User> user = accountService.findUserByName(recipient);
+          if (!user.isPresent()) {
+            Group group = groupService.getGroupByName(recipient);
+            if (group == null) {
+              Message error = Message.messageBuilder()
+                      .setMessageContent(String.format("Group %s could not be found", recipient))
+                      .build();
+              session.getBasicRemote().sendObject(error);
+              return;
+            } else {
+              sendGroupMessage(message);
+            }
+          }
+          sendOneMessage(message);
+        } else {
+          broadcast(message);
         }
-        message.setTo(username);
-      } else {
-        content = splitMessage[0];
-      }
-      message.setContent(content);
-      message.setFrom(users.get(session.getId()));
-
-      if(username.equals("")) {
-        broadcast(message);
-      } else {
-        sendOneMessage(message);
-      }
     }
 
     /**
@@ -209,11 +207,33 @@ public class ChatEndpoint {
         });
     }
 
-    private static void sendOneMessage(Message message) {
+    private void sendGroupMessage(Message message) {
       chatEndpoints.forEach(endpoint -> {
         synchronized (endpoint) {
           try {
-            if(endpoint.session.getId().equals(getSessionForUser(message.getTo())) ||
+            List<User> usersInGroup = groupService.getGroupByName(message.getTo()).getUsers();
+            for(User u: usersInGroup) {
+              if (endpoint.session.getId().equals(getSessionForUser(u.getUsername())) ||
+                      endpoint.session.getId().equals(getSessionForUser(message.getFrom()))) {
+                endpoint.session.getBasicRemote()
+                        .sendObject(message);
+              }
+            }
+          } catch (IOException | EncodeException e) {
+            /* note: in production, who exactly is looking at the console.  This exception's
+             *       output should be moved to a logger.
+             */
+            logger.log(Level.SEVERE, e.getMessage());
+          }
+        }
+      });
+    }
+
+    private void sendOneMessage(Message message) {
+      chatEndpoints.forEach(endpoint -> {
+        synchronized (endpoint) {
+          try {
+            if (endpoint.session.getId().equals(getSessionForUser(message.getTo())) ||
                     endpoint.session.getId().equals(getSessionForUser(message.getFrom()))) {
               endpoint.session.getBasicRemote()
                       .sendObject(message);
@@ -222,7 +242,7 @@ public class ChatEndpoint {
             /* note: in production, who exactly is looking at the console.  This exception's
              *       output should be moved to a logger.
              */
-            logger.log(Level.SEVERE,e.getMessage());
+            logger.log(Level.SEVERE, e.getMessage());
           }
         }
       });

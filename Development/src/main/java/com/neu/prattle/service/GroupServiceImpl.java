@@ -137,7 +137,7 @@ public class GroupServiceImpl implements GroupService {
   }
 
   @Override
-  public void updateGroup(Group group) {
+  public void updateGroup(Group updateGroup) {
 
   }
 

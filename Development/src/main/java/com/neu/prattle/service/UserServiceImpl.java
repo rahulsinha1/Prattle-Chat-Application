@@ -35,8 +35,6 @@ public class UserServiceImpl implements UserService {
     accountService = new UserServiceImpl();
   }
 
-  private Set<User> userSet = new HashSet<>();
-
   /***
    * UserServiceImpl is a Singleton class.
    */
@@ -108,8 +106,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void updateUser (User user){
-      userSet.add(user);
+  public void updateUser (User updatedUser){
+
+
   }
 
   private void create (User user){
@@ -117,7 +116,6 @@ public class UserServiceImpl implements UserService {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
 
-      //User exists = manager.find(User.class,user.getUsername());
       if (isRecordExist(user.getUsername())) {
           throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
       }

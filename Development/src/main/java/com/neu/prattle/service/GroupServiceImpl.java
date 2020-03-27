@@ -103,7 +103,7 @@ public class GroupServiceImpl implements GroupService {
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
-    manager.createNativeQuery("DELETE FROM group_mods u WHERE u.moderator_id = :1 AND u.group_id = :2")
+    manager.createNativeQuery("DELETE FROM group_mods WHERE moderator_id = ? AND u.group_id = ?")
             .setParameter(1, moderator.getUser_id())
             .setParameter(2, group.getId())
             .executeUpdate();
@@ -117,8 +117,8 @@ public class GroupServiceImpl implements GroupService {
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
-    manager.createNativeQuery("DELETE FROM groups g WHERE g.group_name = :name ")
-            .setParameter("name", group.getName())
+    manager.createNativeQuery("DELETE FROM groups WHERE group_name =? ")
+            .setParameter(1, group.getName())
             .executeUpdate();
   }
 

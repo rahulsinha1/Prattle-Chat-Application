@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class GroupServiceImplTest {
@@ -117,7 +118,7 @@ public class GroupServiceImplTest {
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
     group.setMembers(users);
-    group.setName(TESTGROUPNAME);
+    group.setName(generateString());
     group.setModerators(moderators);
   }
 
@@ -142,19 +143,23 @@ public class GroupServiceImplTest {
   @Test
   public void testGetAllGroups(){
     Group g = new Group();
-    g.setName("TESTGROUP6");
-    User m = new User("Moderator6");
+    g.setName(generateString());
+    User m = new User(generateString());
     userService.addUser(m);
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User("testuser6");
+    User u = new User(generateString());
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setMembers(users);
     userService.addUser(u);
     groupService.createGroup(g);
-    groupService.getAllGroups();
+    List<Group> groupList = groupService.getAllGroups();
+    for(Group obj : groupList)
+    {
+      System.out.println(obj.getName());
+    }
   }
 
   @Test
@@ -183,19 +188,22 @@ public class GroupServiceImplTest {
   @Test
   public void testGetGroupByName(){
     Group g = new Group();
-    g.setName("TESTGROUP10");
-    User m = new User("Moderator10000000");
+    g.setName(generateString());
+    g.setCreatedBy("rahul");
+    User m = new User(generateString());
     userService.addUser(m);
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User("testuser10000000");
+    User u = new User(generateString());
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setMembers(users);
     userService.addUser(u);
     groupService.createGroup(g);
-    groupService.getGroupByName("TESTGROUP10");
+    Group group = groupService.getGroupByName(g.getName());
+    assertEquals("rahul",group.getCreatedBy());
+
   }
 
   @Test

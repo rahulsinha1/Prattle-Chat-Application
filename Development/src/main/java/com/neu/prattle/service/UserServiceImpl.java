@@ -1,6 +1,8 @@
 package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
 import java.util.Collections;
@@ -13,6 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 /***
@@ -62,15 +65,14 @@ public class UserServiceImpl implements UserService {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
 
-    if(isRecordExist(username) ==true) {
+    if (isRecordExist(username) == true) {
       TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
 
 
       User user = (User) query.setParameter("name", username).getSingleResult();
       return Optional.of(user);
-    }
-    else
+    } else
       return Optional.empty();
   }
 
@@ -83,36 +85,54 @@ public class UserServiceImpl implements UserService {
   public User findUserByUsername(String name) {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
 
-    if(isRecordExist(name) ==true) {
+    if (isRecordExist(name) == true) {
       TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
 
 
       User user = (User) query.setParameter("name", name).getSingleResult();
       return user;
-    }
-    else
+    } else
       return null;
   }
 
   @Override
   public List findGroupsByName(String name) {
-    if(isRecordExist(name) ==true) {
+    if (isRecordExist(name) == true) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
 
 
       User user = (User) query.setParameter("name", name).getSingleResult();
-        return user.getGroupParticipant();
 
+      Query query1 = manager.createNativeQuery("Select * from groups where group_id in ( select group_id from group_users where user_id =?)", Group.class)
+              .setParameter(1, user.getUser_id());
+
+      List groupList = (List<Group>) query1.getResultList();
+      int b = 4;
+      return groupList;
     }
     return Collections.emptyList();
   }
 
   @Override
   public void updateUser(User user) {
-    userSet.add(user);
+
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    int query1 = manager.createNativeQuery("UPDATE users SET timezone = ?, first_name = ?, last_name = ?, user_password =? WHERE username= ?")
+            .setParameter(1, user.getTimezone())
+            .setParameter(2, user.getFirstName())
+            .setParameter(3, user.getLastName())
+            .setParameter(4, user.getPassword())
+            .setParameter(5, user.getUsername()).executeUpdate();
+
+    transaction.commit();
+    manager.close();
   }
 
   private void create(User user) {
@@ -121,13 +141,11 @@ public class UserServiceImpl implements UserService {
     EntityTransaction transaction = null;
 
     //User exists = manager.find(User.class,user.getUsername());
-    if(isRecordExist(user.getUsername()) ==true)
-    {
+    if (isRecordExist(user.getUsername()) == true) {
       throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
     }
     transaction = manager.getTransaction();
     transaction.begin();
-
 
 
     manager.persist(user);
@@ -144,6 +162,6 @@ public class UserServiceImpl implements UserService {
 
 
     Long count = (Long) query.setParameter("name", username).getSingleResult();
-    return ( ( count.equals( 0L ) ) ? false : true );
+    return ((count.equals(0L)) ? false : true);
   }
 }

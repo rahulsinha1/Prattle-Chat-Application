@@ -13,7 +13,10 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.Group;
+import com.neu.prattle.service.GroupService;
+import com.neu.prattle.service.GroupServiceImpl;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 import org.junit.Before;
@@ -24,12 +27,14 @@ import com.neu.prattle.model.User;
 public class UserServiceImplTest {
 
 	private UserService as;
+	private GroupService groupServices;
 	private static final String MIKE4 = "MIKE4";
 	private static final String MIKE1 = "Mike1";
 
 	@Before
 	public void setUp() {
 		as = UserServiceImpl.getInstance();
+		groupServices = GroupServiceImpl.getInstance();
 	}
 
 
@@ -39,6 +44,35 @@ public class UserServiceImplTest {
 		setMocksForUserService(generateString());
 	}
 
+
+	/*
+	Adding a single user to the databse
+	 */
+	@Test
+	public void addUserTest() {
+		User user = new User(generateString());
+		as.addUser(user);
+		Optional<User> user1 = as.findUserByName(user.getUsername());
+		assertTrue(user1.isPresent());
+	}
+
+	/*
+	Adding multiple users to the databse
+	 */
+	@Test
+	public void addMultipleUsersTest() {
+		for(int i= 0; i<4;i++)
+		{
+			User user = new User(generateString());
+			as.addUser(user);
+			Optional<User> user1 = as.findUserByName(user.getUsername());
+			assertTrue(user1.isPresent());
+		}
+
+
+	}
+
+
 	// This method just tries to add
 	@Test
 	public void getUserTest() {
@@ -46,19 +80,10 @@ public class UserServiceImplTest {
 		assertTrue(user.isPresent());
 	}
 
-	// Performance testing to benchmark our number of users that can be added
-	// in 1 sec
 
-	@Test(timeout = 1000)
-	public void checkPrefTest() {
-		for (int i = 1000; i < 1050; i++) {
-			User user = new User(generateString());
-			user.setFirstName(generateString());
-			user.setLastName(generateString());
-			as.addUser(user);
-		}
-	}
-
+	/*
+	Finding user in the databse according to the username
+	 */
 	@Test
 	public void testFindUserByUsername() {
 		setMocksForUserService(generateString());
@@ -66,18 +91,64 @@ public class UserServiceImplTest {
 		assertEquals(MIKE4, user.getUsername());
 	}
 
+@Test
+	public void testFindUserByUsernameNotExisting() {
+		User user = as.findUserByUsername("nouser");
+	  assertNull(user);
+	}
+
+	/*
+	Test if the user is part of one group
+	 */
 	@Test
 	public void findGroupsByName() {
-		String username = generateString();
-		setMocksForUserService(username);
-		List<Group> g = as.findGroupsByName("Mike3");
-		assertEquals("test", g.get(0).getName());
+		String userName= generateString();
+		String groupName= generateString();
+		User groupUser = new User(userName);
+		Group group = new Group(groupName);
+		List<User> listUsers = new ArrayList<>();
+		List<Group> listGroups = new ArrayList<>();
+		listUsers.add(groupUser);
+		listGroups.add(group);
+		groupUser.setGroupParticipant(listGroups);
+		group.setMembers(listUsers);
+		as.addUser(groupUser);
+		List<Group> g =  as.findGroupsByName(groupUser.getUsername());
+		assertEquals(groupName, g.get(0).getName());
 	}
+
+
+	/*
+	Test if the user is part of multiple groups
+	 */
+	@Test
+	public void findMultipleGroupsByName()
+	{
+		String userName= generateString();
+		String groupName= generateString();
+		String groupName1= generateString();
+		User groupUser = new User(userName);
+		Group group = new Group(groupName);
+		Group group1 = new Group(groupName1);
+		List<User> listUsers = new ArrayList<>();
+		List<Group> listGroups = new ArrayList<>();
+		listUsers.add(groupUser);
+		listGroups.add(group);
+		listGroups.add(group1);
+		groupUser.setGroupParticipant(listGroups);
+		group.setMembers(listUsers);
+		group1.setMembers(listUsers);
+		as.addUser(groupUser);
+		List<Group> g =  as.findGroupsByName(groupUser.getUsername());
+		assertEquals(groupName, g.get(0).getName());
+		assertEquals(groupName1, g.get(1).getName());
+	}
+
+
 
 	@Test
 	public void updateUser() {
-		setMocksForUserService(MIKE1);
-		Optional<User> user = as.findUserByName(MIKE1);
+		Optional<User> user = as.findUserByName("MIKE1");
 		if (user.isPresent()) {
 			user.get().setUsername("Mikeupdate");
 			as.updateUser(user.get());

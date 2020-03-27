@@ -7,8 +7,11 @@ package com.neu.prattle.websocket;
  * @version dated 2017-03-05
  */
 
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Message;
 import com.neu.prattle.model.User;
+import com.neu.prattle.service.GroupService;
+import com.neu.prattle.service.GroupServiceImpl;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
@@ -17,6 +20,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -46,6 +51,8 @@ public class ChatEndpoint {
 
   /** The account service. */
   private UserService accountService = UserServiceImpl.getInstance();
+
+  private GroupService groupService = GroupServiceImpl.getInstance();
 
   /** The session. */
   private Session session;
@@ -136,10 +143,16 @@ public class ChatEndpoint {
     if (recipient != null) {
       Optional<User> user = accountService.findUserByName(recipient);
       if (!user.isPresent()) {
-        throwErrorMesage(session,recipient);
-        return;
+        Group group = groupService.getGroupByName(recipient);
+        if (group == null) {
+          throwErrorMesage(session, recipient);
+          return;
+        } else {
+          sendGroupMessage(message);
+        }
+      } else {
+        sendOneMessage(message);
       }
-      sendOneMessage(message);
     } else {
       broadcast(message);
     }
@@ -191,6 +204,36 @@ public class ChatEndpoint {
         try {
           endpoint.session.getBasicRemote().sendObject(message);
         } catch (IOException | EncodeException e) {
+          logger.log(Level.SEVERE, e.getMessage());
+        }
+      }
+    });
+  }
+
+  private void sendGroupMessage(Message message) {
+    Set<String> groupUsers = new HashSet<>();
+    chatEndpoints.forEach(endpoint -> {
+      synchronized (endpoint) {
+        try {
+          if (endpoint.session.getId().equals(getSessionForUser(message.getFrom()))) {
+            groupUsers.add(message.getFrom());
+            endpoint.session.getBasicRemote()
+                    .sendObject(message);
+          }
+          List<User> usersInGroup = groupService.getGroupByName(message.getTo()).getUsers();
+          for(User u: usersInGroup) {
+            if(!groupUsers.contains(u.getUsername())) {
+              if (endpoint.session.getId().equals(getSessionForUser(u.getUsername()))) {
+                groupUsers.add(u.getUsername());
+                endpoint.session.getBasicRemote()
+                        .sendObject(message);
+              }
+            }
+          }
+        } catch (IOException | EncodeException e) {
+          /* note: in production, who exactly is looking at the console.  This exception's
+           *       output should be moved to a logger.
+           */
           logger.log(Level.SEVERE, e.getMessage());
         }
       }

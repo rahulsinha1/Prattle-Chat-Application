@@ -7,15 +7,15 @@ import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.EntityManagerFactory;
+import javax.ws.rs.HEAD;
+
 
 /**
  * GroupServiceImpl implements groupservice.
@@ -32,8 +32,6 @@ public class GroupServiceImpl implements GroupService {
     groupService = new GroupServiceImpl();
     userService = new UserServiceImpl();
   }
-
-  private Set<Group> groupSet = new HashSet<>();
 
   /***
    * GroupServiceImpl is a Singleton class.
@@ -113,7 +111,7 @@ public class GroupServiceImpl implements GroupService {
           EntityTransaction transaction = null;
           transaction = manager.getTransaction();
           transaction.begin();
-          manager.createNativeQuery("DELETE FROM group_mods u WHERE u.moderator_id = :1 AND u.group_id = :2")
+          manager.createNativeQuery("DELETE FROM group_mods WHERE moderator_id = ? AND u.group_id = ?")
               .setParameter(1, moderator.getUser_id())
               .setParameter(2, group.getId())
               .executeUpdate();
@@ -130,9 +128,11 @@ public class GroupServiceImpl implements GroupService {
           EntityTransaction transaction = null;
           transaction = manager.getTransaction();
           transaction.begin();
-          manager.createNativeQuery("DELETE FROM groups g WHERE g.group_name = :name ")
-              .setParameter("name", group.getName())
+          manager.createNativeQuery("DELETE FROM groups WHERE group_name =? ")
+              .setParameter(1, group.getName())
               .executeUpdate();
+      } else {
+          throw  new GroupDoesNotExistException("Group Does Not Exist");
       }
   }
 

@@ -2,19 +2,21 @@ package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
+
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.ws.rs.HEAD;
 
 /***
  * Implementation of {@link UserService}
@@ -67,8 +69,7 @@ public class UserServiceImpl implements UserService {
 
       User user = (User) query.setParameter("name", username).getSingleResult();
       return Optional.of(user);
-    }
-    else
+    } else
       return Optional.empty();
   }
 
@@ -98,16 +99,33 @@ public class UserServiceImpl implements UserService {
           TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
 
-          User user = (User) query.setParameter("name", name).getSingleResult();
-          return user.getGroupParticipant();
 
-      }
+          User user = (User) query.setParameter("name", name).getSingleResult();
+      return user.getGroupParticipant();
+    } else
       return Collections.emptyList();
   }
 
   @Override
-  public void updateUser (User updatedUser){
+  public void updateUser(User user) {
+      if(user != null){
+          EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+          EntityTransaction transaction = null;
+          transaction = manager.getTransaction();
+          transaction.begin();
 
+          manager.createNativeQuery("UPDATE users SET timezone = ?, first_name = ?, last_name = ?, user_password =? WHERE username= ?")
+              .setParameter(1, user.getTimezone())
+              .setParameter(2, user.getFirstName())
+              .setParameter(3, user.getLastName())
+              .setParameter(4, user.getPassword())
+              .setParameter(5, user.getUsername()).executeUpdate();
+
+          transaction.commit();
+          manager.close();
+      } else{
+          throw new UserDoesNotExistException("User Does Not Exist");
+      }
 
   }
 
@@ -116,6 +134,7 @@ public class UserServiceImpl implements UserService {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
 
+      //User exists = manager.find(User.class,user.getUsername());
       if (isRecordExist(user.getUsername())) {
           throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
       }
@@ -129,14 +148,14 @@ public class UserServiceImpl implements UserService {
       manager.close();
   }
 
-  private boolean isRecordExist (String username){
-      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    private boolean isRecordExist(String username) {
+        EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
 
-      TypedQuery<Long> query = manager.createQuery(
-          "SELECT count(u) FROM User u WHERE u.username = :name", Long.class);
+        TypedQuery<Long> query = manager.createQuery(
+            "SELECT count(u) FROM User u WHERE u.username = :name", Long.class);
 
 
-      Long count = (Long) query.setParameter("name", username).getSingleResult();
-      return (!count.equals(0L));
+        Long count = (Long) query.setParameter("name", username).getSingleResult();
+        return (!count.equals(0L));
+    }
   }
-}

@@ -13,15 +13,15 @@ import java.util.logging.Logger;
 
 /**
  * The Class MessageEncoder.
- * 
+ *
  * @author https://github.com/eugenp/tutorials/java-websocket/src/main/java/com/baeldung/websocket
  * @version dated 2017-03-05
  */
 public class MessageEncoder implements Encoder.Text<Message> {
 
-	/** @see org.codehaus.jackson.map.ObjectMapper */
+    /** @see org.codehaus.jackson.map.ObjectMapper */
     private static ObjectMapper objectMapper = new ObjectMapper();
-    
+
     /** The logger. */
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -30,7 +30,7 @@ public class MessageEncoder implements Encoder.Text<Message> {
      *
      * Constucts a JSON structure from a Message object, in effect
      * serializing the Message by converting it into a String.
-     *  
+     *
      * @param message     What needs to be serialized
      * @return            the resulting JSON (String)
      * @throws EncodeException   see javax.websocket.EncodeException
@@ -47,8 +47,8 @@ public class MessageEncoder implements Encoder.Text<Message> {
 
     /**
      * Custom code if anything special is needed when establishing the session
-     * with a particular endpoint (the websocket).  Not used at present. 
-     * 
+     * with a particular endpoint (the websocket).  Not used at present.
+     *
      * @param endpointConfig the endpoint config
      */
     @Override

@@ -18,36 +18,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 
-import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GroupServiceImplTest {
 
   private GroupService groupService;
   private UserService userService;
-  private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
-          .createEntityManagerFactory("fse");
 
   @Mock
   private GroupService mockGroupService;
@@ -62,7 +53,7 @@ public class GroupServiceImplTest {
 
   @Before
   public void setUp() {
-    group2 = new Group("Test","This is a Test.","TestTest","Test", false);
+    group2 = new Group("Test", "This is a Test.", "TestTest", "Test", false);
     groupService = GroupServiceImpl.getInstance();
     userService = UserServiceImpl.getInstance();
     mockGroupService = GroupServiceImpl.getInstance();
@@ -79,9 +70,13 @@ public class GroupServiceImplTest {
   public void testCreateGroup() {
     String groupName = generateString();
     Group group = new Group(groupName);
-    groupService.createGroup(group);
-    Group createdGroup = groupService.getGroupByName(groupName);
-    assertEquals(createdGroup.getName(),groupName);
+    mockGroupService.createGroup(group);
+    when(mockGroupService.getGroupByName(groupName)).thenReturn(new Group(groupName));
+    Group createdGroup = mockGroupService.getGroupByName(groupName);
+    assertEquals(createdGroup.getName(), groupName);
+//    groupService.createGroup(group);
+//    Group createdGroup = groupService.getGroupByName(groupName);
+//    assertEquals(createdGroup.getName(),groupName);
   }
 
   /*
@@ -89,13 +84,13 @@ public class GroupServiceImplTest {
    */
 
   @Test(expected = GroupAlreadyPresentException.class)
-  public void testGroupCreation(){
+  public void testGroupCreation() {
     String groupName = generateString();
     Group group = new Group(groupName);
     Group group1 = new Group(groupName);
-    groupService.createGroup(group);
-    groupService.createGroup(group1);
-    assertFalse(false);
+    mockGroupService.createGroup(group);
+    doThrow(new GroupAlreadyPresentException("Group already exists")).when(mockGroupService).createGroup(group1);
+    mockGroupService.createGroup(group1);
   }
 
 
@@ -106,13 +101,13 @@ public class GroupServiceImplTest {
    */
 
   @Test
-  public void getGroupByName()
-  {
+  public void getGroupByName() {
     String groupName = generateString();
     Group group = new Group(groupName);
-    groupService.createGroup(group);
-    Group createdGroup = groupService.getGroupByName(groupName);
-    assertEquals(createdGroup.getName(),groupName);
+    mockGroupService.createGroup(group);
+    when(mockGroupService.getGroupByName(groupName)).thenReturn(new Group(groupName));
+    Group createdGroup = mockGroupService.getGroupByName(groupName);
+    assertEquals(createdGroup.getName(), groupName);
   }
 
    /*
@@ -121,10 +116,11 @@ public class GroupServiceImplTest {
    */
 
 
-  @Test(expected =  GroupDoesNotExistException.class)
-  public void getGroupByNameNotExisting()
-  {
-    Group createdGroup = groupService.getGroupByName("NoGroup");
+  @Test(expected = GroupDoesNotExistException.class)
+  public void getGroupByNameNotExisting() {
+    String group = "doesnotexist";
+    doThrow(new GroupDoesNotExistException("Group does not exist")).when(mockGroupService).getGroupByName(group);
+    mockGroupService.getGroupByName(group);
   }
 
 
@@ -134,56 +130,61 @@ public class GroupServiceImplTest {
 
 
   @Test
-  public void testAddUserToGroup () {
+  public void testAddUserToGroup() {
     String groupName = generateString();
     String userName = generateString();
     Group g = new Group();
     g.setName(groupName);
     User u = new User(userName);
     u.setFirstName(generateString());
-    userService.addUser(u);
-    groupService.createGroup(g);
-    groupService.addUser(g,u);
-    Group group = groupService.getGroupByName(groupName);
+    mockUserService.addUser(u);
+    mockGroupService.createGroup(g);
+    mockGroupService.addUser(g, u);
 
 
-    //verify(mockGroupService).addUser(g,u);
+    Group mockGroup = new Group("Test", "This is a test", "Test", "password", true);
+    List<User> group_user = new ArrayList<>();
+    group_user.add(u);
+    mockGroup.setMembers(group_user);
+    when(mockGroupService.getGroupByName(groupName)).thenReturn(mockGroup);
 
-   EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-   Query query1 = manager.createNativeQuery("Select * from group_users where group_id= ?")
-                   .setParameter(1, group.getId());
+    Group group = mockGroupService.getGroupByName(groupName);
 
-   List list =  query1.getResultList();
-   assertEquals(list.size(),1);
+    assertEquals(group.getMembers().get(0).getUsername(), mockGroup.getMembers().get(0).getUsername());
+
   }
 
   /*
   Tests to verify that multiple users are added to the group
    */
   @Test
-  public void testAddMultipleUserToGroup () {
+  public void testAddMultipleUserToGroup() {
     String groupName = generateString();
     String userName = generateString();
     Group g = new Group();
     g.setName(groupName);
     User u = new User(userName);
     u.setFirstName(generateString());
-    userService.addUser(u);
-    groupService.createGroup(g);
+    mockUserService.addUser(u);
+    mockGroupService.createGroup(g);
     //Adding first user
-    groupService.addUser(g,u);
+    mockGroupService.addUser(g, u);
     //Adding second user to group
     User user2 = new User(generateString());
-    userService.addUser(user2);
-    groupService.addUser(g,user2);
-    Group group = groupService.getGroupByName(groupName);
+    mockUserService.addUser(user2);
+    mockGroupService.addUser(g, user2);
 
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-    Query query1 = manager.createNativeQuery("Select * from group_users where group_id= ?")
-            .setParameter(1, group.getId());
+    Group mockGroup = new Group("Test", "This is a test", "Test", "password", true);
+    List<User> group_user = new ArrayList<>();
+    group_user.add(u);
+    group_user.add(user2);
+    mockGroup.setMembers(group_user);
+    when(mockGroupService.getGroupByName(groupName)).thenReturn(mockGroup);
 
-    List list =  query1.getResultList();
-    assertEquals(list.size(),2);
+    Group group = mockGroupService.getGroupByName(groupName);
+
+    assertEquals(group.getMembers().size(), mockGroup.getMembers().size());
+
   }
 
 
@@ -191,26 +192,25 @@ public class GroupServiceImplTest {
    Test to check if user is removed to the group
   */
   @Test
-  public void testRemoveUserFromGroup () {
+  public void testRemoveUserFromGroup() {
     String groupName = generateString();
     String userName = generateString();
     Group g = new Group();
     g.setName(groupName);
     User u = new User(userName);
     u.setFirstName(generateString());
-    userService.addUser(u);
-    groupService.createGroup(g);
-    groupService.addUser(g,u);
-    Group group = groupService.getGroupByName(groupName);
+    mockUserService.addUser(u);
+    mockGroupService.createGroup(g);
+    mockGroupService.addUser(g, u);
 
     //Adding second user to group
     User user2 = new User(generateString());
-    userService.addUser(user2);
-    groupService.addUser(g,user2);
+    mockUserService.addUser(user2);
+    mockGroupService.addUser(g, user2);
 
     //TRemoving second user
-    mockGroupService.removeUser(g,user2);
-    verify(mockGroupService).removeUser(g,user2);
+    mockGroupService.removeUser(g, user2);
+    verify(mockGroupService).removeUser(g, user2);
   }
 
 
@@ -218,24 +218,26 @@ public class GroupServiceImplTest {
     Verify adding a single moderator to a group
    */
   @Test
-  public void testAddModeratorToGroup () {
+  public void testAddModeratorToGroup() {
     String groupName = generateString();
     String moderatorName = generateString();
     Group g = new Group();
     g.setName(groupName);
     User mod = new User(moderatorName);
-    userService.addUser(mod);
-    groupService.createGroup(g);
-    groupService.addModerator(g,mod);
-    Group group = groupService.getGroupByName(groupName);
+    mockUserService.addUser(mod);
+    mockGroupService.createGroup(g);
+    mockGroupService.addModerator(g, mod);
 
+    Group mockGroup = new Group("Test", "This is a test", "Test", "password", true);
+    List<User> group_mods = new ArrayList<>();
+    group_mods.add(mod);
+    mockGroup.setModerators(group_mods);
 
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-    Query query1 = manager.createNativeQuery("Select * from group_mods where group_id= ?")
-            .setParameter(1, group.getId());
+    when(mockGroupService.getGroupByName(groupName)).thenReturn(mockGroup);
 
-    List list =  query1.getResultList();
-    assertEquals(list.size(),1);
+    Group group = mockGroupService.getGroupByName(groupName);
+
+    assertEquals(group.getModerators().get(0).getUsername(), mockGroup.getModerators().get(0).getUsername());
   }
 
 
@@ -243,30 +245,26 @@ public class GroupServiceImplTest {
    Test to check if moderator is removed from the group
   */
   @Test
-  public void testRemoveModeratorFromGroup () {
+  public void testRemoveModeratorFromGroup() {
     String groupName = generateString();
     String modName = generateString();
     Group g = new Group();
     g.setName(groupName);
     User mod = new User(modName);
-    userService.addUser(mod);
-    groupService.createGroup(g);
-    Group group = groupService.getGroupByName(groupName);
-    groupService.addModerator(group,mod);
+    mockUserService.addUser(mod);
+    mockGroupService.createGroup(g);
+    when(mockGroupService.getGroupByName(groupName)).thenReturn(g);
+    Group group = mockGroupService.getGroupByName(groupName);
+    mockGroupService.addModerator(group, mod);
 
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-    Query query1 = manager.createNativeQuery("Select * from group_mods where group_id= ?")
-            .setParameter(1, group.getId());
-
-    List list =  query1.getResultList();
-    assertEquals(1, list.size());
+    // Adding and removing the second moderator
 
     User mod2 = new User(generateString());
-    userService.addUser(mod2);
-    groupService.addModerator(group,mod2);
+    mockUserService.addUser(mod2);
+    mockGroupService.addModerator(group, mod2);
 
     mockGroupService.removeModerator(group, mod2);
-    verify(mockGroupService).removeModerator(group,mod2);
+    verify(mockGroupService).removeModerator(group, mod2);
   }
 
 
@@ -274,14 +272,14 @@ public class GroupServiceImplTest {
   Updating a group. Adding a description and verifying itys been updated
    */
   @Test
-  public void testUpdateGroup () {
+  public void testUpdateGroup() {
     String groupName = generateString();
-    String moderator = "Moderator"+generateString();
-    String username = "User"+generateString();
+    String moderator = "Moderator" + generateString();
+    String username = "User" + generateString();
     Group g = new Group();
     g.setName(groupName);
     User m = new User(moderator);
-    userService.addUser(m);
+    mockUserService.addUser(m);
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
@@ -289,29 +287,15 @@ public class GroupServiceImplTest {
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setMembers(users);
-    userService.addUser(u);
+    mockUserService.addUser(u);
     //Creating a group without description
-    groupService.createGroup(g);
+    mockGroupService.createGroup(g);
     g.setDescription("This is a test group");
-    groupService.updateGroup(g);
-    assertEquals("This is a test group",groupService.getGroupByName(groupName).getDescription());
+    mockGroupService.updateGroup(g);
+    when(mockGroupService.getGroupByName(groupName)).thenReturn(g);
+    assertEquals("This is a test group", mockGroupService.getGroupByName(groupName).getDescription());
   }
 
-  private void setMocksForGroupCreation() {
-    User u = new User(generateString());
-    u.setFirstName(generateString());
-    userService.addUser(u);
-    User m = new User(TESTMODERATOR+generateString());
-    m.setFirstName(generateString());
-    userService.addUser(m);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    group.setMembers(users);
-    group.setName(generateString());
-    group.setModerators(moderators);
-  }
 
   /*
     Test if a group is successfully deleted
@@ -322,7 +306,7 @@ public class GroupServiceImplTest {
     String name = generateString();
     g.setName(name);
     User m = new User(generateString());
-    userService.addUser(m);
+    mockUserService.addUser(m);
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
@@ -330,65 +314,54 @@ public class GroupServiceImplTest {
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setMembers(users);
-    userService.addUser(u);
-    groupService.createGroup(g);
-    Group group = groupService.getGroupByName(name);
-    groupService.deleteGroup(group);
-
-    groupService.getGroupByName(name);;
+    mockUserService.addUser(u);
+    mockGroupService.createGroup(g);
+    when(mockGroupService.getGroupByName(name)).thenReturn(g);
+    Group group = mockGroupService.getGroupByName(name);
+    mockGroupService.deleteGroup(group);
+    doThrow(new GroupDoesNotExistException("Group does not exist")).when(mockGroupService).getGroupByName(group.getName());
+    mockGroupService.getGroupByName(group.getName());
   }
 
   @Test
-  public void testGetAllGroups(){
-    Group g = new Group();
-    g.setName(generateString());
-    User m = new User(generateString());
-    userService.addUser(m);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User(generateString());
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setMembers(users);
-    userService.addUser(u);
-    groupService.createGroup(g);
-    List<Group> groupList = groupService.getAllGroups();
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-    Query query = manager.createNativeQuery("SELECT COUNT(*) FROM groups");
-    int count = ((BigInteger) query.getSingleResult()).intValue();
-    manager.close();
-    assertEquals(count,groupList.size());
+  public void testGetAllGroups() {
+    Group g = new Group(generateString());
+    mockGroupService.createGroup(g);
+    Group g1 = new Group(generateString());
+
+    List<Group> mockGroupList = new ArrayList<>();
+    mockGroupList.add(g);
+    mockGroupList.add(g1);
+
+    when(mockGroupService.getAllGroups()).thenReturn(mockGroupList);
+
+    List<Group> groupList = mockGroupService.getAllGroups();
+
+    assertEquals(mockGroupList.size(), groupList.size());
   }
 
   @Test(expected = UnsupportedOperationException.class)
-  public void testNotifyGroup(){
+  public void testNotifyGroup() {
     groupService.notifyGroup();
   }
 
   @Test
-  public void testGetGroupByName(){
+  public void testGetGroupByName() {
     Group g = new Group();
-    g.setName(generateString());
+    g.setName("testGroup");
     g.setCreatedBy("rahul");
-    User m = new User(generateString());
-    userService.addUser(m);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User(generateString());
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setMembers(users);
-    userService.addUser(u);
-    groupService.createGroup(g);
-    Group group = groupService.getGroupByName(g.getName());
-    assertEquals("rahul",group.getCreatedBy());
+
+    when(mockGroupService.getGroupByName("testGroup")).thenReturn(g);
+    Group group = mockGroupService.getGroupByName("testGroup");
+
+    assertEquals("rahul", group.getCreatedBy());
 
   }
 
 
-
+  /*
+  Helper method to generate random strings
+   */
   private String generateString() {
     int n = 8;
     {

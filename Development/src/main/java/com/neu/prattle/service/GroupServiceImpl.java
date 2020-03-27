@@ -69,6 +69,22 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(1, user.getUser_id())
               .setParameter(2, group.getId())
               .executeUpdate();
+
+
+    Group groupObj = manager.find(Group.class, group.getId());
+    User userObj = manager.find(User.class, user.getUser_id());
+
+     List<User> groupUsers = groupObj.getMembers();
+     groupUsers.add(user);
+     groupObj.setMembers(groupUsers);
+     manager.merge(groupObj);
+
+    List<Group> groupPart = userObj.getGroupParticipant();
+    groupPart.add(group);
+    userObj.setGroupParticipant(groupPart);
+    manager.merge(userObj);
+
+
       transaction.commit();
       manager.close();
     }
@@ -78,20 +94,46 @@ public class GroupServiceImpl implements GroupService {
   public void removeUser(Group group, User user) {
 
 //    if (!group.getMembers().contains(user)) {
-      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-      EntityTransaction transaction = null;
-      transaction = manager.getTransaction();
-      transaction.begin();
-      manager.createNativeQuery("DELETE FROM group_users u WHERE u.user_id = :1 AND u.group_id = :2")
-              .setParameter(1, user.getUser_id())
-              .setParameter(2, group.getId())
-              .executeUpdate();
-      transaction.commit();
-      manager.close();
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+    manager.createNativeQuery("DELETE FROM group_users u WHERE u.user_id = :1 AND u.group_id = :2")
+            .setParameter(1, user.getUser_id())
+            .setParameter(2, group.getId())
+            .executeUpdate();
+
+    Group groupObj = manager.find(Group.class, group.getId());
+    User userObj = manager.find(User.class, user.getUser_id());
+
+    List<User> groupUsers = groupObj.getMembers();
+
+    for (User userEntry : groupUsers) {
+      if (userEntry.equals(user)) {
+        groupUsers.remove(user);
+      }
+    }
+      groupObj.setMembers(groupUsers);
+      manager.merge(groupObj);
+
+      List<Group> groupPart = userObj.getGroupParticipant();
+
+      for (Group groupEntry : groupPart) {
+        if (groupEntry.equals(group)) {
+          groupPart.remove(group);
+        }
+      }
+        userObj.setGroupParticipant(groupPart);
+
+        manager.merge(userObj);
+        transaction.commit();
+        manager.close();
+
 //    } else {
 //      throw new UserDoesNotExistException("User does not exist in the group.");
 //    }
-  }
+      }
+
 
   @Override
   public void addModerator(Group group, User moderator) {
@@ -105,6 +147,14 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(1, moderator.getUser_id())
               .setParameter(2, group.getId())
               .executeUpdate();
+
+    Group groupObj = manager.find(Group.class, group.getId());
+
+    List<User> groupMods = groupObj.getMembers();
+    groupMods.add(moderator);
+    groupObj.setModerators(groupMods);
+    manager.merge(groupObj);
+
       transaction.commit();
       manager.close();
 //    } else {
@@ -125,6 +175,19 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(1, moderator.getUser_id())
               .setParameter(2, group.getId())
               .executeUpdate();
+
+    Group groupObj = manager.find(Group.class, group.getId());
+
+    List<User> groupMods = groupObj.getMembers();
+
+    for (User modsEntry : groupMods) {
+      if (modsEntry.equals(moderator)) {
+        groupMods.remove(moderator);
+      }
+    }
+    groupObj.setModerators(groupMods);
+    manager.merge(groupObj);
+
       transaction.commit();
       manager.close();
 //    } else {

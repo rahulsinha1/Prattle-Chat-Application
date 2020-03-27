@@ -6,6 +6,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import com.neu.prattle.exceptions.GroupAlreadyPresentException;
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.Group;
@@ -23,11 +27,18 @@ import com.neu.prattle.service.UserServiceImpl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.neu.prattle.model.User;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
 
+  @Mock
+  private UserService mockUserService;
   private UserService as;
   private static final String MIKE4 = "MIKE4";
   private static final String MIKE1 = "Mike1";
@@ -35,6 +46,8 @@ public class UserServiceImplTest {
   @Before
   public void setUp() {
     as = UserServiceImpl.getInstance();
+    mockUserService = UserServiceImpl.getInstance();
+    MockitoAnnotations.initMocks(this);
   }
 
 
@@ -49,16 +62,22 @@ public class UserServiceImplTest {
   Adding a single user to the databse
    */
   @Test
-  public void addUserTest() {
-    User user = new User(generateString());
-    as.addUser(user);
-    Optional<User> user1 = as.findUserByName(user.getUsername());
-    assertTrue(user1.isPresent());
+  public void createUserTest() {
+
+    String userName = generateString();
+    User mockUser = new User(userName);
+    mockUser.setFirstName("john");
+    mockUserService.addUser(mockUser);
+
+    when(mockUserService.findUserByName(userName)).thenReturn(Optional.of(mockUser));
+
+    User result = mockUserService.findUserByName(userName).get();
+    assertEquals(mockUser.getFirstName(), result.getFirstName());
   }
 
-  /*
+  /* *//*
   Adding multiple users to the databse
-   */
+   *//*
   @Test
   public void addMultipleUsersTest() {
     for (int i = 0; i < 4; i++) {
@@ -70,19 +89,21 @@ public class UserServiceImplTest {
 
 
   }
-
+*/
 
   // This method tests finding and getting user information from the database
   @Test
   public void getUserTest() {
-    String username = generateString();
-    String first_name = generateString();
-    User user = new User(username);
-    user.setFirstName(first_name);
-    as.addUser(user);
-    Optional<User> userObj = as.findUserByName(username);
-    assertTrue(userObj.isPresent());
-    assertEquals(first_name, userObj.get().getFirstName());
+    String userName = generateString();
+    User mockUser = new User(userName);
+    mockUser.setFirstName("john");
+    mockUser.setLastName("doe");
+    mockUserService.addUser(mockUser);
+
+    when(mockUserService.findUserByName(userName)).thenReturn(Optional.of(mockUser));
+
+    User result = mockUserService.findUserByName(userName).get();
+    assertEquals(mockUser.getFirstName() + mockUser.getLastName(), result.getFirstName() + result.getLastName());
 
   }
 
@@ -92,10 +113,14 @@ public class UserServiceImplTest {
    */
   @Test
   public void testFindUserByUsername() {
-    String username = generateString();
-    User user = new User(username);
-    as.addUser(user);
-    Optional<User> userObj = as.findUserByName(username);
+    String userName = generateString();
+    User mockUser = new User(userName);
+    mockUser.setFirstName("john");
+    mockUserService.addUser(mockUser);
+
+    when(mockUserService.findUserByName(userName)).thenReturn(Optional.of(mockUser));
+
+    Optional<User> userObj = mockUserService.findUserByName(userName);
     assertTrue(userObj.isPresent());
   }
 
@@ -104,8 +129,9 @@ public class UserServiceImplTest {
    */
   @Test(expected = UserDoesNotExistException.class)
   public void testFindUserByUsernameNotExisting() {
-    User user = as.findUserByUsername("nouser");
-    assertNull(user);
+    doThrow(new UserDoesNotExistException("User does not exists")).when(mockUserService).findUserByName("nouser");
+    Optional<User> userObj = mockUserService.findUserByName("nouser");
+    assertNull(userObj);
   }
 
   /*
@@ -123,8 +149,15 @@ public class UserServiceImplTest {
     listGroups.add(group);
     groupUser.setGroupParticipant(listGroups);
     group.setMembers(listUsers);
-    as.addUser(groupUser);
-    List<Group> g = as.findGroupsByName(groupUser.getUsername());
+    mockUserService.addUser(groupUser);
+
+    List<Group> mockGroup = new ArrayList<>();
+    mockGroup.add(group);
+
+    when(mockUserService.findGroupsByName(groupUser.getUsername())).thenReturn(mockGroup);
+    List<Group> g = mockUserService.findGroupsByName(groupUser.getUsername());
+
+
     assertEquals(groupName, g.get(0).getName());
   }
 
@@ -134,12 +167,23 @@ public class UserServiceImplTest {
    */
   @Test
   public void updateUser() {
-    Optional<User> user = as.findUserByName("MIKE1");
+
+    String userName = generateString();
+    User mockUser = new User(userName);
+    mockUser.setFirstName("john");
+    mockUserService.addUser(mockUser);
+
+    when(mockUserService.findUserByName(userName)).thenReturn(Optional.of(mockUser));
+    Optional<User> user = mockUserService.findUserByName(userName);
     if (user.isPresent()) {
       user.get().setFirstName("Mikeupdate");
-      as.updateUser(user.get());
+      mockUserService.updateUser(user.get());
     }
-    user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getFirstName()));
+
+    when(mockUserService.findUserByUsername(userName)).thenReturn(mockUser);
+    User user2 = mockUserService.findUserByUsername(userName);
+
+    user.ifPresent(user1 -> assertEquals("Mikeupdate", user2.getFirstName()));
   }
 
 

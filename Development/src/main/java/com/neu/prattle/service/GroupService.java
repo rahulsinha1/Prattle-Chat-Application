@@ -35,12 +35,12 @@ public interface GroupService {
   /**
    * adds moderator to existing group
    */
-  void addModerator(Group group, Moderator moderator);
+  void addModerator(Group group, User moderator);
 
   /**
    * removes moderator from existing group
    */
-  void removeModerator(Group group, Moderator moderator);
+  void removeModerator(Group group, User moderator);
 
   /**
    * updates group information

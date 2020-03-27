@@ -1,18 +1,21 @@
 package com.neu.prattle.service;
 
+import com.neu.prattle.exceptions.GroupAlreadyPresentException;
+import com.neu.prattle.exceptions.GroupDoesNotExistException;
+import com.neu.prattle.exceptions.UserAlreadyPresentInGroupException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.Group;
-import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+import javax.persistence.EntityManagerFactory;
+import javax.ws.rs.HEAD;
+
 
 /**
  * GroupServiceImpl implements groupservice.
@@ -20,15 +23,16 @@ import java.util.Set;
 public class GroupServiceImpl implements GroupService {
 
   private static GroupService groupService;
+  private static UserService userService;
+
+  private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
+          .createEntityManagerFactory("fse");
 
   static {
     groupService = new GroupServiceImpl();
+    userService = new UserServiceImpl();
   }
 
-  private UserService userService = UserServiceImpl.getInstance();
-  private Set<Group> groupSet = new HashSet<>();
-  private Map<String, List<User>> userGroupList = new HashMap<>();
-  private Map<String, List<Moderator>> moderatorGroupList = new HashMap<>();
   /***
    * GroupServiceImpl is a Singleton class.
    */
@@ -47,80 +51,131 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void createGroup(Group group) {
-    for (User user : group.getUsers()) {
-      checkUserAndAddToGroup(group, user);
-    }
-    group.setId("" + groupSet.size() + 1);
-    addModerator(group, group.getModerators().get(0));
-    Long currentTimeStamp = new Date().getTime();
-    group.setCreatedOn(currentTimeStamp.toString());
-    groupSet.add(group);
+    create(group);
   }
 
   @Override
   public void addUser(Group group, User user) {
-    if (userGroupList.containsKey(group)) {
-      List<User> userList = userGroupList.get(group.getId());
-      userList.add(user);
-      userGroupList.put(group.getId(), userList);
-    } else {
-      List<User> userList = new ArrayList();
-      userList.add(user);
-      userGroupList.put(group.getId(), userList);
+
+//    System.out.println(user);
+//    if (group.getModerators().contains(user) || group.getMembers().contains(user)) {
+//      throw new UserAlreadyPresentInGroupException("User is already present in the group.");
+//    } else {
+      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+      EntityTransaction transaction = null;
+      transaction = manager.getTransaction();
+      transaction.begin();
+      manager.createNativeQuery("INSERT INTO group_users (user_id, group_id) VALUES (?,?)")
+              .setParameter(1, user.getUser_id())
+              .setParameter(2, group.getId())
+              .executeUpdate();
+      transaction.commit();
+      manager.close();
     }
-    checkUserAndAddToGroup(group, user);
-  }
 
 
   @Override
   public void removeUser(Group group, User user) {
-    if (userGroupList.containsKey(group)) {
-      List<User> userList = userGroupList.get(group.getId());
-      userList.remove(user);
-      userGroupList.put(group.getId(), userList);
-    }
+
+//    if (!group.getMembers().contains(user)) {
+      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+      EntityTransaction transaction = null;
+      transaction = manager.getTransaction();
+      transaction.begin();
+      manager.createNativeQuery("DELETE FROM group_users u WHERE u.user_id = :1 AND u.group_id = :2")
+              .setParameter(1, user.getUser_id())
+              .setParameter(2, group.getId())
+              .executeUpdate();
+      transaction.commit();
+      manager.close();
+//    } else {
+//      throw new UserDoesNotExistException("User does not exist in the group.");
+//    }
   }
 
   @Override
-  public void addModerator(Group group, Moderator moderator) {
-    if (moderatorGroupList.containsKey(group)) {
-      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
-      moderatorList.add(moderator);
-      moderatorGroupList.put(group.getId(), moderatorList);
-    } else {
-      List<Moderator> moderatorList = new ArrayList();
-      moderatorList.add(moderator);
-      moderatorGroupList.put(group.getId(), moderatorList);
-    }
-    checkUserAndAddToGroup(group, moderator);
+  public void addModerator(Group group, User moderator) {
+
+//    if (!group.getModerators().contains(moderator)) {
+      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+      EntityTransaction transaction = null;
+      transaction = manager.getTransaction();
+      transaction.begin();
+      manager.createNativeQuery("INSERT INTO group_mods (moderator_id, group_id) VALUES (?,?)")
+              .setParameter(1, moderator.getUser_id())
+              .setParameter(2, group.getId())
+              .executeUpdate();
+      transaction.commit();
+      manager.close();
+//    } else {
+//      throw new UserAlreadyPresentInGroupException("Moderator is already present in the group.");
+//    }
   }
 
+
   @Override
-  public void removeModerator(Group group, Moderator moderator) {
-    if (moderatorGroupList.containsKey(group)) {
-      List<Moderator> moderatorList = moderatorGroupList.get(group.getId());
-      moderatorList.remove(moderator);
-      moderatorGroupList.put(group.getId(), moderatorList);
-    }
+  public void removeModerator(Group group, User moderator) {
+
+//    if (group.getModerators().contains(moderator)) {
+      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+      EntityTransaction transaction = null;
+      transaction = manager.getTransaction();
+      transaction.begin();
+      manager.createNativeQuery("DELETE FROM group_mods WHERE moderator_id = ? AND u.group_id = ?")
+              .setParameter(1, moderator.getUser_id())
+              .setParameter(2, group.getId())
+              .executeUpdate();
+      transaction.commit();
+      manager.close();
+//    } else {
+//      throw new UserDoesNotExistException("Moderator does not exist.");
+//    }
+
+  }
+
+
+  @Override
+  public void deleteGroup(Group group) {
+
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+    manager.createNativeQuery("DELETE FROM groups WHERE group_name =? ")
+            .setParameter(1, group.getName())
+            .executeUpdate();
+    transaction.commit();
+    manager.close();
   }
 
   @Override
   public void updateGroup(Group group) {
-    groupSet.add(group);
-    List<User> usersInGroup = group.getUsers();
-    for (User user : usersInGroup) {
-      checkUserAndAddToGroup(group, user);
+    if (!isRecordExist(group.getName())) {
+      throw new GroupDoesNotExistException("Group does not exist");
     }
-  }
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
 
-  @Override
-  public void deleteGroup(Group group) {
-    groupSet.remove(group);
+    manager.createNativeQuery("UPDATE groups SET group_description = ?, group_password = ?, is_private = ?  WHERE group_name= ?")
+            .setParameter(1, group.getDescription())
+            .setParameter(2, group.getPassword())
+            .setParameter(3, group.getIsGroupPrivate())
+            .setParameter(4, group.getName())
+            .executeUpdate();
+
+    transaction.commit();
+    manager.close();
+
   }
 
   @Override
   public List getAllGroups() {
-    return Arrays.asList(groupSet.toArray());
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    TypedQuery<Group> query = manager.createQuery("SELECT g FROM Group g", Group.class);
+    List<Group> results = query.getResultList();
+    return results;
   }
 
   @Override
@@ -135,21 +190,46 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public Group getGroupByName(String name) {
-    for (Group group : groupSet) {
-      if (group.getName().equals(name))
-        return group;
-    }
-    return null;
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+
+    if (isRecordExist(name)) {
+      TypedQuery<Group> query = manager.createQuery(
+              "SELECT g FROM Group g WHERE g.name = :name", Group.class);
+
+      return (Group) query.setParameter("name", name).getSingleResult();
+    } else
+    throw new GroupDoesNotExistException("Group does not exist");
   }
 
-  private void checkUserAndAddToGroup(Group group, User user) {
-    if (userService.findUserByName(user.getUsername()).isPresent()) {
-      List groupParticipant = user.getGroupParticipant();
-      groupParticipant.add(group.getName());
-      User currentUser = userService.findUserByUsername(user.getUsername());
-      currentUser.setGroupParticipant(user.getGroupParticipant());
-    } else {
-      throw new UserDoesNotExistException(String.format("User %s does not exist in system.", user.getUsername()));
+
+
+  private void create(Group group) {
+
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+
+
+    if (isRecordExist(group.getName())) {
+      throw new GroupAlreadyPresentException(String.format("Group already present with name: %s", group.getName()));
     }
+
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    manager.persist(group);
+
+    transaction.commit();
+    manager.close();
+  }
+
+  private boolean isRecordExist(String groupName) {
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+
+    TypedQuery<Long> query = manager.createQuery(
+            "SELECT count(g) FROM Group g WHERE g.name = :name", Long.class);
+
+
+    Long count = (Long) query.setParameter("name", groupName).getSingleResult();
+    return (!count.equals(0L));
   }
 }

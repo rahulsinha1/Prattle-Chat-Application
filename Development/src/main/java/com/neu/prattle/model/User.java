@@ -4,12 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
+
 /***
  * A User object represents a basic account information for a user.
  *
  * @author CS5500 Fall 2019 Teaching staff
  * @version dated 2019-10-06
  */
+
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+
 public class User {
 
     public String getUsername() {
@@ -30,11 +49,11 @@ public class User {
 
     public String getPassword() { return password; }
 
-    public List getGroupParticipant() {
+    public List<Group> getGroupParticipant() {
         return groupParticipant;
     }
 
-    public List getFollowers() {
+    public List<User> getFollowers() {
         return followers;
     }
 
@@ -53,28 +72,58 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    public void setGroupParticipant(List<String> groupParticipant) {
+    public void setGroupParticipant(List<Group> groupParticipant) {
         this.groupParticipant.addAll(groupParticipant);
     }
-    public void setFollowers(List<String> followers) {
+    public void setFollowers(List<User> followers) {
         this.followers.addAll(followers);
     }
 
 
-	private String username;
-	private String firstName;
-	private String lastName;
-	private String password;
-	private String timezone;
-	private List<String> groupParticipant;
-	private List<String> followers;
+  public int getUser_id() {
+    return user_id;
+  }
+
+  public void setUser_id(int user_id) {
+    this.user_id = user_id;
+  }
+
+  @Id
+  @Column(name = "user_id", unique = true)
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private int user_id;
+
+  @Column(name = "username")
+  private String username;
+  @Column(name = "first_name", unique = false)
+  private String firstName;
+  @Column(name = "last_name", unique = false)
+  private String lastName;
+  @Column(name = "user_password", unique = false)
+  private String password;
+  @Column(name = "timezone", unique = false)
+  private String timezone;
+
+  @ManyToMany(cascade = {CascadeType.ALL})
+  @JoinTable(name = "group_users",
+          joinColumns = @JoinColumn(name = "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "group_id"))
+	private List<Group> groupParticipant;
+
+  @ManyToMany
+	private List<User> followers;
 
 	public User() {
 	    groupParticipant = new ArrayList();
 	    followers = new ArrayList<>();
+    this.timezone="default";
+    this.firstName="first_name";
+    this.lastName="last_name";
+    this.password ="password";
   }
 
     public User(String firstName, String lastName, String username, String password, String timezone) {
+	      this.user_id = user_id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -86,6 +135,10 @@ public class User {
 
     public User(String username) {
         this.username = username;
+        this.timezone="default";
+        this.firstName="first_name";
+        this.lastName="last_name";
+        this.password ="password";
         groupParticipant = new ArrayList();
         followers = new ArrayList<>();
     }

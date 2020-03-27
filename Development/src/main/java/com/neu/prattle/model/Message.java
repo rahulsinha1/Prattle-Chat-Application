@@ -20,12 +20,23 @@ public class Message {
      */
     private String content;
 
+    private String timestamp;
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
     @Override
     public String toString() {
         return new StringBuilder()
                 .append("From: ").append(from)
                 .append("To: ").append(to)
                 .append("Content: ").append(content)
+                .append("Timestamp: ").append(timestamp)
                 .toString();
     }
 
@@ -83,6 +94,11 @@ public class Message {
 
         public MessageBuilder setMessageContent(String content)   {
             message.setContent(content);
+            return this;
+        }
+
+        public MessageBuilder setMessageTimestamp(String timestamp)   {
+            message.setTimestamp(timestamp);
             return this;
         }
 

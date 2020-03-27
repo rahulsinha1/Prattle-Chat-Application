@@ -1,15 +1,49 @@
+var ws;
+
 document.getElementById("welcoming").innerText = "Welcome " + localStorage.getItem('username');
 var keySize = 256;
 var ivSize = 128;
 var iterations = 100;
 
+document.addEventListener('DOMContentLoaded', function () {
+    var checkbox = document.querySelector('input[type="checkbox"]');
+    checkbox.addEventListener('change', function () {
+        if (checkbox.checked) {
+            // do this
+            console.log('Checked');
+            goOnline();
+        } else {
+            // do that
+            console.log('Not checked');
+            goOffline();
+        }
+    });
+});
+
 var password = "Secret Password";
 
-function connect() {
-    var username = document.getElementById("username").value;
 
+function connect() {
+    // var username = document.getElementById("username").value;
+    //
+    // var host = document.location.host;
+    // // var pathname = document.location.pathname;
+    //
+    // ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
+    //
+    // ws.onmessage = function(event) {
+    //     var log = document.getElementById("log");
+    //     var message = JSON.parse(event.data);
+    //     log.innerHTML += message.from + " : " + message.content + "\n";
+    // };
+}
+
+function goOnline() {
+    console.log('Username:' + localStorage.getItem('username'));
+    var username = localStorage.getItem('username');
     var host = document.location.host;
 
+    // var pathname = document.location.pathname;
     ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
 
     ws.onmessage = function (event) {
@@ -29,9 +63,10 @@ function connect() {
             log.innerHTML += message.from + " : " + message.content + "\n";
         }
     };
-}
-
-function goOnline() {
+    ws.onclose = function() {
+        var log = document.getElementById("log");
+        log.innerHTML += username + " : Disconnected!" + "\n";
+    }
 //     ws.onopen = function(event) {
 //     var log = document.getElementById("log");
 //     var message = JSON.parse(event.data);
@@ -40,21 +75,18 @@ function goOnline() {
 }
 
 function goOffline() {
-    // ws.onclose = function (event) {
-    //     var log = document.getElementById("log");
-    //     var message = JSON.parse(event.data);
-    //     log.innerHTML += message.from + " : Disconnected!" + "\n";
-    // };
+    ws.close();
 }
 
 function send() {
     var content = document.getElementById("msg").value;
     var username = document.getElementById("username").value;
-    var encrypted = encrypt(content, password);
+
+  var encrypted = encrypt(content, password);
     var json = JSON.stringify({
-                                  "to": username === "" ? null : username,
-                                  "content": encrypted
-                              });
+        "to": username === "" ? null : username,
+        "content": encrypted
+    });
 
     ws.send(json);
 }

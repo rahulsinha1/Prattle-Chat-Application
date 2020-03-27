@@ -1,42 +1,87 @@
 package com.neu.prattle.model;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 /***
  * A Group object represents a basic group information.
  *
  */
+
+@Entity
+@Table(name = "groups")
+
 public class Group {
 
+  @Id
+  @Column(name = "group_id", unique = true)
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private int id;
+
+  @Column(name = "group_name", unique = true)
   private String name;
-  private List<Moderator> moderators;
-  private List<User> users = new LinkedList<>();
-  private boolean isPrivate;
+
+  @ManyToMany(cascade = {CascadeType.MERGE})
+  @JoinTable( name = "group_mods",
+          joinColumns = @JoinColumn(name = "group_id"),
+          inverseJoinColumns = @JoinColumn(name = "moderator_id"))
+  private List<User> moderators;
+
+  @ManyToMany(cascade = {CascadeType.MERGE})
+  @JoinTable(name = "group_users",
+          joinColumns = @JoinColumn(name = "group_id"),
+          inverseJoinColumns = @JoinColumn(name = "user_id"))
+  private List<User> members = new LinkedList<>();
+
+  @Column(name = "is_private", unique = false)
+  private Boolean isGroupPrivate;
+
+  @Column(name = "group_password", unique = false)
+  private String password;
+
+  @Column(name = "group_description", unique = false)
   private String description;
-  private String id;
+
+  @Column(name = "created_on", unique = false)
   private String createdOn;
 
-  public void setModerators(List<Moderator> moderators) {
+  @Column(name = "created_by", unique = false)
+  private String createdBy;
+
+  public void setModerators(List<User> moderators) {
     this.moderators = moderators;
   }
 
-  public void setUsers(List<User> users) {
-    for(User user : users)
-      this.users.add(user);
+  public void setCreatedBy(String username){this.createdBy = username;}
+
+  public void setMembers(List<User> members) {
+    this.members.addAll(members);
   }
 
-  public void setPrivate(boolean aPrivate) {
-    isPrivate = aPrivate;
+  public void setIsGroupPrivate(Boolean isPrivate) {
+    this.isGroupPrivate = isPrivate;
   }
 
   public void setDescription(String description) {
     this.description = description;
   }
 
-  public void setId(String id) {
+  public void setId(int id) {
     this.id = id;
   }
 
@@ -44,23 +89,36 @@ public class Group {
     this.createdOn = createdOn;
   }
 
-  public List<Moderator> getModerators() {
+  public void setPassword(String password){
+    this.password = password;
+  }
+
+  public List<User> getModerators() {
     return moderators;
   }
 
-  public List<User> getUsers() {
-    return users;
+
+  public String getCreatedBy(){ return this.createdBy;}
+
+  public List<User> getMembers() {
+    return members;
   }
 
-  public boolean isPrivate() {
-    return isPrivate;
+  public boolean getIsGroupPrivate() {
+    return isGroupPrivate;
   }
+
+
+  public String getPassword(){
+    return this.password;
+  }
+
 
   public String getDescription() {
     return description;
   }
 
-  public String getId() {
+  public int getId() {
     return id;
   }
 
@@ -78,17 +136,45 @@ public class Group {
 
 
   public Group() {
-
+    this.isGroupPrivate = false;
+    this.description= "Empty";
+    this.password = "";
   }
 
-  public Group(String name) {
-    this.name = name;
+  public Group(String groupName) {
+    this.name = groupName;
+    this.isGroupPrivate = false;
+    this.description= "Empty";
+    this.password = "";
   }
 
-  public Group(String name,List<User> users,List<Moderator> moderators){
-    this.name = name;
-    this.users = users;
-    this.moderators = moderators;
+  public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
+    String strDate = setTimestamp();
+
+
+    this.name = groupName;
+    this.description = description;
+    this.isGroupPrivate = isGroupPrivate;
+    this.password = password;
+
+
+    this.createdOn = strDate;
+    this.createdBy = createdBy;
+    this.id += id;
+    this.moderators = new ArrayList<>();
+    this.members = new ArrayList<>();
+
+    this.moderators.add(new Moderator(createdBy));
+  }
+
+  /**
+   * Sets the timestamped.
+   * @return the time in the format yyyy-MM-dd HH:mm:ss
+   */
+  private String setTimestamp() {
+    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    Date now = new Date();
+    return sdfDate.format(now);
   }
 
   /***

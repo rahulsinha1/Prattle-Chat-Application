@@ -59,7 +59,7 @@ public class GroupModelTest {
 
     @Test
     public void testModerators(){
-        List<Moderator> moderators = new ArrayList<>();
+        List<User> moderators = new ArrayList<>();
         Moderator m = new Moderator("Moderator800");
         moderators.add(m);
         group.setModerators(moderators);

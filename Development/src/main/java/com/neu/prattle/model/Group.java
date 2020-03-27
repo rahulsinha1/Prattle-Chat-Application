@@ -1,9 +1,5 @@
 package com.neu.prattle.model;
 
-import com.neu.prattle.exceptions.UserDoesNotExistException;
-import com.neu.prattle.service.UserService;
-import com.neu.prattle.service.UserServiceImpl;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
@@ -11,30 +7,73 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
+import javax.ws.rs.HEAD;
+
 
 /***
  * A Group object represents a basic group information.
  *
  */
+
+@Entity
+@Table(name = "groups")
+
 public class Group {
-    private String name;
-  private List<Moderator> moderators;
+
+  @Id
+  @Column(name = "group_id", unique = true)
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private int id;
+
+  @Column(name = "group_name", unique = true)
+  private String name;
+
+  @ManyToMany(cascade = {CascadeType.MERGE})
+  @JoinTable( name = "group_mods",
+          joinColumns = @JoinColumn(name = "group_id"),
+          inverseJoinColumns = @JoinColumn(name = "moderator_id"))
+  private List<User> moderators;
+
+  @ManyToMany(cascade = {CascadeType.MERGE})
+  @JoinTable(name = "group_users",
+          joinColumns = @JoinColumn(name = "group_id"),
+          inverseJoinColumns = @JoinColumn(name = "user_id"))
   private List<User> members = new LinkedList<>();
+
+  @Column(name = "is_private", unique = false)
   private Boolean isGroupPrivate;
+
+  @Column(name = "group_password", unique = false)
   private String password;
+
+  @Column(name = "group_description", unique = false)
   private String description;
-  private int id = 0;
+
+  @Column(name = "created_on", unique = false)
   private String createdOn;
+
+  @Column(name = "created_by", unique = false)
   private String createdBy;
 
-  public void setModerators(List<Moderator> moderators) {
+  public void setModerators(List<User> moderators) {
     this.moderators = moderators;
   }
 
   public void setCreatedBy(String username){this.createdBy = username;}
 
   public void setMembers(List<User> members) {
-      this.members.addAll(members);
+    this.members.addAll(members);
   }
 
   public void setIsGroupPrivate(Boolean isPrivate) {
@@ -53,11 +92,11 @@ public class Group {
     this.createdOn = createdOn;
   }
 
-    public void setPassword(String password){
-        this.password = password;
-    }
+  public void setPassword(String password){
+    this.password = password;
+  }
 
-  public List<Moderator> getModerators() {
+  public List<User> getModerators() {
     return moderators;
   }
 
@@ -74,7 +113,7 @@ public class Group {
 
 
   public String getPassword(){
-      return this.password;
+    return this.password;
   }
 
 
@@ -107,33 +146,35 @@ public class Group {
   }
 
   public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
-      String strDate = setTimestamp();
+    String strDate = setTimestamp();
 
-      this.name = groupName;
-      this.description = description;
-      this.isGroupPrivate = isGroupPrivate;
-      this.password = password;
 
-      this.createdOn = strDate;
-      this.createdBy = createdBy;
-      this.id += id;
-      this.moderators = new ArrayList<>();
-      this.members = new ArrayList<>();
+    this.name = groupName;
+    this.description = description;
+    this.isGroupPrivate = isGroupPrivate;
+    this.password = password;
 
-      this.moderators.add(new Moderator(createdBy));
+
+    this.createdOn = strDate;
+    this.createdBy = createdBy;
+    this.id += id;
+    this.moderators = new ArrayList<>();
+    this.members = new ArrayList<>();
+
+    this.moderators.add(new Moderator(createdBy));
   }
 
-    /**
-     * Sets the timestamped.
-     * @return the time in the format yyyy-MM-dd HH:mm:ss
-     */
-    private String setTimestamp() {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date now = new Date();
-        return sdfDate.format(now);
-    }
+  /**
+   * Sets the timestamped.
+   * @return the time in the format yyyy-MM-dd HH:mm:ss
+   */
+  private String setTimestamp() {
+    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    Date now = new Date();
+    return sdfDate.format(now);
+  }
 
-    /***
+  /***
    * Returns the hashCode of this object.
    *
    * As name can be treated as a sort of identifier for

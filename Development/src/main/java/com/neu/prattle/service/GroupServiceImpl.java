@@ -175,6 +175,7 @@ public class GroupServiceImpl implements GroupService {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     TypedQuery<Group> query = manager.createQuery("SELECT g FROM Group g", Group.class);
     List<Group> results = query.getResultList();
+    manager.close();
     return results;
   }
 
@@ -196,7 +197,9 @@ public class GroupServiceImpl implements GroupService {
       TypedQuery<Group> query = manager.createQuery(
               "SELECT g FROM Group g WHERE g.name = :name", Group.class);
 
-      return (Group) query.setParameter("name", name).getSingleResult();
+      Group group = query.setParameter("name", name).getSingleResult();
+      manager.close();
+      return group;
     } else
     throw new GroupDoesNotExistException("Group does not exist");
   }
@@ -230,6 +233,8 @@ public class GroupServiceImpl implements GroupService {
 
 
     Long count = (Long) query.setParameter("name", groupName).getSingleResult();
+
+    manager.close();
     return (!count.equals(0L));
   }
 }

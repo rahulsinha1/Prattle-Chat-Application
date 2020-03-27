@@ -66,136 +66,9 @@ public class UserServiceImplTest {
       as.addUser(user);
       Optional<User> user1 = as.findUserByName(user.getUsername());
       assertTrue(user1.isPresent());
-   }
-	
-    // This method just tries to add
-	@Test
-	public void getUserTest(){
-		Optional<User> user = as.findUserByName(MIKE1);
-		assertTrue(!user.isPresent());
-	}
-
-	// Performance testing to benchmark our number of users that can be added
-	// in 1 sec
-
-	@Test(timeout = 1000)
-	public void checkPrefTest(){
-		for(int i=1000; i < 2000; i++) {
-			as.addUser(new User("Mike"+i));
-		}
-	}
-
-	@Test
-	public void testFindUserByUsername() {
-		setMocksForUserService(MIKE4);
-		User user = as.findUserByUsername(MIKE4);
-		assertEquals(MIKE4,user.getUsername());
-	}
-
-	@Test
-	public void findGroupsByName() {
-		setMocksForUserService("Mike3");
-		List<String> g = as.findGroupsByName("Mike3");
-		assertEquals("test",g.get(0));
-	}
-
-	@Test
-	public void updateUser() {
-		setMocksForUserService(MIKE1);
-		Optional<User> user = as.findUserByName(MIKE1);
-		if(user.isPresent()){
-			user.get().setUsername("Mikeupdate");
-			as.updateUser(user.get());
-		}
-		user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getUsername()));
-	}
-
-	@Test
-	public void testEmptyFindUser() {
-		Optional<User> user = as.findUserByName("Test94");
-		assertFalse(user.isPresent());
-	}
-
-	@Test
-	public void testEmptyFindUserByName() {
-		User user = as.findUserByUsername("Test94");
-		assertNull(user);
-	}
-
-	@Test(expected = UserAlreadyPresentException.class)
-	public void testUserAlreadyExist() {
-		as.addUser(new User("Test1"));
-		as.addUser(new User("Test1"));
-	}
-
-    @Test(expected = UserAlreadyPresentException.class)
-    public void testUserAlreadyExistTwo() {
-        as.addUser(new User("Test", "Test","Test", "Test","Test"));
-        as.addUser(new User("Test", "Test","Test", "Test","Test"));
-        assertFalse(false);
     }
-
-
-  // This method tests finding and getting user information from the database
-  @Test
-  public void getUserTest() {
-    String username = generateString();
-    String first_name = generateString();
-    User user = new User(username);
-    user.setFirstName(first_name);
-    as.addUser(user);
-    Optional<User> userObj = as.findUserByName(username);
-    assertTrue(userObj.isPresent());
-    assertEquals(first_name, userObj.get().getFirstName());
-
   }
 
-
-  /*
-  Finding user in the databse according to the username
-   */
-  @Test
-  public void testFindUserByUsername() {
-    String username = generateString();
-    User user = new User(username);
-    as.addUser(user);
-    Optional<User> userObj = as.findUserByName(username);
-    assertTrue(userObj.isPresent());
-  }
-
-  /*
-  Find a user which does not exist
-   */
-  @Test(expected = UserDoesNotExistException.class)
-  public void testFindUserByUsernameNotExisting() {
-    User user = as.findUserByUsername("nouser");
-    assertNull(user);
-  }
-
-  /*
-  Test if the user is part of one group
-   */
-  @Test
-  public void findGroupsByName() {
-    String userName = generateString();
-    String groupName = generateString();
-    User groupUser = new User(userName);
-    Group group = new Group(groupName);
-    List<User> listUsers = new ArrayList<>();
-    List<Group> listGroups = new ArrayList<>();
-    listUsers.add(groupUser);
-    listGroups.add(group);
-    groupUser.setGroupParticipant(listGroups);
-    group.setMembers(listUsers);
-    as.addUser(groupUser);
-    List<Group> g = as.findGroupsByName(groupUser.getUsername());
-    assertEquals(groupName, g.get(0).getName());
-  }
-
-
-  /*
-  Test for updating the user entity which exists in the system
-   */
   @Test
   public void updateUser() {
     Optional<User> user = as.findUserByName("MIKE1");
@@ -206,94 +79,171 @@ public class UserServiceImplTest {
     user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getFirstName()));
   }
 
+    @Test(expected = UserAlreadyPresentException.class)
+    public void testUserAlreadyExist () {
+      as.addUser(new User("Test1"));
+      as.addUser(new User("Test1"));
+    }
+
+
+    // This method tests finding and getting user information from the database
+    @Test
+    public void getUserTest () {
+      String username = generateString();
+      String first_name = generateString();
+      User user = new User(username);
+      user.setFirstName(first_name);
+      as.addUser(user);
+      Optional<User> userObj = as.findUserByName(username);
+      assertTrue(userObj.isPresent());
+      assertEquals(first_name, userObj.get().getFirstName());
+
+    }
+
+
+  /*
+  Finding user in the databse according to the username
+   */
+    @Test
+    public void testFindUserByUsername () {
+      String username = generateString();
+      User user = new User(username);
+      as.addUser(user);
+      Optional<User> userObj = as.findUserByName(username);
+      assertTrue(userObj.isPresent());
+    }
+
+  /*
+  Find a user which does not exist
+   */
+    @Test(expected = UserDoesNotExistException.class)
+    public void testFindUserByUsernameNotExisting () {
+      User user = as.findUserByUsername("nouser");
+      assertNull(user);
+    }
+
+  /*
+  Test if the user is part of one group
+   */
+    @Test
+    public void findGroupsByName () {
+      String userName = generateString();
+      String groupName = generateString();
+      User groupUser = new User(userName);
+      Group group = new Group(groupName);
+      List<User> listUsers = new ArrayList<>();
+      List<Group> listGroups = new ArrayList<>();
+      listUsers.add(groupUser);
+      listGroups.add(group);
+      groupUser.setGroupParticipant(listGroups);
+      group.setMembers(listUsers);
+      as.addUser(groupUser);
+      List<Group> g = as.findGroupsByName(groupUser.getUsername());
+      assertEquals(groupName, g.get(0).getName());
+    }
+
+
+  /*
+  Test for updating the user entity which exists in the system
+   */
+    /*@Test
+    public void updateUser () {
+      Optional<User> user = as.findUserByName("MIKE1");
+      if (user.isPresent()) {
+        user.get().setFirstName("Mikeupdate");
+        as.updateUser(user.get());
+      }
+      user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getFirstName()));
+    }*/
+
 
   /*
   Update a non existing user Entity
    */
-  @Test(expected = UserDoesNotExistException.class)
-  public void updateUserNotExists() {
-    User user = new User(generateString());
-    user.setFirstName("update");
-    as.updateUser(user);
-  }
+    @Test(expected = UserDoesNotExistException.class)
+    public void updateUserNotExists () {
+      User user = new User(generateString());
+      user.setFirstName("update");
+      as.updateUser(user);
+    }
 
 
   /*
   Find user in the databse which does not exist
    */
-  @Test
-  public void testEmptyFindUser() {
-    Optional<User> user = as.findUserByName("Test94");
-    assertFalse(user.isPresent());
-  }
+    @Test
+    public void testEmptyFindUser () {
+      Optional<User> user = as.findUserByName("Test94");
+      assertFalse(user.isPresent());
+    }
 
-  @Test(expected = UserDoesNotExistException.class)
-  public void testEmptyFindUserByName() {
-    User user = as.findUserByUsername("Test94");
-    assertNull(user);
-  }
+    @Test(expected = UserDoesNotExistException.class)
+    public void testEmptyFindUserByName () {
+      User user = as.findUserByUsername("Test94");
+      assertNull(user);
+    }
 
 
   /*
     Adding user which already exists in the databse
    */
-  @Test(expected = UserAlreadyPresentException.class)
-  public void testUserAlreadyExistTwo() {
-    as.addUser(new User("Test", "Test", "Test", "Test", "Test"));
-    as.addUser(new User("Test", "Test", "Test", "Test", "Test"));
-    assertFalse(false);
-  }
+    @Test(expected = UserAlreadyPresentException.class)
+    public void testUserAlreadyExistTwo () {
+      as.addUser(new User("Test", "Test", "Test", "Test", "Test"));
+      as.addUser(new User("Test", "Test", "Test", "Test", "Test"));
+      assertFalse(false);
+    }
 
   /*
     Check the groups for user who is not a part of any group
    */
-  @Test
-  public void testEmptyGroup() {
-    List g = as.findGroupsByName("Test93");
-    assertEquals(0, g.size());
-  }
+    @Test
+    public void testEmptyGroup () {
+      List g = as.findGroupsByName("Test93");
+      assertEquals(0, g.size());
+    }
 
-  private void setMocksForUserService(String name) {
-    List<Group> groups = new ArrayList<>();
-    Group g = new Group();
-    g.setName(generateString());
-    groups.add(g);
-    User u = new User(name);
-    u.setFirstName(generateString());
-    u.setLastName(generateString());
-    u.setGroupParticipant(groups);
-    as.addUser(u);
-  }
+    private void setMocksForUserService (String name){
+      List<Group> groups = new ArrayList<>();
+      Group g = new Group();
+      g.setName(generateString());
+      groups.add(g);
+      User u = new User(name);
+      u.setFirstName(generateString());
+      u.setLastName(generateString());
+      u.setGroupParticipant(groups);
+      as.addUser(u);
+    }
 
   /*
   This is a helper method using to generate random strings rto populate group and user names.
    */
-  private String generateString() {
-    int n = 8;
-    {
-      // chose a Character random from this String
-      String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-              + "0123456789"
-              + "abcdefghijklmnopqrstuvxyz";
+    private String generateString () {
+      int n = 8;
+      {
+        // chose a Character random from this String
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                + "0123456789"
+                + "abcdefghijklmnopqrstuvxyz";
 
 
-      StringBuilder sb = new StringBuilder(n);
+        StringBuilder sb = new StringBuilder(n);
 
-      for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
 
-        int index = (int) (AlphaNumericString.length()
-                * Math.random());
+          int index = (int) (AlphaNumericString.length()
+                  * Math.random());
 
-        // add Character one by one in end of sb
-        sb.append(AlphaNumericString
-                .charAt(index));
+          // add Character one by one in end of sb
+          sb.append(AlphaNumericString
+                  .charAt(index));
+        }
+
+        return sb.toString();
       }
 
-      return sb.toString();
     }
 
   }
-
-}
 
 

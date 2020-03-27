@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
               "SELECT u FROM User u WHERE u.username = :name", User.class);
 
       User user = (User) query.setParameter("name", username).getSingleResult();
+      manager.close();
       return Optional.of(user);
     } else
       return Optional.empty();
@@ -85,8 +86,10 @@ public class UserServiceImpl implements UserService {
     if (isRecordExist(name)) {
       TypedQuery<User> query = manager.createQuery(
               "SELECT u FROM User u WHERE u.username = :name", User.class);
+      User user = query.setParameter("name", name).getSingleResult();
+      manager.close();
+      return user;
 
-      return (User) query.setParameter("name", name).getSingleResult();
     } else
       throw new UserDoesNotExistException("User does not exist.");
   }
@@ -105,6 +108,7 @@ public class UserServiceImpl implements UserService {
               .setParameter(1, user.getUser_id());
 
       List groupList = (List<Group>) query1.getResultList();
+      manager.close();
       return groupList;
     }
     return Collections.emptyList();
@@ -159,6 +163,7 @@ public class UserServiceImpl implements UserService {
 
 
     Long count = (Long) query.setParameter("name", username).getSingleResult();
+    manager.close();
     return (!count.equals(0L));
   }
 }

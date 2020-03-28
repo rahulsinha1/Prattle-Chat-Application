@@ -159,7 +159,9 @@ public class Group {
     this.id += id;
     this.moderators = new ArrayList<>();
     this.members = new ArrayList<>();
-    this.moderators.add(new User(createdBy));
+    User groupCreator = new User(createdBy);
+    this.moderators.add(groupCreator);
+    this.members.add(groupCreator);
   }
 
   /**

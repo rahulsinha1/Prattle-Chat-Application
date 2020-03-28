@@ -65,7 +65,6 @@ public class GroupController {
         }catch (GroupDoesNotExistException e ){
             return Response.status(409, e.getMessage()).build();
         }
-
         return Response.status(200).entity(userGroup).build();
     }
 

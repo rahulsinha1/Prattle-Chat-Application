@@ -2,6 +2,7 @@ package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.main.EntityManagerObject;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
@@ -29,9 +30,9 @@ public class UserServiceImpl implements UserService {
 
   private static UserService accountService;
   private static final String SELECT_QUERY = "SELECT u FROM User u WHERE u.username = :name";
-  private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
-          .createEntityManagerFactory("fse");
-  private static final EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+  //private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("fse");
+  private static final EntityManager manager = EntityManagerObject.getInstance();
+
 
   static {
     accountService = new UserServiceImpl();

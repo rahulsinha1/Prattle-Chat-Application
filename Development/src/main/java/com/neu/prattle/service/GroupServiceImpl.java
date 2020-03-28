@@ -2,6 +2,7 @@ package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.GroupAlreadyPresentException;
 import com.neu.prattle.exceptions.GroupDoesNotExistException;
+import com.neu.prattle.main.EntityManagerObject;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
@@ -23,9 +24,8 @@ public class GroupServiceImpl implements GroupService {
   private static GroupService groupService;
   private static UserService userService;
 
-  private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
-          .createEntityManagerFactory("fse");
-  private static final EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+  //private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("fse");
+  private static final EntityManager manager = EntityManagerObject.getInstance();
 
   static {
     groupService = new GroupServiceImpl();
@@ -179,8 +179,9 @@ public class GroupServiceImpl implements GroupService {
 
     manager.persist(group);
     transaction.commit();
-    /*User moderator = userService.findUserByUsername(group.getCreatedBy());
-    addModerator(group,moderator);*/
+    User moderator = userService.findUserByUsername(group.getCreatedBy());
+    addModerator(group,moderator);
+    addUser(group,moderator);
   }
 
   private boolean isRecordExist(String groupName) {

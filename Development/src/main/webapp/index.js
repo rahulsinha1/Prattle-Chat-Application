@@ -92,7 +92,6 @@ function submitGroupCreation(){
     }).catch((e)=>{
             displayMessage.innerText = "Unsuccessfully Created";
     })
-
     }
 }
 function clear(){

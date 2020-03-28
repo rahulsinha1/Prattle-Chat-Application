@@ -16,7 +16,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import javax.ws.rs.HEAD;
 
 /***
  * Implementation of {@link UserService}
@@ -32,6 +31,7 @@ public class UserServiceImpl implements UserService {
   private static UserService accountService;
   private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
           .createEntityManagerFactory("fse");
+  private static final String selectQuery = "SELECT u FROM User u WHERE u.username = :name";
 
   static {
     accountService = new UserServiceImpl();
@@ -61,16 +61,16 @@ public class UserServiceImpl implements UserService {
   @Override
   public Optional<User> findUserByName(String username) {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-    EntityTransaction transaction = null;
 
     if (isRecordExist(username)) {
       TypedQuery<User> query = manager.createQuery(
-              "SELECT u FROM User u WHERE u.username = :name", User.class);
+              selectQuery, User.class);
 
       User user = (User) query.setParameter("name", username).getSingleResult();
       return Optional.of(user);
-    } else
+    } else {
       return Optional.empty();
+    }
   }
 
   @Override
@@ -84,11 +84,13 @@ public class UserServiceImpl implements UserService {
 
     if (isRecordExist(name)) {
       TypedQuery<User> query = manager.createQuery(
-              "SELECT u FROM User u WHERE u.username = :name", User.class);
+              selectQuery, User.class);
 
       return (User) query.setParameter("name", name).getSingleResult();
-    } else
+
+    } else {
       throw new UserDoesNotExistException("User does not exist.");
+    }
   }
 
   @Override
@@ -96,7 +98,7 @@ public class UserServiceImpl implements UserService {
     if (isRecordExist(name)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       TypedQuery<User> query = manager.createQuery(
-              "SELECT u FROM User u WHERE u.username = :name", User.class);
+              selectQuery, User.class);
 
 
       User user = (User) query.setParameter("name", name).getSingleResult();
@@ -104,8 +106,7 @@ public class UserServiceImpl implements UserService {
       Query query1 = manager.createNativeQuery("Select * from groups where group_id in ( select group_id from group_users where user_id =?)", Group.class)
               .setParameter(1, user.getUser_id());
 
-      List groupList = (List<Group>) query1.getResultList();
-      return groupList;
+      return (List<Group>) query1.getResultList();
     }
     return Collections.emptyList();
 

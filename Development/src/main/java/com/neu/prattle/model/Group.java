@@ -17,8 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.ws.rs.HEAD;
 
 
 /***
@@ -39,13 +37,13 @@ public class Group {
   @Column(name = "group_name", unique = true)
   private String name;
 
-  @ManyToMany(cascade = {CascadeType.MERGE})
-  @JoinTable( name = "group_mods",
+  @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+  @JoinTable(name = "group_mods",
           joinColumns = @JoinColumn(name = "group_id"),
           inverseJoinColumns = @JoinColumn(name = "moderator_id"))
   private List<User> moderators;
 
-  @ManyToMany(cascade = {CascadeType.MERGE})
+  @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "group_id"),
           inverseJoinColumns = @JoinColumn(name = "user_id"))
@@ -70,7 +68,9 @@ public class Group {
     this.moderators = moderators;
   }
 
-  public void setCreatedBy(String username){this.createdBy = username;}
+  public void setCreatedBy(String username) {
+    this.createdBy = username;
+  }
 
   public void setMembers(List<User> members) {
     this.members.addAll(members);
@@ -92,7 +92,7 @@ public class Group {
     this.createdOn = createdOn;
   }
 
-  public void setPassword(String password){
+  public void setPassword(String password) {
     this.password = password;
   }
 
@@ -101,7 +101,9 @@ public class Group {
   }
 
 
-  public String getCreatedBy(){ return this.createdBy;}
+  public String getCreatedBy() {
+    return this.createdBy;
+  }
 
   public List<User> getMembers() {
     return members;
@@ -112,7 +114,7 @@ public class Group {
   }
 
 
-  public String getPassword(){
+  public String getPassword() {
     return this.password;
   }
 
@@ -140,18 +142,18 @@ public class Group {
 
   public Group() {
     this.isGroupPrivate = false;
-    this.description= "Empty";
+    this.description = "Empty";
     this.password = "";
   }
 
   public Group(String groupName) {
     this.name = groupName;
     this.isGroupPrivate = false;
-    this.description= "Empty";
+    this.description = "Empty";
     this.password = "";
   }
 
-  public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
+  public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate) {
     String strDate = setTimestamp();
 
 
@@ -172,6 +174,7 @@ public class Group {
 
   /**
    * Sets the timestamped.
+   *
    * @return the time in the format yyyy-MM-dd HH:mm:ss
    */
   private String setTimestamp() {

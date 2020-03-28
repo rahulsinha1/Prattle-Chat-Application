@@ -14,7 +14,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.HEAD;
 
 
 /**
@@ -57,10 +56,6 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public void addUser(Group group, User user) {
 
-//    System.out.println(user);
-//    if (group.getModerators().contains(user) || group.getMembers().contains(user)) {
-//      throw new UserAlreadyPresentInGroupException("User is already present in the group.");
-//    } else {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
@@ -93,7 +88,6 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public void removeUser(Group group, User user) {
 
-//    if (!group.getMembers().contains(user)) {
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
@@ -129,16 +123,12 @@ public class GroupServiceImpl implements GroupService {
         transaction.commit();
         manager.close();
 
-//    } else {
-//      throw new UserDoesNotExistException("User does not exist in the group.");
-//    }
       }
 
 
   @Override
   public void addModerator(Group group, User moderator) {
 
-//    if (!group.getModerators().contains(moderator)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
@@ -157,16 +147,12 @@ public class GroupServiceImpl implements GroupService {
 
       transaction.commit();
       manager.close();
-//    } else {
-//      throw new UserAlreadyPresentInGroupException("Moderator is already present in the group.");
-//    }
   }
 
 
   @Override
   public void removeModerator(Group group, User moderator) {
 
-//    if (group.getModerators().contains(moderator)) {
       EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
@@ -190,12 +176,7 @@ public class GroupServiceImpl implements GroupService {
 
       transaction.commit();
       manager.close();
-//    } else {
-//      throw new UserDoesNotExistException("Moderator does not exist.");
-//    }
-
   }
-
 
   @Override
   public void deleteGroup(Group group) {
@@ -260,8 +241,9 @@ public class GroupServiceImpl implements GroupService {
               "SELECT g FROM Group g WHERE g.name = :name", Group.class);
 
       return (Group) query.setParameter("name", name).getSingleResult();
-    } else
-    throw new GroupDoesNotExistException("Group does not exist");
+    } else {
+      throw new GroupDoesNotExistException("Group does not exist");
+    }
   }
 
 

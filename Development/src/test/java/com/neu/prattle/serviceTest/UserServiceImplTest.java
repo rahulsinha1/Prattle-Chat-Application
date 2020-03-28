@@ -50,14 +50,6 @@ public class UserServiceImplTest {
     MockitoAnnotations.initMocks(this);
   }
 
-
-  // This method just tries to add
-  @Test
-  public void setUserTest() {
-    setMocksForUserService(generateString());
-  }
-
-
   /*
   Adding a single user to the databse
    */

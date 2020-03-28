@@ -296,6 +296,18 @@ public class GroupServiceImplTest {
     assertEquals("This is a test group", mockGroupService.getGroupByName(groupName).getDescription());
   }
 
+  /*
+    Updating a group which does not exist
+     */
+  @Test(expected = GroupDoesNotExistException.class)
+  public void testUpdateGroupNotExist() {
+    Group group = new Group("Test","This is a test", "Test","password",true);
+    doThrow(new GroupDoesNotExistException("Group does not exist")).when(mockGroupService).updateGroup(group);
+    group.setPassword("newPass");
+    mockGroupService.updateGroup(group);
+  }
+
+
 
   /*
     Test if a group is successfully deleted
@@ -358,6 +370,26 @@ public class GroupServiceImplTest {
 
   }
 
+  @Test
+  public void addUsersToGroups()
+  {
+    String gName = generateString()+"z";
+    String userName = generateString()+"cdmmnkj";
+    User user = new User(userName);
+    userService.addUser(user);
+    Group group = new Group(gName);
+    groupService.createGroup(group);
+
+    User userObj = userService.findUserByUsername(user.getUsername());
+    Group groupObj = groupService.getGroupByName(group.getName());
+
+    groupService.addUser(groupObj,userObj);
+
+    //assertEquals(userService.findGroupsByName(userObj.getUsername()).get(0).getName(),gName);
+
+    List<Group> grpList = userService.findGroupsByName(userName);
+    assertEquals(grpList.get(0).getName(),gName);
+  }
 
   /*
   Helper method to generate random strings

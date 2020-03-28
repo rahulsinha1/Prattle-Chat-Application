@@ -12,6 +12,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.EntityManagerFactory;
+import javax.transaction.Transactional;
 
 
 /**
@@ -177,8 +178,9 @@ public class GroupServiceImpl implements GroupService {
     transaction.begin();
 
     manager.persist(group);
-
     transaction.commit();
+    /*User moderator = userService.findUserByUsername(group.getCreatedBy());
+    addModerator(group,moderator);*/
   }
 
   private boolean isRecordExist(String groupName) {

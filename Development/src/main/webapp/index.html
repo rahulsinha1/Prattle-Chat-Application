@@ -47,7 +47,7 @@
     <button onclick="createGroup()">Create Groups</button>
     <button onclick="viewGroupMethod()">View Groups</button>
     <button>Update Groups</button>
-    <button>Delete Groups</button>
+    <button onclick="deleteGroup()">Delete Groups</button>
     <button>Join Group</button>
 </div>
 <div id="create_group_form">
@@ -63,7 +63,21 @@
     </form>
     <div id="create_group_message"></div>
 </div>
-<div id="view_group"></div>
+<!--View Group-->
+<div id="view_group_section">
+    <p>The select the group:</p>
+    <label for="groups">Choose a group:</label>
+    <select id="groupsParticipation"></select>
+    <br>
+    <input type="button" value="Submit" onclick="submitGroupView()"/>
+    <div id="view_group_message"></div>
+</div>
+<!--Delete Group-->
+<div id="delete_group_form">
+    Group Name : <select id="moderatorOfGroup"></select>
+    <button onclick="deleteGroupButton()">Delete Group</button>
+    <div id="delete_group_message"></div>
+</div>
 </body>
 <script src="websocket.js"></script>
 <script src="index.js"></script>

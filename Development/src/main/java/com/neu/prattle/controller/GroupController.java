@@ -81,7 +81,6 @@ public class GroupController {
         }  catch (UserAlreadyPresentInGroupException e){
             return Response.status(409, e.getMessage()).build();
         }
-
     return Response.status(200,"User Successfully Added In Group.").build();
   }
 

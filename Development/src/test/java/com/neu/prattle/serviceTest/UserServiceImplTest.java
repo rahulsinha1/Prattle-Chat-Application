@@ -77,8 +77,74 @@ public class UserServiceImplTest {
       as.addUser(user);
       Optional<User> user1 = as.findUserByName(user.getUsername());
       assertTrue(user1.isPresent());
-    }
+   }
+	
+    // This method just tries to add
+	@Test
+	public void getUserTest(){
+		Optional<User> user = as.findUserByName(MIKE1);
+		assertTrue(!user.isPresent());
+	}
 
+	// Performance testing to benchmark our number of users that can be added
+	// in 1 sec
+
+	@Test(timeout = 1000)
+	public void checkPrefTest(){
+		for(int i=1000; i < 2000; i++) {
+			as.addUser(new User("Mike"+i));
+		}
+	}
+
+	@Test
+	public void testFindUserByUsername() {
+		setMocksForUserService(MIKE4);
+		User user = as.findUserByUsername(MIKE4);
+		assertEquals(MIKE4,user.getUsername());
+	}
+
+	@Test
+	public void findGroupsByName() {
+		setMocksForUserService("Mike3");
+		List<String> g = as.findGroupsByName("Mike3");
+		assertEquals("test",g.get(0));
+	}
+
+	@Test
+	public void updateUser() {
+		setMocksForUserService(MIKE1);
+		Optional<User> user = as.findUserByName(MIKE1);
+		if(user.isPresent()){
+			user.get().setUsername("Mikeupdate");
+			as.updateUser(user.get());
+		}
+		user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getUsername()));
+	}
+
+	@Test
+	public void testEmptyFindUser() {
+		Optional<User> user = as.findUserByName("Test94");
+		assertFalse(user.isPresent());
+	}
+
+	@Test
+	public void testEmptyFindUserByName() {
+		User user = as.findUserByUsername("Test94");
+		assertNull(user);
+	}
+
+	@Test(expected = UserAlreadyPresentException.class)
+	public void testUserAlreadyExist() {
+		as.addUser(new User("Test1"));
+		as.addUser(new User("Test1"));
+	}
+
+    @Test(expected = UserAlreadyPresentException.class)
+    public void testUserAlreadyExistTwo() {
+        as.addUser(new User("Test", "Test","Test", "Test","Test"));
+        as.addUser(new User("Test", "Test","Test", "Test","Test"));
+        assertFalse(false);
+    }
 
   }
 */

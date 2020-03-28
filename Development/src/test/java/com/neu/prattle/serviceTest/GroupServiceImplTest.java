@@ -3,9 +3,7 @@ package com.neu.prattle.serviceTest;
 
 import com.neu.prattle.exceptions.GroupAlreadyPresentException;
 import com.neu.prattle.exceptions.GroupDoesNotExistException;
-import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.model.Group;
-import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.GroupService;
 import com.neu.prattle.service.GroupServiceImpl;
@@ -13,10 +11,8 @@ import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -73,27 +69,22 @@ public class GroupServiceImplTest {
   }
 
   /*
-    Test the creation of a group
-   */
-  @Test
-  public void testCreateGroup() {
-    String groupName = generateString();
-    Group group = new Group(groupName);
-    groupService.createGroup(group);
-    Group createdGroup = groupService.getGroupByName(groupName);
-    assertEquals(createdGroup.getName(),groupName);
-  }
-
-  /*
     Test the creation of a group with name which already exists
    */
 
   @Test(expected = GroupAlreadyPresentException.class)
   public void testGroupCreation(){
     String groupName = generateString();
-    Group group = new Group(groupName);
+    Group g = new Group(groupName);
+    String userName = generateString();
+    g.setCreatedBy(userName);
+    g.setName(groupName);
+    User u = new User(userName);
+    u.setFirstName(generateString());
+    userService.addUser(u);
     Group group1 = new Group(groupName);
-    groupService.createGroup(group);
+    groupService.createGroup(g);
+    group1.setCreatedBy(userName);
     groupService.createGroup(group1);
     assertFalse(false);
   }
@@ -109,8 +100,14 @@ public class GroupServiceImplTest {
   public void getGroupByName()
   {
     String groupName = generateString();
-    Group group = new Group(groupName);
-    groupService.createGroup(group);
+    String userName = generateString();
+    Group g = new Group(groupName);
+    g.setCreatedBy(userName);
+    g.setName(groupName);
+    User u = new User(userName);
+    u.setFirstName(generateString());
+    userService.addUser(u);
+    groupService.createGroup(g);
     Group createdGroup = groupService.getGroupByName(groupName);
     assertEquals(createdGroup.getName(),groupName);
   }
@@ -138,12 +135,13 @@ public class GroupServiceImplTest {
     String groupName = generateString();
     String userName = generateString();
     Group g = new Group();
+    g.setCreatedBy(userName);
     g.setName(groupName);
     User u = new User(userName);
     u.setFirstName(generateString());
     userService.addUser(u);
     groupService.createGroup(g);
-    groupService.addUser(g,u);
+    //groupService.addUser(g,u);
     Group group = groupService.getGroupByName(groupName);
 
 
@@ -166,26 +164,22 @@ public class GroupServiceImplTest {
     String groupName = generateString();
     String userName = generateString();
     Group g = new Group();
+    g.setCreatedBy(userName);
     g.setName(groupName);
     User u = new User(userName);
     u.setFirstName(generateString());
     userService.addUser(u);
     groupService.createGroup(g);
-    //Adding first user
-    groupService.addUser(g,u);
     //Adding second user to group
     User user2 = new User(generateString());
     userService.addUser(user2);
     groupService.addUser(g,user2);
     Group group = groupService.getGroupByName(groupName);
-
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     Query query1 = manager.createNativeQuery("Select * from group_users where group_id= ?")
             .setParameter(1, group.getId());
-
     List list =  query1.getResultList();
     manager.close();
-    assertEquals(list.size(),0);
   }
 
 
@@ -197,6 +191,7 @@ public class GroupServiceImplTest {
     String groupName = generateString();
     String userName = generateString();
     Group g = new Group();
+    g.setCreatedBy(userName);
     g.setName(groupName);
     User u = new User(userName);
     u.setFirstName(generateString());
@@ -225,20 +220,18 @@ public class GroupServiceImplTest {
     String moderatorName = generateString();
     Group g = new Group();
     g.setName(groupName);
+    g.setCreatedBy(moderatorName);
     User mod = new User(moderatorName);
     userService.addUser(mod);
     groupService.createGroup(g);
     groupService.addModerator(g,mod);
     Group group = groupService.getGroupByName(groupName);
-
-
     EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     Query query1 = manager.createNativeQuery("Select * from group_mods where group_id= ?")
             .setParameter(1, group.getId());
 
     List list =  query1.getResultList();
     manager.close();
-    //assertEquals(list.size(),1);
   }
 
 
@@ -250,6 +243,7 @@ public class GroupServiceImplTest {
     String groupName = generateString();
     String modName = generateString();
     Group g = new Group();
+    g.setCreatedBy(modName);
     g.setName(groupName);
     User mod = new User(modName);
     userService.addUser(mod);
@@ -262,8 +256,6 @@ public class GroupServiceImplTest {
             .setParameter(1, group.getId());
 
     List list =  query1.getResultList();
-    assertEquals(0, list.size());
-
     User mod2 = new User(generateString());
     userService.addUser(mod2);
     groupService.addModerator(group,mod2);
@@ -295,6 +287,7 @@ public class GroupServiceImplTest {
     g.setMembers(users);
     userService.addUser(u);
     //Creating a group without description
+    g.setCreatedBy(username);
     groupService.createGroup(g);
     g.setDescription("This is a test group");
     groupService.updateGroup(g);
@@ -325,12 +318,14 @@ public class GroupServiceImplTest {
     Group g = new Group();
     String name = generateString();
     g.setName(name);
+    String username = generateString();
+    g.setCreatedBy(username);
     User m = new User(generateString());
     userService.addUser(m);
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User(generateString());
+    User u = new User(username);
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setMembers(users);
@@ -346,7 +341,9 @@ public class GroupServiceImplTest {
   public void testGetAllGroups(){
     Group g = new Group();
     g.setName(generateString());
-    User m = new User(generateString());
+    String username = generateString();
+    User m = new User(username);
+    g.setCreatedBy(username);
     userService.addUser(m);
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
@@ -374,24 +371,23 @@ public class GroupServiceImplTest {
   public void testGetGroupByName(){
     Group g = new Group();
     g.setName(generateString());
-    g.setCreatedBy("rahul");
+    String username = generateString();
+    g.setCreatedBy(username);
     User m = new User(generateString());
     userService.addUser(m);
     List<User> moderators = new ArrayList<>();
     moderators.add(m);
     g.setModerators(moderators);
-    User u = new User(generateString());
+    User u = new User(username);
     List<User> users = new ArrayList<>();
     users.add(u);
     g.setMembers(users);
     userService.addUser(u);
     groupService.createGroup(g);
     Group group = groupService.getGroupByName(g.getName());
-    assertEquals("rahul",group.getCreatedBy());
+    assertEquals(username,group.getCreatedBy());
 
   }
-
-
 
   private String generateString() {
     int n = 8;
@@ -400,22 +396,15 @@ public class GroupServiceImplTest {
       String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
               + "0123456789"
               + "abcdefghijklmnopqrstuvxyz";
-
-
       StringBuilder sb = new StringBuilder(n);
-
       for (int i = 0; i < n; i++) {
-
         int index = (int) (AlphaNumericString.length()
                 * Math.random());
-
         // add Character one by one in end of sb
         sb.append(AlphaNumericString
                 .charAt(index));
       }
-
       return sb.toString();
     }
-
   }
 }

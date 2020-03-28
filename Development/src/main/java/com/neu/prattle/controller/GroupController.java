@@ -65,7 +65,6 @@ public class GroupController {
         }catch (GroupDoesNotExistException e ){
             return Response.status(409, e.getMessage()).build();
         }
-
         return Response.status(200).entity(userGroup).build();
     }
 
@@ -81,7 +80,6 @@ public class GroupController {
         }  catch (UserAlreadyPresentInGroupException e){
             return Response.status(409, e.getMessage()).build();
         }
-
     return Response.status(200,"User Successfully Added In Group.").build();
   }
 

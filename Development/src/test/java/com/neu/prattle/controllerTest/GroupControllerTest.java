@@ -34,94 +34,77 @@ public class GroupControllerTest {
 
   @Test
     public void testCreateGroup(){
-        group2 = new Group(generateString (),"This is a group","test4","", false);
-    User m = new User(generateString());
-    userService.addUser(m);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    group2.setModerators(moderators);
-    User u = new User(generateString());
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    group2.setMembers(users);
+    String groupName = generateString();
+    Group g = new Group(groupName);
+    String userName = generateString();
+    g.setCreatedBy(userName);
+    g.setName(groupName);
+    User u = new User(userName);
+    u.setFirstName(generateString());
     userService.addUser(u);
-        Response response = groupController.createGroup(group2);
+        Response response = groupController.createGroup(g);
         assertEquals(200, response.getStatus());
     }
 
     @Test
     public void testCreateGroupMessage(){
-        group2 = new Group(generateString (),"This is a group","test4","", false);
-      User m = new User(generateString());
-      userService.addUser(m);
-      List<User> moderators = new ArrayList<>();
-      moderators.add(m);
-      group2.setModerators(moderators);
-      User u = new User(generateString());
-      List<User> users = new ArrayList<>();
-      users.add(u);
-      group2.setMembers(users);
+      String groupName = generateString();
+      Group g = new Group(groupName);
+      String userName = generateString();
+      g.setCreatedBy(userName);
+      g.setName(groupName);
+      User u = new User(userName);
+      u.setFirstName(generateString());
       userService.addUser(u);
-        Response response = groupController.createGroup(group2);
+        Response response = groupController.createGroup(g);
         assertEquals("OK", response.getStatusInfo().getReasonPhrase());
     }
 
     @Test
     public void testCreateGroupAlreadyExist(){
-        group2 = new Group(generateString (),"This is a group","test4","", false);
-      User m = new User(generateString());
-      userService.addUser(m);
-      List<User> moderators = new ArrayList<>();
-      moderators.add(m);
-      group2.setModerators(moderators);
-      User u = new User(generateString());
-      List<User> users = new ArrayList<>();
-      users.add(u);
-      group2.setMembers(users);
+      String groupName = generateString();
+      Group g = new Group(groupName);
+      String userName = generateString();
+      g.setCreatedBy(userName);
+      g.setName(groupName);
+      User u = new User(userName);
+      u.setFirstName(generateString());
       userService.addUser(u);
-        groupController.createGroup(group2);
-        Response response = groupController.createGroup(group2);
+      groupController.createGroup(g);
+        Response response = groupController.createGroup(g);
         assertEquals(409, response.getStatus());
     }
 
     @Test
     public void testCreateGroupAlreadyExistMessage(){
-        group2 = new Group(generateString (),"This is a group","test4","", false);
-      User m = new User(generateString());
-      userService.addUser(m);
-      List<User> moderators = new ArrayList<>();
-      moderators.add(m);
-      group2.setModerators(moderators);
-      User u = new User(generateString());
-      List<User> users = new ArrayList<>();
-      users.add(u);
-      group2.setMembers(users);
+      String groupName = generateString();
+      Group g = new Group(groupName);
+      String userName = generateString();
+      g.setCreatedBy(userName);
+      g.setName(groupName);
+      User u = new User(userName);
+      u.setFirstName(generateString());
       userService.addUser(u);
-        groupController.createGroup(group2);
-        Response response = groupController.createGroup(group2);
+        groupController.createGroup(g);
+        Response response = groupController.createGroup(g);
         assertEquals("Conflict", response.getStatusInfo().getReasonPhrase());
     }
 
     @Test
     public void testGetGroup(){
-    String groupname = generateString();
-        Group group3 = new Group(groupname,"This is a group","test4","", false);
-      User m = new User(generateString());
-      userService.addUser(m);
-      List<User> moderators = new ArrayList<>();
-      moderators.add(m);
-      group3.setModerators(moderators);
-      String username = generateString();
-      User u = new User(username);
-      List<User> users = new ArrayList<>();
-      users.add(u);
-      group3.setMembers(users);
+      String groupName = generateString();
+      Group g = new Group(groupName);
+      String userName = generateString();
+      g.setCreatedBy(userName);
+      g.setName(groupName);
+      User u = new User(userName);
+      u.setFirstName(generateString());
       userService.addUser(u);
-        groupController.createGroup(group3);
-        Response response = groupController.getGroup(username);
+      groupController.createGroup(g);
+        Response response = groupController.getGroup(userName);
         ArrayList<Group> responseGroup = (ArrayList<Group>) response.getEntity();
 
-        assertEquals(group3,responseGroup.get(0));
+        assertEquals(g,responseGroup.get(0));
     }
 
     @Test
@@ -138,91 +121,63 @@ public class GroupControllerTest {
 
     @Test
     public void testUserAlreadyPresentInGroupException(){
-    String groupname = generateString();
-        Group group3 = new Group(groupname,"This is a group","test4","", false);
-      User m = new User(generateString());
-      userService.addUser(m);
-      List<User> moderators = new ArrayList<>();
-      moderators.add(m);
-      group3.setModerators(moderators);
-      String username = generateString();
-      User u = new User(username);
-      List<User> users = new ArrayList<>();
-      users.add(u);
-      group3.setMembers(users);
+      String groupName = generateString();
+      Group g = new Group(groupName);
+      String userName = generateString();
+      g.setCreatedBy(userName);
+      g.setName(groupName);
+      User u = new User(userName);
+      u.setFirstName(generateString());
       userService.addUser(u);
-        groupController.createGroup(group3);
+      groupController.createGroup(g);
 
-        groupController.addUser(groupname,username);
-        Response response = groupController.addUser(groupname,username);
+        groupController.addUser(groupName,userName);
+        Response response = groupController.addUser(groupName,userName);
         assertEquals("OK",response.getStatusInfo().getReasonPhrase());
     }
 
   @Test
   public void testRemoveUser(){
-    String groupname = generateString();
-    Group group3 = new Group(groupname,"This is a group","test4","", false);
-    String moderatorname = generateString();
-    User m = new User(moderatorname);
-    userService.addUser(m);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    group3.setModerators(moderators);
-    String username = generateString();
-    User u = new User(username);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    group3.setMembers(users);
+    String groupName = generateString();
+    Group g = new Group(groupName);
+    String userName = generateString();
+    g.setCreatedBy(userName);
+    g.setName(groupName);
+    User u = new User(userName);
+    u.setFirstName(generateString());
     userService.addUser(u);
-    groupController.createGroup(group3);
-
-    groupController.addUser(groupname,username);
-    Response response = groupController.removeUser(groupname,moderatorname);
+    groupController.createGroup(g);
+    Response response = groupController.removeUser(groupName,userName);
     assertEquals("OK",response.getStatusInfo().getReasonPhrase());
   }
 
   @Test
   public void testAddModerator(){
-    String groupname = generateString();
-    Group group3 = new Group(groupname,"This is a group","test4","", false);
-    User m = new User(generateString());
-    userService.addUser(m);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    group3.setModerators(moderators);
-    String username = generateString();
-    User u = new User(username);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    group3.setMembers(users);
+    String groupName = generateString();
+    Group g = new Group(groupName);
+    String userName = generateString();
+    g.setCreatedBy(userName);
+    g.setName(groupName);
+    User u = new User(userName);
+    u.setFirstName(generateString());
     userService.addUser(u);
-    groupController.createGroup(group3);
-
-    groupController.addUser(groupname,username);
-    Response response = groupController.addModerator(groupname,username);
+    groupController.createGroup(g);
+    Response response = groupController.addModerator(groupName,userName);
     assertEquals("OK",response.getStatusInfo().getReasonPhrase());
   }
 
   @Test
   public void testRemoveModerator(){
-    String groupname = generateString();
-    Group group3 = new Group(groupname,"This is a group","test4","", false);
-    String moderatorname =  generateString();
-    User m = new User(moderatorname);
-    userService.addUser(m);
-    List<User> moderators = new ArrayList<>();
-    moderators.add(m);
-    group3.setModerators(moderators);
-    String username = generateString();
-    User u = new User(username);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    group3.setMembers(users);
+    String groupName = generateString();
+    Group g = new Group(groupName);
+    String userName = generateString();
+    g.setCreatedBy(userName);
+    g.setName(groupName);
+    User u = new User(userName);
+    u.setFirstName(generateString());
     userService.addUser(u);
-    groupController.createGroup(group3);
-
-    groupController.addUser(groupname,username);
-    Response response = groupController.removeModerator(groupname,moderatorname);
+    groupController.createGroup(g);
+    Response response = groupController.removeModerator(groupName,userName);
     assertEquals("OK",response.getStatusInfo().getReasonPhrase());
   }
 
@@ -233,8 +188,6 @@ public class GroupControllerTest {
       String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
               + "0123456789"
               + "abcdefghijklmnopqrstuvxyz";
-
-
       StringBuilder sb = new StringBuilder(n);
 
       for (int i = 0; i < n; i++) {

@@ -150,21 +150,18 @@ public class Group {
 
   public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
     String strDate = setTimestamp();
-
-
     this.name = groupName;
     this.description = description;
     this.isGroupPrivate = isGroupPrivate;
     this.password = password;
-
-
     this.createdOn = strDate;
     this.createdBy = createdBy;
     this.id += id;
     this.moderators = new ArrayList<>();
     this.members = new ArrayList<>();
-
-    this.moderators.add(new Moderator(createdBy));
+    User groupCreator = new User(createdBy);
+    this.moderators.add(groupCreator);
+    this.members.add(groupCreator);
   }
 
   /**

@@ -35,7 +35,6 @@ public class UserModelTest {
         user.setTimezone("GMT");
 
         user.setGroupParticipant(group);
-        user.setFollowers(follower);
     }
 
   @Test
@@ -69,11 +68,6 @@ public class UserModelTest {
     }
 
     @Test
-    public void testUserFollowers(){
-        assertEquals(1,user.getFollowers().size());
-    }
-
-    @Test
     public void testUserGroup(){
         assertEquals(1,user.getGroupParticipant().size());
     }
@@ -91,7 +85,6 @@ public class UserModelTest {
         assertEquals("firstlast", user.getUsername());
         assertEquals("pass1234", user.getPassword());
         assertEquals("GMT", user.getTimezone());
-        assertEquals(emptyFollow,user.getFollowers());
         assertEquals(emptyGroup, user.getGroupParticipant());
     }
 

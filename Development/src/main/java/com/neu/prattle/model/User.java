@@ -54,10 +54,6 @@ public class User {
     return groupParticipant;
   }
 
-  public List<User> getFollowers() {
-    return followers;
-  }
-
   public void setUsername(String username) {
     this.username = username;
   }
@@ -80,10 +76,6 @@ public class User {
 
   public void setGroupParticipant(List<Group> groupParticipant) {
     this.groupParticipant.addAll(groupParticipant);
-  }
-
-  public void setFollowers(List<User> followers) {
-    this.followers.addAll(followers);
   }
 
 
@@ -111,18 +103,14 @@ public class User {
   @Column(name = "timezone", unique = false)
   private String timezone;
 
-  @ManyToMany(cascade = {CascadeType.ALL})
+  @ManyToMany(cascade = {CascadeType.MERGE})
   @JoinTable(name = "group_users",
-          joinColumns = @JoinColumn(name = "userId"),
+          joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
   private List<Group> groupParticipant;
 
-  @ManyToMany
-  private List<User> followers;
-
   public User() {
     groupParticipant = new ArrayList();
-    followers = new ArrayList<>();
     this.timezone = "default";
     this.firstName = "first_name";
     this.lastName = "last_name";
@@ -136,7 +124,6 @@ public class User {
     this.password = password;
     this.timezone = timezone;
     groupParticipant = new ArrayList();
-    followers = new ArrayList<>();
   }
 
   public User(String username) {
@@ -146,7 +133,6 @@ public class User {
     this.lastName = "last_name";
     this.password = getEncryptedPassword();
     groupParticipant = new ArrayList();
-    followers = new ArrayList<>();
   }
 
   /***

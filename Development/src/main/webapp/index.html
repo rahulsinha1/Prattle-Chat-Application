@@ -47,6 +47,7 @@
     <button onclick="viewGroupButton()">View Groups</button>
     <button>Update Groups</button>
     <button onclick="deleteGroup()">Delete Groups</button>
+    <button onclick="addUserToGroup()">Add new users</button>
     <button>Join Group</button>
 </div>
 <!--Create Group-->
@@ -77,6 +78,16 @@
     Group Name : <select id="moderatorOfGroup"></select>
     <button onclick="deleteGroupButton()">Delete Group</button>
     <div id="delete_group_message"></div>
+</div>
+<div id="adduser_group_section">
+    <form name="addUserGroupForm">
+        Group Name : <input type="text" name="groupname" />
+        <br>
+        User Name : <input type="text" name="newusername" />
+        <input type="button" value="Submit" onclick="submitAddUserGroupCreation()" />
+        <input type="button" value="Clear" onclick="clear()" />
+        <div id="adduser_group_message"></div>
+    </form>
 </div>
 </body>
 <script src="websocket.js"></script>

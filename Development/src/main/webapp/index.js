@@ -1,4 +1,5 @@
 let createForm = document.getElementById("create_group_form");
+let addUserGroupForm = document.getElementById("adduser_group_section");
 let viewAllGroupUserIsApartOf = document.getElementById("view_group_section");
 let deleteGroupForm = document.getElementById("delete_group_form");
 let moderatorOfGroup = document.getElementById("moderatorOfGroup");
@@ -8,10 +9,15 @@ function closeAllDisplay(){
     createForm.style.display = "none";
     viewAllGroupUserIsApartOf.style.display = "none";
     deleteGroupForm.style.display = "none";
+    addUserGroupForm.style.display = "none";
 }
 function createGroup(){
     closeAllDisplay();
     createForm.style.display = "block";
+}
+function addUserToGroup() {
+    closeAllDisplay();
+    addUserGroupForm.style.display = "block";
 }
 function viewGroupButton(){
     closeAllDisplay()
@@ -109,5 +115,32 @@ function submitGroupCreation(){
     })
     }
 }
+function submitAddUserGroupCreation(){
+    let newusername = document.addUserGroupForm.newusername.value;
+    let groupname = document.addUserGroupForm.groupname.value;
+    let displayMessage = document.getElementById("adduser_group_message");
+    if( newusername.trim() !== "" && groupname.trim() !== ""){
+        fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupname + '/' + newusername, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((response)=>{
+            if(!response.ok){
+            displayMessage.innerText = "Error while adding user " + newusername;
+        } else {
+            displayMessage.innerText = "Successfully Add user " + newusername;
+        }
+    }).catch((e)=>{
+            displayMessage.innerText = "Unsuccessfully Created";
+    })
+    }
+}
+
+
+
+
+
+
 function clear(){
 }

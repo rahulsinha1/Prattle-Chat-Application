@@ -146,7 +146,6 @@ public class ChatEndpoint {
         Group group = groupService.getGroupByName(recipient);
         if (group == null) {
           throwErrorMesage(session, recipient);
-          return;
         } else {
           sendGroupMessage(message);
         }
@@ -220,14 +219,12 @@ public class ChatEndpoint {
             endpoint.session.getBasicRemote()
                     .sendObject(message);
           }
-          List<User> usersInGroup = groupService.getGroupByName(message.getTo()).getUsers();
+          List<User> usersInGroup = groupService.getGroupByName(message.getTo()).getMembers();
           for(User u: usersInGroup) {
-            if(!groupUsers.contains(u.getUsername())) {
-              if (endpoint.session.getId().equals(getSessionForUser(u.getUsername()))) {
+            if(!groupUsers.contains(u.getUsername()) && endpoint.session.getId().equals(getSessionForUser(u.getUsername()))) {
                 groupUsers.add(u.getUsername());
                 endpoint.session.getBasicRemote()
                         .sendObject(message);
-              }
             }
           }
         } catch (IOException | EncodeException e) {

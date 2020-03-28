@@ -24,6 +24,7 @@ public class GroupServiceImpl implements GroupService {
 
   private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
           .createEntityManagerFactory("fse");
+  private static final EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
 
   static {
     groupService = new GroupServiceImpl();
@@ -53,7 +54,6 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void addUser(Group group, User user) {
-      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
@@ -62,13 +62,10 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
-      manager.close();
     }
-
 
   @Override
   public void removeUser(Group group, User user) {
-      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
@@ -77,12 +74,10 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
-      manager.close();
   }
 
   @Override
   public void addModerator(Group group, User moderator) {
-      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
@@ -91,13 +86,11 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
-      manager.close();
   }
 
 
   @Override
   public void removeModerator(Group group, User moderator) {
-      EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
       EntityTransaction transaction = null;
       transaction = manager.getTransaction();
       transaction.begin();
@@ -106,14 +99,12 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(2, group.getId())
               .executeUpdate();
       transaction.commit();
-      manager.close();
   }
 
 
   @Override
   public void deleteGroup(Group group) {
 
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
@@ -121,7 +112,6 @@ public class GroupServiceImpl implements GroupService {
             .setParameter(1, group.getName())
             .executeUpdate();
     transaction.commit();
-    manager.close();
   }
 
   @Override
@@ -129,7 +119,7 @@ public class GroupServiceImpl implements GroupService {
     if (!isRecordExist(group.getName())) {
       throw new GroupDoesNotExistException("Group does not exist");
     }
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
@@ -142,17 +132,13 @@ public class GroupServiceImpl implements GroupService {
             .executeUpdate();
 
     transaction.commit();
-    manager.close();
 
   }
 
   @Override
   public List getAllGroups() {
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     TypedQuery<Group> query = manager.createQuery("SELECT g FROM Group g", Group.class);
-    List<Group> results = query.getResultList();
-    manager.close();
-    return results;
+    return query.getResultList();
   }
 
   @Override
@@ -167,15 +153,11 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public Group getGroupByName(String name) {
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
-
     if (isRecordExist(name)) {
       TypedQuery<Group> query = manager.createQuery(
               "SELECT g FROM Group g WHERE g.name = :name", Group.class);
 
-      Group group = query.setParameter("name", name).getSingleResult();
-      manager.close();
-      return group;
+      return query.setParameter("name", name).getSingleResult();
     } else {
       throw new GroupDoesNotExistException("Group does not exist");
     }
@@ -184,8 +166,6 @@ public class GroupServiceImpl implements GroupService {
 
 
   private void create(Group group) {
-
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
     EntityTransaction transaction = null;
 
 
@@ -199,11 +179,9 @@ public class GroupServiceImpl implements GroupService {
     manager.persist(group);
 
     transaction.commit();
-    manager.close();
   }
 
   private boolean isRecordExist(String groupName) {
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
 
     TypedQuery<Long> query = manager.createQuery(
             "SELECT count(g) FROM Group g WHERE g.name = :name", Long.class);
@@ -211,7 +189,6 @@ public class GroupServiceImpl implements GroupService {
 
     Long count = query.setParameter("name", groupName).getSingleResult();
 
-    manager.close();
     return (!count.equals(0L));
   }
 }

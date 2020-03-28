@@ -13,7 +13,7 @@ function createGroup(){
     groupForm.style.display = "block";
 }
 
-function viewGroup(){
+function viewGroupMethod(){
     closeAllDisplay()
     viewGroup.style.display = "block";
 

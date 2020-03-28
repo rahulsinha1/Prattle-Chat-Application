@@ -51,9 +51,7 @@ public class ChatEndpointTest {
 
   private User user2 = new User("firstname","lastname","username2","password","America/New_York");
 
-  private Moderator moderator = new Moderator("username");
-
-  private Group group = new Group("groupname", Arrays.asList(user,user2),Arrays.asList(moderator));
+  private Group group = new Group("groupname","groupDescription","username","groupPassword",false);
 
   private ChatEndpoint chatEndpoint = new ChatEndpoint();
 
@@ -70,6 +68,8 @@ public class ChatEndpointTest {
     Field f2 = chatEndpoint.getClass().getDeclaredField("groupService");
     f2.setAccessible(true);
     f2.set(chatEndpoint, groupService);
+
+    group.setMembers(Arrays.asList(user,user2));
   }
 
   @Test

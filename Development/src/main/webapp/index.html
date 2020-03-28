@@ -10,7 +10,6 @@
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
         crossorigin="anonymous"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
 <table>
@@ -45,13 +44,14 @@
 <div id="groups">
     <h2>Groups:</h2>
     <button onclick="createGroup()">Create Groups</button>
-    <button onclick="viewGroupMethod()">View Groups</button>
+    <button onclick="viewGroupButton()">View Groups</button>
     <button>Update Groups</button>
     <button onclick="deleteGroup()">Delete Groups</button>
     <button>Join Group</button>
 </div>
+<!--Create Group-->
 <div id="create_group_form">
-    <form name="groupForm">
+    <form name="createGroupForm">
         Group Name : <input type="text" name="groupName" />
         <br>
         Description :

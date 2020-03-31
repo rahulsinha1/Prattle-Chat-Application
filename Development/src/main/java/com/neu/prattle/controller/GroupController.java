@@ -182,7 +182,7 @@ public class GroupController {
         }catch(UserDoesNotExistException e){
             return Response.status(409, e.getMessage()).build();
         }
-
+    System.out.println(groupByUsername);
     return Response.status(200).entity(groupByUsername).build();
   }
 

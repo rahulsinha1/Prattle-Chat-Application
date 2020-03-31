@@ -59,10 +59,10 @@ public class GroupModelTest {
 
     @Test
     public void testModerators(){
-        List<User> moderators = new ArrayList<>();
+        //List<User> moderators = new ArrayList<>();
         Moderator m = new Moderator("Moderator800");
-        moderators.add(m);
-        group.setModerators(moderators);
+        //moderators.add(m);
+        group.setModerators(m);
 
         assertEquals("Moderator800",group.getModerators().get(0).getUsername());
     }
@@ -106,9 +106,9 @@ public class GroupModelTest {
     public void testSetMembers(){
         User user = new User("First", "Last", "firstlast",
             "pass1234","GMT");
-      List<User> members = new ArrayList<>();
-      members.add(user);
-      group.setMembers(members);
+      //List<User> members = new ArrayList<>();
+      //members.add(user);
+      group.setMembers(user);
       assertTrue(group.getMembers().size()!=0);
     }
 }

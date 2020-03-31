@@ -70,12 +70,16 @@ public class UserServiceImplTest {
   }
 
   @Test
-  public void updateUser() {
-    Optional<User> user = as.findUserByName("MIKE1");
-    if (user.isPresent()) {
-      user.get().setFirstName("Mikeupdate");
-      as.updateUser(user.get());
-    }
+   public void updateUser() {
+    String username = generateString();
+    User u = new User(username);
+    as.addUser(u);
+
+    User u1 = new User(username);
+    u1.setFirstName("Mikeupdate");
+    as.updateUser(u1);
+
+    Optional<User> user = as.findUserByName(username);
     user.ifPresent(user1 -> assertEquals("Mikeupdate", user1.getFirstName()));
   }
 
@@ -125,22 +129,26 @@ public class UserServiceImplTest {
   /*
   Test if the user is part of one group
    */
-    /*@Test
+    @Test
     public void findGroupsByName () {
       String userName = generateString();
       String groupName = generateString();
       User groupUser = new User(userName);
-      Group group = new Group(groupName);
-      List<User> listUsers = new ArrayList<>();
-      List<Group> listGroups = new ArrayList<>();
-      listUsers.add(groupUser);
-      listGroups.add(group);
-      groupUser.setGroupParticipant(listGroups);
-      group.setMembers(listUsers);
       as.addUser(groupUser);
+      Group group = new Group(groupName);
+      group.setMembers(groupUser);
+
+      Group group1 = new Group(generateString());
+      group1.setMembers(groupUser);
+      //List<User> listUsers = new ArrayList<>();
+      //List<Group> listGroups = new ArrayList<>();
+      //listUsers.add(groupUser);
+      //listGroups.add(group);
+
       List<Group> g = as.findGroupsByName(groupUser.getUsername());
       assertEquals(groupName, g.get(0).getName());
-    }*/
+      assertEquals(group1.getName(), g.get(1).getName());
+    }
 
 
 
@@ -205,14 +213,14 @@ public class UserServiceImplTest {
     }
 
     private void setMocksForUserService (String name){
-      List<Group> groups = new ArrayList<>();
+      //List<Group> groups = new ArrayList<>();
       Group g = new Group();
       g.setName(generateString());
-      groups.add(g);
+      //groups.add(g);
       User u = new User(name);
       u.setFirstName(generateString());
       u.setLastName(generateString());
-      u.setGroupParticipant(groups);
+      u.setGroupParticipant(g);
       as.addUser(u);
     }
 

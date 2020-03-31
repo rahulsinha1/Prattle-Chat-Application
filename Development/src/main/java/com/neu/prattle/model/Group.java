@@ -36,16 +36,10 @@ public class Group {
   @Column(name = "group_name", unique = true)
   private String name;
 
-  @ManyToMany(cascade = {CascadeType.MERGE})
-  @JoinTable( name = "group_mods",
-          joinColumns = @JoinColumn(name = "group_id"),
-          inverseJoinColumns = @JoinColumn(name = "moderator_id"))
+  @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.ALL})
   private List<User> moderators;
 
-  @ManyToMany(cascade = {CascadeType.MERGE})
-  @JoinTable(name = "group_users",
-          joinColumns = @JoinColumn(name = "group_id"),
-          inverseJoinColumns = @JoinColumn(name = "user_id"))
+  @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.ALL})
   private List<User> members = new LinkedList<>();
 
   @Column(name = "is_private", unique = false)
@@ -63,14 +57,17 @@ public class Group {
   @Column(name = "created_by", unique = false)
   private String createdBy;
 
-  public void setModerators(List<User> moderators) {
-    this.moderators = moderators;
+  public void setModerators(User moderator) {
+    this.moderators.add(moderator);
+    moderator.setGroupModerator(this);
   }
 
   public void setCreatedBy(String username){this.createdBy = username;}
 
-  public void setMembers(List<User> members) {
-    this.members.addAll(members);
+  public void setMembers(User member) {
+    this.members.add((member));
+    member.setGroupParticipant(this);
+
   }
 
   public void setIsGroupPrivate(Boolean isPrivate) {
@@ -139,6 +136,8 @@ public class Group {
     this.isGroupPrivate = false;
     this.description= "Empty";
     this.password = "";
+    moderators = new ArrayList<>();
+    members = new ArrayList<>();
   }
 
   public Group(String groupName) {
@@ -146,6 +145,8 @@ public class Group {
     this.isGroupPrivate = false;
     this.description= "Empty";
     this.password = "";
+    moderators = new ArrayList<>();
+    members = new ArrayList<>();
   }
 
   public Group(String groupName, String description, String createdBy, String password, Boolean isGroupPrivate){
@@ -159,9 +160,6 @@ public class Group {
     this.id += id;
     this.moderators = new ArrayList<>();
     this.members = new ArrayList<>();
-    User groupCreator = new User(createdBy);
-    this.moderators.add(groupCreator);
-    this.members.add(groupCreator);
   }
 
   /**

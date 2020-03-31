@@ -32,7 +32,7 @@ public interface GroupService {
   void removeUser(Group group, User user);
 
   /**
-   * adds moderator to existing group
+   * adds moderator to existing group. Also add as a user to the group if already is not.
    */
   void addModerator(Group group, User moderator);
 

@@ -1,6 +1,4 @@
 var ws;
-
-document.getElementById("welcoming").innerText = "Welcome " + localStorage.getItem('username');
 var keySize = 256;
 var ivSize = 128;
 var iterations = 100;
@@ -89,11 +87,6 @@ function send() {
     });
 
     ws.send(json);
-}
-
-function logout() {
-    localStorage.clear();
-    window.location.href = 'login.html';
 }
 
 function encrypt(msg, pass) {

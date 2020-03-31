@@ -15,7 +15,7 @@ function login(){
             })
             .then((data) => {
                 if(data.password === password){
-                    localStorage.setItem("username", username)
+                    setCookie("username",username,365)
                     window.location.href = "index.html";
                 } else {
                     throw new Error();
@@ -27,8 +27,15 @@ function login(){
     } else {
         displayMessage.innerText = "Field(s) must not be empty.";
     }
-
 }
+
+function setCookie(cookie_name, cookie_value, exdays){
+    var dt = new Date();
+    dt.setTime(dt.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+dt.toUTCString();
+    document.cookie = cookie_name + "=" + cookie_value + "; " + expires;
+}
+
 
 
 

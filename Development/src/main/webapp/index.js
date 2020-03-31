@@ -4,21 +4,34 @@ let viewAllGroupUserIsApartOf = document.getElementById("view_group_section");
 let deleteGroupForm = document.getElementById("delete_group_form");
 let moderatorOfGroup = document.getElementById("moderatorOfGroup");
 let selectedGroup = moderatorOfGroup.value;
+
+checkCookie();
+
 closeAllDisplay();
+
+
+function logout() {
+    setCookie("username", "", 365);
+    window.location.href = 'login.html';
+}
+
 function closeAllDisplay(){
     createForm.style.display = "none";
     viewAllGroupUserIsApartOf.style.display = "none";
     deleteGroupForm.style.display = "none";
     addUserGroupForm.style.display = "none";
 }
+
 function createGroup(){
     closeAllDisplay();
     createForm.style.display = "block";
 }
+
 function addUserToGroup() {
     closeAllDisplay();
     addUserGroupForm.style.display = "block";
 }
+
 function viewGroupButton(){
     closeAllDisplay()
     viewAllGroupUserIsApartOf.style.display = "block";
@@ -39,6 +52,7 @@ function viewGroupButton(){
         displayMessage.innerText = error;
 })
 }
+
 function deleteGroup() {
     closeAllDisplay();
     deleteGroupForm.style.display = "block";
@@ -67,6 +81,7 @@ function deleteGroup() {
     //Save Selected
     selectedGroup = moderatorOfGroup.value;
 }
+
 function deleteGroupButton(){
     let displayMessage = document.getElementById("delete_group_message");
     // DELETE A GROUP
@@ -82,9 +97,11 @@ function deleteGroupButton(){
         displayMessage.innerText = error.toString();
 })
 }
+
 function submitGroupView(){
     console.log(groupsParticipation.value)
 }
+
 function submitGroupCreation(){
     let groupName = document.createGroupForm.groupName.value;
     let description = document.createGroupForm.description.value;
@@ -115,6 +132,7 @@ function submitGroupCreation(){
     })
     }
 }
+
 function submitAddUserGroupCreation(){
     let newusername = document.addUserGroupForm.newusername.value;
     let groupname = document.addUserGroupForm.groupname.value;
@@ -137,8 +155,32 @@ function submitAddUserGroupCreation(){
     }
 }
 
+function getCookie(cname){
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
 
+function checkCookie() {
+    var username=getCookie("username");
+    if (username != "") {
+        document.getElementById("welcoming").innerText = "Welcome " + username ;
+    }else{
+        window.location.href = '404.html';
+    }
+}
 
+function setCookie(cookie_name, cookie_value, exdays){
+    var dt = new Date();
+    dt.setTime(dt.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+dt.toUTCString();
+    document.cookie = cookie_name + "=" + cookie_value + "; " + expires;
+}
 
 
 

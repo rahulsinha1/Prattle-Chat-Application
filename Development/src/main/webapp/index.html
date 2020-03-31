@@ -3,15 +3,16 @@
     <title>Chat</title>
 </head>
 <body>
-<h1 id="welcoming">Welcome </h1>
 <link rel="stylesheet" href="style.css">
-<script src="session.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
+<script src="session.js"></script>
+<h1 id="welcoming"></h1>
+
 <table>
     <tr>
         <td colspan="2">
@@ -50,6 +51,7 @@
     <button onclick="addUserToGroup()">Add new users</button>
     <button>Join Group</button>
 </div>
+
 <!--Create Group-->
 <div id="create_group_form">
     <form name="createGroupForm">
@@ -64,6 +66,7 @@
     </form>
     <div id="create_group_message"></div>
 </div>
+
 <!--View Group-->
 <div id="view_group_section">
     <p>The select the group:</p>
@@ -73,12 +76,14 @@
     <input type="button" value="Submit" onclick="submitGroupView()"/>
     <div id="view_group_message"></div>
 </div>
+
 <!--Delete Group-->
 <div id="delete_group_form">
     Group Name : <select id="moderatorOfGroup"></select>
     <button onclick="deleteGroupButton()">Delete Group</button>
     <div id="delete_group_message"></div>
 </div>
+
 <div id="adduser_group_section">
     <form name="addUserGroupForm">
         Group Name : <input type="text" name="groupname" />

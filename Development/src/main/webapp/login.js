@@ -1,5 +1,5 @@
 function fieldsNotEmpty(username, password) {
-    return username.trim() !== "" && password.trim()  !== "";
+    return username.trim()!== "" && password.trim()!== "";
 }
 
 function login(){
@@ -11,18 +11,17 @@ function login(){
     if(fieldsNotEmpty(username,password)){
         fetch('http://localhost:8080/prattle/rest/user/getUser/'+ username)
             .then((response) => {
+                console.log(response);
                 return response.json();
             })
             .then((data) => {
                 if(data.password === password){
-                    setCookie("username",username,365)
+                    setCookie("username",username,365);
                     window.location.href = "index.html";
-                } else {
-                    throw new Error();
                 }
             })
             .catch((error)=> {
-                displayMessage.innerText = "Invalid credential.";
+                displayMessage.innerText = error;
             })
     } else {
         displayMessage.innerText = "Field(s) must not be empty.";

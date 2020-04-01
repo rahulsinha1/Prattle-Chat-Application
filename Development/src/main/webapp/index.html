@@ -4,7 +4,7 @@
 </head>
     <body>
         <link rel="stylesheet" href="style.css">
-        <script src="session.js"></script>
+<!--        <script src="session.js"></script>-->
             <h1 id="welcoming"></h1>
 
             <table>
@@ -51,7 +51,7 @@
             <!--Create Group-->
             <div id="create_group_form">
                 <form name="createGroupForm">
-                    Group Name : <input type="text" name="groupName" placeholder="Enter a group name" />
+                    Group Name : <input type="text" name="groupName" placeholder="Enter a group name"/>
                     <br>
                     Description :
                     <br>
@@ -70,9 +70,33 @@
                 <br>
                 <label for="groups">Choose a group you would like to update:</label>
                 <select id="modOfGroup"></select>
+                <button onclick="selectedGroup()">Select Group</button>
                 <br>
-                <input type="button" value="Submit" />
+                <br>
+                    <div id="group_to_be_updated">
+                        <form name="updateGroup">
+                            Group Name :  <span id="groupName"></span>
+                            <br>
+                            Description :
+                            <br>
+                            <textarea name="description" rows="10" cols="30"></textarea>
+                            <br>
+                            Would you like the Group to be private?
+                            <br>
+                            <input type="radio" id="True" name="isPrivate" value="True">
+                            <label for="True">True</label>
+                            <input type="radio" id="False" name="isPrivate" value="False" checked>
+                            <label for="False">False</label>
+                            <br>
+                            If Group Is Private, Enter Password: <input type="text" id="groupPassword"
+                                                                        name="group_password">
+                            <br>
+                        </form>
+                    </div>
                 <div id="update_group_message"></div>
+                <br>
+                <input type="button" value="Update Group" />
+                <input type="reset" value="Reset"/>
             </div>
 
             <!--View Group-->

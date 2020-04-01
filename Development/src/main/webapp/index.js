@@ -12,6 +12,7 @@ closeAllDisplay();
  * Close all display tag.
  */
 function closeAllDisplay(){
+
     createForm.style.display = "none";
     updateForm.style.display = "none";
     // viewAllGroupUserIsApartOf.style.display = "none";
@@ -127,6 +128,8 @@ function submitGroupCreation(){
  */
 function updateGroupButton(){
     closeAllDisplay();
+    document.getElementById("group_to_be_updated").style.display = "none";
+
     updateForm.style.display = "block";
 
     let modOfGroup = document.getElementById("modOfGroup");
@@ -148,9 +151,27 @@ function updateGroupButton(){
         })
 }
 
+/**
+ * Select the group the user wants to update.
+ */
+function selectedGroup() {
+    let selectedGroup = document.getElementById("modOfGroup").value;
+
+    if(selectedGroup !== ""){
+        document.getElementById("group_to_be_updated").style.display = "block";
+        document.getElementById("groupName").innerText = selectedGroup;
+    } else {
+        document.getElementById("update_group_message").innerText = "Must Select A Group.";
+    }
+}
+
+/**
+ * Submit the Group Update.
+ */
 function submitGroupUpdate() {
 
 }
+
 function deleteGroup() {
     closeAllDisplay();
     deleteGroupForm.style.display = "block";

@@ -10,8 +10,9 @@ package com.neu.prattle.websocket;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neu.prattle.model.Message;
-import org.codehaus.jackson.map.ObjectMapper;
+//import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.util.logging.Level;

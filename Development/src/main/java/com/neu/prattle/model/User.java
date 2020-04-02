@@ -1,5 +1,10 @@
 package com.neu.prattle.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -118,12 +123,17 @@ public class User {
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
+  @JsonManagedReference(value="group-participant")
+  //@JsonIgnoreProperties({"members","moderators"})
   private List<Group> groupParticipant;
+
 
   @ManyToMany(cascade = {CascadeType.ALL})
   @JoinTable(name = "group_mods",
           joinColumns = @JoinColumn(name = "moderator_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
+  @JsonManagedReference(value="group-moderator")
+  // @JsonIgnoreProperties({"members","moderators"})
   private List<Group> groupModerator;
 
   public User() {

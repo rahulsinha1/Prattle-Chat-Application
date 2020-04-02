@@ -1,5 +1,8 @@
 package com.neu.prattle.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
@@ -36,10 +39,14 @@ public class Group {
   @Column(name = "group_name", unique = true)
   private String name;
 
-  @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.ALL})
+  @JsonBackReference(value="group-moderator")
+  //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
+  @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.ALL})
   private List<User> moderators;
 
-  @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.ALL})
+  @JsonBackReference(value="group-participant")
+  //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
+  @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.ALL})
   private List<User> members = new LinkedList<>();
 
   @Column(name = "is_private", unique = false)

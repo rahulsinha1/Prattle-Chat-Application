@@ -12,6 +12,7 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -119,7 +120,7 @@ public class User {
   @Column(name = "timezone", unique = false)
   private String timezone;
 
-  @ManyToMany(cascade = {CascadeType.ALL})
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
@@ -128,7 +129,7 @@ public class User {
   private List<Group> groupParticipant;
 
 
-  @ManyToMany(cascade = {CascadeType.ALL})
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
   @JoinTable(name = "group_mods",
           joinColumns = @JoinColumn(name = "moderator_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))

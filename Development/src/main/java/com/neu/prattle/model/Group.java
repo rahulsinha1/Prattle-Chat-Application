@@ -13,6 +13,7 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,12 +42,12 @@ public class Group {
 
   @JsonBackReference(value="group-moderator")
   //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
-  @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.ALL})
+  @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
   private List<User> moderators;
 
   @JsonBackReference(value="group-participant")
   //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
-  @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.ALL})
+  @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
   private List<User> members = new LinkedList<>();
 
   @Column(name = "is_private", unique = false)

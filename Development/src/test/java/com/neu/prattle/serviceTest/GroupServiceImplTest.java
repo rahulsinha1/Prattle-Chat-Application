@@ -248,6 +248,38 @@ public class GroupServiceImplTest {
   }
 
 
+  @Test(expected = CannotRemoveUserException.class)
+  public void testRemoveUserFromGroupNotExist() {
+    String groupName = generateString();
+    String userName = generateString();
+    User u = new User(userName);
+    userService.addUser(u);
+
+    Group g = new Group();
+    g.setCreatedBy(userName);
+    g.setName(groupName);
+
+    u.setFirstName(generateString());
+
+    groupService.createGroup(g);
+
+
+    //Adding second user to group
+    User user2 = new User(generateString());
+    //userService.addUser(user2);
+
+    //groupService.addUser(g, user2);
+
+    //TRemoving second user
+    groupService.removeUser(g, user2);
+    Group groupObj = groupService.getGroupByName(groupName);
+
+    assertEquals(1, groupObj.getMembers().size());
+
+  }
+
+
+
   /*
    Test to check moderator cannot be removed from group
   */

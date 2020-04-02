@@ -6,6 +6,7 @@ import com.neu.prattle.exceptions.GroupAlreadyPresentException;
 import com.neu.prattle.exceptions.GroupDoesNotExistException;
 import com.neu.prattle.exceptions.UserAlreadyModeratorException;
 import com.neu.prattle.exceptions.UserAlreadyPresentInGroupException;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.main.EntityManagerObject;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
@@ -81,14 +82,22 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void removeUser(Group group, User user) {
+    Group groupObj = getGroupByName(group.getName());
+    if(!groupObj.getMembers().contains(user))
+    {
+      throw new CannotRemoveUserException("User not present in group");
+    }
+    User userObj = userService.findUserByUsername(user.getUsername());
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
         transaction.begin();
-        Group groupObj = getGroupByName(group.getName());
+
         if (group.getModerators().contains(user)) {
           throw new CannotRemoveUserException("Cannot remove . User is a moderator of the group");
         }
+
         groupObj.getMembers().remove(user);
+        userObj.getGroupParticipant().remove(group);
 
      /* manager.createNativeQuery("DELETE FROM group_users WHERE user_id = ? AND group_id = ?")
               .setParameter(1, user.getUserId())
@@ -132,6 +141,11 @@ public class GroupServiceImpl implements GroupService {
       @Override
       public void removeModerator (Group group, User moderator){
         EntityTransaction transaction = null;
+        Group groupObj = getGroupByName(group.getName());
+        if(!groupObj.getModerators().contains(moderator))
+        {
+          throw new CannotRemoveModeratorException("User not a moderator of this group");
+        }
         transaction = manager.getTransaction();
         transaction.begin();
 
@@ -139,12 +153,13 @@ public class GroupServiceImpl implements GroupService {
               .setParameter(1, moderator.getUserId())
               .setParameter(2, group.getId())
               .executeUpdate();*/
-            Group groupObj = getGroupByName(group.getName());
+            User mod = userService.findUserByUsername(moderator.getUsername());
             if (groupObj.getModerators().contains(moderator)) {
               if (groupObj.getModerators().size() == 1) {
                 throw new CannotRemoveModeratorException("Unable to remove the only moderator");
               }
               groupObj.getModerators().remove(moderator);
+              mod.getGroupModerator().remove(group);
             } else {
               throw new CannotRemoveModeratorException("User is not a moderator of this group");
             }

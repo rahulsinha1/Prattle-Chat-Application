@@ -42,12 +42,12 @@ public class Group {
 
   @JsonBackReference(value="group-moderator")
   //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
-  @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
+  @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
   private List<User> moderators;
 
   @JsonBackReference(value="group-participant")
   //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
-  @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
+  @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
   private List<User> members = new LinkedList<>();
 
   @Column(name = "is_private", unique = false)

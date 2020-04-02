@@ -405,10 +405,22 @@ public class GroupServiceImplTest {
     groupService.createGroup(g);
     Group group = groupService.getGroupByName(name);
     assertEquals(true, groupService.getAllGroups().contains(group));
-    groupService.deleteGroup(group);
+    groupService.deleteGroup(name);
     assertEquals(false, groupService.getAllGroups().contains(group));
 
   }
+
+
+  @Test
+  public void testDeleteGrouptest() {
+
+    Group group = groupService.getGroupByName("grouptest47");
+    assertEquals(true, groupService.getAllGroups().contains(group));
+    groupService.deleteGroup("grouptest47");
+    assertEquals(false, groupService.getAllGroups().contains(group));
+
+  }
+
 
   /*
     Test if a group is successfully deleted
@@ -428,7 +440,7 @@ public class GroupServiceImplTest {
     //groupService.createGroup(g);
     //Group group = groupService.getGroupByName(name);
     //assertEquals(true,groupService.getAllGroups().contains(group));
-    groupService.deleteGroup(group);
+    groupService.deleteGroup(g.getName());
     //assertEquals(false,groupService.getAllGroups().contains(group));
 
   }

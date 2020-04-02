@@ -155,15 +155,23 @@ public class GroupServiceImpl implements GroupService {
 
 
       @Override
-      public void deleteGroup (Group group){
+      public void deleteGroup (String group){
 
-        if (!isRecordExist(group.getName())) {
+        if (!isRecordExist(group)) {
           throw new GroupDoesNotExistException("Group does not exist");
         }
         EntityTransaction transaction = null;
         transaction = manager.getTransaction();
             transaction.begin();
-            Group groupObj = getGroupByName(group.getName());
+            Group groupObj = getGroupByName(group);
+            List<User> userList = groupObj.getMembers();
+            //List<User> moderatorList = groupObj.getModerators();
+
+            for(User u : userList)
+            {
+              u.getGroupParticipant().removeIf(group1 -> group1.equals(groupObj));
+              u.getGroupModerator().removeIf(group1 -> group1.equals(groupObj));
+            }
             manager.remove(groupObj);
    /* manager.createNativeQuery("DELETE FROM groups WHERE group_name =? ")
             .setParameter(1, group.getName())

@@ -29,12 +29,14 @@ import com.neu.prattle.model.User;
 public class UserServiceImplTest {
 
   private UserService as;
+  private GroupService groupService;
   private static final String MIKE4 = "MIKE4";
   private static final String MIKE1 = "Mike1";
 
   @Before
   public void setUp() {
     as = UserServiceImpl.getInstance();
+    groupService = GroupServiceImpl.getInstance();
   }
 
 
@@ -132,14 +134,17 @@ public class UserServiceImplTest {
     @Test
     public void findGroupsByName () {
       String userName = generateString();
-      String groupName = generateString();
       User groupUser = new User(userName);
       as.addUser(groupUser);
+
+      String groupName = generateString();
       Group group = new Group(groupName);
-      group.setMembers(groupUser);
+      group.setCreatedBy(userName);
+      groupService.createGroup(group);
 
       Group group1 = new Group(generateString());
-      group1.setMembers(groupUser);
+      group1.setCreatedBy(userName);
+      groupService.createGroup(group1);
       //List<User> listUsers = new ArrayList<>();
       //List<Group> listGroups = new ArrayList<>();
       //listUsers.add(groupUser);
@@ -148,6 +153,10 @@ public class UserServiceImplTest {
       List<Group> g = as.findGroupsByName(groupUser.getUsername());
       assertEquals(groupName, g.get(0).getName());
       assertEquals(group1.getName(), g.get(1).getName());
+      groupService.deleteGroup(group1.getName());
+     // Group a = groupService.getGroupByName(group1.getName());
+      g = as.findGroupsByName(groupUser.getUsername());
+      assertEquals(1,g.size());
     }
 
 

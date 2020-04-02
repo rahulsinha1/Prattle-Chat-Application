@@ -49,7 +49,7 @@ public interface GroupService {
   /**
    * deletes group from system
    */
-  void deleteGroup(Group group);
+  void deleteGroup(String groupName);
 
   /**
    * gives list of all groups present in the system

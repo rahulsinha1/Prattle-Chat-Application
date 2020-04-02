@@ -120,7 +120,7 @@ public class User {
   @Column(name = "timezone", unique = false)
   private String timezone;
 
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
+  @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
@@ -129,7 +129,7 @@ public class User {
   private List<Group> groupParticipant;
 
 
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
+  @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
   @JoinTable(name = "group_mods",
           joinColumns = @JoinColumn(name = "moderator_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))

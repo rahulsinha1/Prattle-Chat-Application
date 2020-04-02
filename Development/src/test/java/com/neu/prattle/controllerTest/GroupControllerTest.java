@@ -107,6 +107,30 @@ public class GroupControllerTest {
         assertEquals(g,responseGroup.get(0));
     }
 
+  @Test
+  public void testGetAllGroup(){
+    String userName = generateString();
+    String groupName = generateString();
+    User u = new User(userName);
+    u.setFirstName(generateString());
+    userService.addUser(u);
+    Group g = new Group(groupName);
+    g.setCreatedBy(userName);
+    groupController.createGroup(g);
+
+    Group g1 = new Group(generateString());
+    g1.setCreatedBy(userName);
+    groupController.createGroup(g1);
+
+    Response response = groupController.getAllUserGroups(userName);
+    List<Group> responseGroup = (List<Group>) response.getEntity();
+
+    assertEquals(g,responseGroup.get(0));
+    assertEquals(g1,responseGroup.get(1));
+  }
+
+
+
     @Test
     public void testGroupDoesNotExist(){
         Response response = groupController.getGroup(generateString());

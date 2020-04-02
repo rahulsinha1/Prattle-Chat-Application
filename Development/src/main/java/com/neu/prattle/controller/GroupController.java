@@ -147,7 +147,7 @@ public class GroupController {
   public Response deleteGroup(@PathParam("groupName") String groupName) {
       try{
           Group group = groupService.getGroupByName(groupName);
-          groupService.deleteGroup(group);
+          groupService.deleteGroup(groupName);
       }catch (GroupDoesNotExistException e){
           return Response.status(409, e.getMessage()).build();
       }
@@ -182,7 +182,7 @@ public class GroupController {
         }catch(UserDoesNotExistException e){
             return Response.status(409, e.getMessage()).build();
         }
-
+    System.out.println(groupByUsername);
     return Response.status(200).entity(groupByUsername).build();
   }
 

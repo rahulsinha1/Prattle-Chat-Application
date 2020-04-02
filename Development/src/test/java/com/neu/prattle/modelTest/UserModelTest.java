@@ -21,12 +21,12 @@ public class UserModelTest {
     @Before
     public void setUp() {
         user = new User();
-        group = new ArrayList<>();
-        Group group1 = new Group();
+        //group = new ArrayList<>();
+        Group group = new Group();
         follower = new ArrayList<>();
 
-        group.add(group1);
-        follower.add(user);
+        //group.add(group1);
+        //follower.add(user);
 
         user.setFirstName("User");
         user.setLastName("One");

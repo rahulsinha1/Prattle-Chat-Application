@@ -1,5 +1,6 @@
 package com.neu.prattle.modelTest;
 
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
 import org.junit.Before;
@@ -14,17 +15,18 @@ import static org.junit.Assert.assertFalse;
 public class UserModelTest {
 
     private User user;
-    private ArrayList<String> group;
-    private ArrayList<String> follower;
+    private ArrayList<Group> group;
+    private ArrayList<User> follower;
 
     @Before
     public void setUp() {
         user = new User();
         group = new ArrayList<>();
+        Group group1 = new Group();
         follower = new ArrayList<>();
 
-        group.add("Group1");
-        follower.add("User2");
+        group.add(group1);
+        follower.add(user);
 
         user.setFirstName("User");
         user.setLastName("One");
@@ -33,7 +35,6 @@ public class UserModelTest {
         user.setTimezone("GMT");
 
         user.setGroupParticipant(group);
-        user.setFollowers(follower);
     }
 
   @Test
@@ -67,11 +68,6 @@ public class UserModelTest {
     }
 
     @Test
-    public void testUserFollowers(){
-        assertEquals(1,user.getFollowers().size());
-    }
-
-    @Test
     public void testUserGroup(){
         assertEquals(1,user.getGroupParticipant().size());
     }
@@ -89,7 +85,6 @@ public class UserModelTest {
         assertEquals("firstlast", user.getUsername());
         assertEquals("pass1234", user.getPassword());
         assertEquals("GMT", user.getTimezone());
-        assertEquals(emptyFollow,user.getFollowers());
         assertEquals(emptyGroup, user.getGroupParticipant());
     }
 

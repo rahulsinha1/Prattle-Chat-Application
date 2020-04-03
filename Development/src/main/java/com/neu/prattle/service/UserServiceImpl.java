@@ -1,13 +1,21 @@
 package com.neu.prattle.service;
 
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.main.EntityManagerObject;
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /***
  * Implementation of {@link UserService}
@@ -21,12 +29,14 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
   private static UserService accountService;
+  private static final String SELECT_QUERY = "SELECT u FROM User u WHERE u.username = :name";
+  //private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("fse");
+  private static final EntityManager manager = EntityManagerObject.getInstance();
+
 
   static {
     accountService = new UserServiceImpl();
   }
-
-  private Set<User> userSet = new HashSet<>();
 
   /***
    * UserServiceImpl is a Singleton class.
@@ -45,52 +55,95 @@ public class UserServiceImpl implements UserService {
   }
 
   /***
-     *
-     * @param username -> The name of the user.
-     * @return An optional wrapper supplying the user.
-     */
-    @Override
-    public Optional<User> findUserByName(String username) {
-        for(User u : userSet){
-          if(u.getUsername().equals(username)){
-            return Optional.of(u);
-          }
-        }
-        return Optional.empty();
-    }
+   *
+   * @param username -> The name of the user.
+   * @return An optional wrapper supplying the user.
+   */
+  @Override
+  public Optional<User> findUserByName(String username) {
+    if (isRecordExist(username)) {
+      TypedQuery<User> query = manager.createQuery(
+              SELECT_QUERY, User.class);
 
-    @Override
-    public synchronized void addUser(User user) {
-        for(User userInSet : userSet){
-            if(userInSet.getUsername().equals(user.getUsername())){
-                throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
-            }
-        }
-        userSet.add(user);
+      User user = query.setParameter("name", username).getSingleResult();
+      return Optional.of(user);
+    } else {
+      return Optional.empty();
+    }
   }
 
-    @Override
+  @Override
+  public synchronized void addUser(User user) {
+    create(user);
+  }
+
+  @Override
   public User findUserByUsername(String name) {
-    for (User user : userSet) {
-      if (user.getUsername().equals(name)) {
-        return user;
-      }
+    if (isRecordExist(name)) {
+      TypedQuery<User> query = manager.createQuery(
+              SELECT_QUERY, User.class);
+      return query.setParameter("name", name).getSingleResult();
+
+    } else {
+      throw new UserDoesNotExistException("User does not exist.");
     }
-    return null;
   }
 
   @Override
   public List findGroupsByName(String name) {
-    for (User user : userSet) {
-      if (user.getUsername().equals(name)) {
-        return user.getGroupParticipant();
-      }
+    if (isRecordExist(name)) {
+      TypedQuery<User> query = manager.createQuery(
+              SELECT_QUERY, User.class);
+
+
+      User user = query.setParameter("name", name).getSingleResult();
+
+      Query query1 = manager.createNativeQuery("Select * from groups where group_id in ( select group_id from group_users where user_id =?)", Group.class)
+              .setParameter(1, user.getUserId());
+      
+      return query1.getResultList();
     }
     return Collections.emptyList();
+
   }
 
   @Override
   public void updateUser(User user) {
-    userSet.add(user);
+    if (!isRecordExist(user.getUsername())) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    manager.createNativeQuery("UPDATE users SET timezone = ?, first_name = ?, last_name = ?, user_password =? WHERE username= ?")
+            .setParameter(1, user.getTimezone())
+            .setParameter(2, user.getFirstName())
+            .setParameter(3, user.getLastName())
+            .setParameter(4, user.getPassword())
+            .setParameter(5, user.getUsername()).executeUpdate();
+
+    transaction.commit();
+  }
+
+  private void create(User user) {
+    EntityTransaction transaction = null;
+    if (isRecordExist(user.getUsername())) {
+      throw new UserAlreadyPresentException(String.format("User already present with name: %s", user.getUsername()));
+    }
+    transaction = manager.getTransaction();
+    transaction.begin();
+    manager.persist(user);
+    transaction.commit();
+  }
+
+  private boolean isRecordExist(String username) {
+
+    TypedQuery<Long> query = manager.createQuery(
+            "SELECT count(u) FROM User u WHERE u.username = :name", Long.class);
+
+
+    Long count = query.setParameter("name", username).getSingleResult();
+    return (!count.equals(0L));
   }
 }

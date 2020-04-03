@@ -4,25 +4,25 @@
 </head>
 <body>
 <h1 id="welcoming">Welcome </h1>
+<link rel="stylesheet" href="style.css">
 <script src="session.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
         crossorigin="anonymous"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
 <table>
     <tr>
         <td colspan="2">
             <input type="text" id="username" placeholder="Username"/>
-            <button type="button" onclick="connect();" >Connect</button>
         </td>
         <td colspan="2">
-            <button type="button" onclick="goOnline();" >Go Online</button>
-        </td>
-        <td colspan="2">
-            <button type="button" onclick="goOffline();" >Go Offline</button>
+            <!-- Rounded switch -->
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider round"></span>
+            </label>
         </td>
         <td colspan="2">
             <button type="button" onclick="logout();" >Logout</button>
@@ -41,7 +41,56 @@
         </td>
     </tr>
 </table>
+<div id="groups">
+    <h2>Groups:</h2>
+    <button onclick="createGroup()">Create Groups</button>
+    <button onclick="viewGroupButton()">View Groups</button>
+    <button>Update Groups</button>
+    <button onclick="deleteGroup()">Delete Groups</button>
+    <button onclick="addUserToGroup()">Add new users</button>
+    <button>Join Group</button>
+</div>
+<!--Create Group-->
+<div id="create_group_form">
+    <form name="createGroupForm">
+        Group Name : <input type="text" name="groupName" />
+        <br>
+        Description :
+        <br>
+        <textarea name="description" rows="10" cols="30" placeholder="Enter a text"></textarea>
+        <br>
+        <input type="button" value="Submit" onclick="submitGroupCreation()" />
+        <input type="button" value="Clear" onclick="clear()" />
+    </form>
+    <div id="create_group_message"></div>
+</div>
+<!--View Group-->
+<div id="view_group_section">
+    <p>The select the group:</p>
+    <label for="groups">Choose a group:</label>
+    <select id="groupsParticipation"></select>
+    <br>
+    <input type="button" value="Submit" onclick="submitGroupView()"/>
+    <div id="view_group_message"></div>
+</div>
+<!--Delete Group-->
+<div id="delete_group_form">
+    Group Name : <select id="moderatorOfGroup"></select>
+    <button onclick="deleteGroupButton()">Delete Group</button>
+    <div id="delete_group_message"></div>
+</div>
+<div id="adduser_group_section">
+    <form name="addUserGroupForm">
+        Group Name : <input type="text" name="groupname" />
+        <br>
+        User Name : <input type="text" name="newusername" />
+        <input type="button" value="Submit" onclick="submitAddUserGroupCreation()" />
+        <input type="button" value="Clear" onclick="clear()" />
+        <div id="adduser_group_message"></div>
+    </form>
+</div>
 </body>
 <script src="websocket.js"></script>
-
+<script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 </html>

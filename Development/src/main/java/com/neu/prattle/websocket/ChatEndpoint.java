@@ -202,16 +202,20 @@ public class ChatEndpoint {
    * @param message
    */
   private static void broadcast(Message message) {
-    chatEndpoints.forEach(endpoint -> {
+    boolean persistMessage = false;
+    for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
         try {
-          persistMessage(message);
+          if (!persistMessage) {
+            persistMessage(message);
+          }
+          persistMessage = true;
           endpoint.session.getBasicRemote().sendObject(message);
         } catch (IOException | EncodeException e) {
           logger.log(Level.SEVERE, e.getMessage());
         }
       }
-    });
+    }
   }
 
   private void sendGroupMessage(Message message) {
@@ -243,12 +247,16 @@ public class ChatEndpoint {
   }
 
   private static void sendOneMessage(Message message) {
-    chatEndpoints.forEach(endpoint -> {
+    boolean persistMessage = false;
+    for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
         try {
           if (endpoint.session.getId().equals(getSessionForUser(message.getTo())) ||
                   endpoint.session.getId().equals(getSessionForUser(message.getFrom()))) {
-            persistMessage(message);
+            if (!persistMessage) {
+              persistMessage(message);
+            }
+            persistMessage = true;
             endpoint.session.getBasicRemote()
                     .sendObject(message);
           }
@@ -259,7 +267,7 @@ public class ChatEndpoint {
           logger.log(Level.SEVERE, e.getMessage());
         }
       }
-    });
+    }
   }
 
   private static String getSessionForUser(String username) {

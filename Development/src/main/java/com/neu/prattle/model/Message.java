@@ -47,6 +47,17 @@ public class Message {
     @Column(name = "time_stamp")
     private String timestamp;
 
+    @Column(name = "isDeleted")
+    private boolean isDeleted;
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
     public String getTimestamp() {
         return timestamp;
     }
@@ -129,6 +140,11 @@ public class Message {
 
         public MessageBuilder setId(int id)   {
             message.setId(id);
+            return this;
+        }
+
+        public MessageBuilder setIsDeleted(boolean isDeleted) {
+            message.setDeleted(isDeleted);
             return this;
         }
 

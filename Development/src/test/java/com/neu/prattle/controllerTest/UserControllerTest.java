@@ -6,20 +6,16 @@ import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.User;
 
 import com.neu.prattle.service.UserService;
-import com.neu.prattle.service.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -28,7 +24,6 @@ public class UserControllerTest {
 
     @Mock
     private UserService userService;
-
 
     @Before
   public void setUp() throws IllegalAccessException, NoSuchFieldException  {
@@ -67,8 +62,6 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserThatDoesNotExist(){
-        User user = new User("User", "Test", "User","pass1234","GMT");
-
         doThrow(new UserDoesNotExistException("User Does Not Exist")).when(userService).findUserByUsername("User");
         Response response = userController.getUser("DoNotExit");
         assertEquals(409, response.getStatus());

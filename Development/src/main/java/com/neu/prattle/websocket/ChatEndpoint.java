@@ -30,6 +30,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -198,15 +202,20 @@ public class ChatEndpoint {
    * @param message
    */
   private static void broadcast(Message message) {
-    chatEndpoints.forEach(endpoint -> {
+    boolean persistMessage = false;
+    for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
         try {
+          if (!persistMessage) {
+            persistMessage(message);
+          }
+          persistMessage = true;
           endpoint.session.getBasicRemote().sendObject(message);
         } catch (IOException | EncodeException e) {
           logger.log(Level.SEVERE, e.getMessage());
         }
       }
-    });
+    }
   }
 
   private void sendGroupMessage(Message message) {
@@ -238,11 +247,16 @@ public class ChatEndpoint {
   }
 
   private static void sendOneMessage(Message message) {
-    chatEndpoints.forEach(endpoint -> {
+    boolean persistMessage = false;
+    for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
         try {
           if (endpoint.session.getId().equals(getSessionForUser(message.getTo())) ||
                   endpoint.session.getId().equals(getSessionForUser(message.getFrom()))) {
+            if (!persistMessage) {
+              persistMessage(message);
+            }
+            persistMessage = true;
             endpoint.session.getBasicRemote()
                     .sendObject(message);
           }
@@ -253,7 +267,7 @@ public class ChatEndpoint {
           logger.log(Level.SEVERE, e.getMessage());
         }
       }
-    });
+    }
   }
 
   private static String getSessionForUser(String username) {
@@ -284,6 +298,34 @@ public class ChatEndpoint {
             .build();
     session.getBasicRemote().sendObject(error);
     return error;
+  }
+
+  private static void persistMessage(Message message){
+     final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
+            .createEntityManagerFactory("fse");
+    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+    manager.createNativeQuery("INSERT INTO messages(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
+            .setParameter(1, message.getFrom())
+            .setParameter(2, message.getTo())
+            .setParameter(3, message.getContent())
+            .setParameter(4, message.getTimestamp())
+            .executeUpdate();
+    /*transaction = manager.getTransaction();
+    transaction.begin();
+    Message msg = new Message();
+    msg.setFrom(message.getFrom());
+    msg.setTo(message.getTo());
+    msg.setTimestamp(message.getTimestamp());
+    msg.setContent(message.getContent());
+
+
+    manager.persist(msg);*/
+
+    transaction.commit();
+    manager.close();
   }
 }
 

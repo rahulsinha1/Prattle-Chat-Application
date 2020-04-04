@@ -1,10 +1,12 @@
 let createForm = document.getElementById("create_group_form");
 let updateForm = document.getElementById("update_group_section");
-// let addUserGroupForm = document.getElementById("adduser_group_section");
+let addInviteUserGroupForm = document.getElementById("add_invite_user_section");
 // let viewAllGroupUserIsApartOf = document.getElementById("view_group_section");
 // let deleteGroupForm = document.getElementById("delete_group_form");
 // let moderatorOfGroup = document.getElementById("moderatorOfGroup");
-// let selectedGroup = moderatorOfGroup.value;
+
+
+let username = getCookie("username");
 
 closeAllDisplay();
 
@@ -12,12 +14,12 @@ closeAllDisplay();
  * Close all display tag.
  */
 function closeAllDisplay(){
-
     createForm.style.display = "none";
     updateForm.style.display = "none";
+    addInviteUserGroupForm.style.display = "none";
+
     // viewAllGroupUserIsApartOf.style.display = "none";
     //  deleteGroupForm.style.display = "none";
-    //  addUserGroupForm.style.display = "none";
 }
 
 /**
@@ -30,22 +32,10 @@ function getCookie(cname){
     var ca = document.cookie.split(';');
     for(var i=0; i<ca.length; i++) {
         var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+        while (c.charAt(0)===' ') c = c.substring(1);
+        if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
     }
     return "";
-}
-
-/**
- * Checks for cookie.
- */
-function checkCookie() {
-    var username=getCookie("username");
-    if (username != "") {
-        document.getElementById("welcoming").innerText = "Welcome " + username ;
-    }else{
-        window.location.href = '404.html';
-    }
 }
 
 /**
@@ -69,16 +59,6 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-
-
-/**
- * Display the Add/Invite User.
- */
-function addUserToGroup() {
-    closeAllDisplay();
-    addUserGroupForm.style.display = "block";
-}
-
 // CREATING A GROUP SECTION
 /**
  * Display the Create Group form.
@@ -100,7 +80,7 @@ function submitGroupCreation(){
         const group_data = {
             "name": groupName,
             "description": description,
-            "createdBy": getCookie('username'),
+            "createdBy": username,
             "isGroupPrivate": false,
             "password": "",
         };
@@ -112,7 +92,7 @@ function submitGroupCreation(){
             body: JSON.stringify(group_data),
         }).then((response)=>{
             if(!response.ok){
-                displayMessage.innerText = response.error().statusText;
+                displayMessage.innerText = "Unsuccessfully Created";
             } else {
                 displayMessage.innerText = "Successfully Created";
             }
@@ -134,7 +114,6 @@ function updateGroupButton(){
 
     let modOfGroup = document.getElementById("modOfGroup");
     let displayMessage = document.getElementById("update_group_message");
-    var username = getCookie("username");
 
     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
         .then((response) => {
@@ -169,8 +148,187 @@ function selectedGroup() {
  * Submit the Group Update.
  */
 function submitGroupUpdate() {
+    let selectedGroup = document.getElementById("modOfGroup").value;
+    let updated_description = document.updateGroup.description.value;
+    let updated_isPrivate = document.updateGroup.isPrivate.value;
+    let update_password = document.updateGroup.group_password.value;
+
+
+    if(selectedGroup !== "") {
+        const group_data = {
+            "name": selectedGroup,
+            "description": updated_description,
+            "createdBy": getCookie('username'),
+            "isGroupPrivate": updated_isPrivate,
+            "password": update_password,
+        };
+
+        fetch('http://localhost:8080/prattle/rest/group/updateGroup/' + selectedGroup, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(group_data),
+        }).then((response) => {
+            if (!response.ok) {
+                displayMessage.innerText = "Unsuccessfully Updated";
+            } else {
+                displayMessage.innerText = "Successfully Updated";
+            }
+        }).catch((e) => {
+            displayMessage.innerText = "Unsuccessfully Updated";
+        })
+    } else {
+        document.getElementById("update_group_message").innerText = "Must Select A Group.";
+    }
+}
+
+//ADD/INVITE USERS SECTION
+/**
+ * Display the Add/Invite User.
+ */
+function addUserToGroup() {
+    closeAllDisplay();
+    document.getElementById("add_user").style.display = "none";
+    document.getElementById("invite_user").style.display = "none";
+
+    document.getElementById("Add").checked = false;
+    document.getElementById("Invite").checked = false;
+
+
+    addInviteUserGroupForm.style.display = "block";
+}
+
+function selectOption(){
+    let radios = document.getElementsByName("Add_Invite");
+    let add_user = document.getElementById("add_user");
+    let invite_user = document.getElementById("invite_user");
+
+    let selectedOption;
+
+    for (var i = 0, length = radios.length; i < length; i++) {
+        if (radios[i].checked) {
+            // do whatever you want with the checked radio
+            selectedOption = radios[i].value;
+
+            // only one radio can be logically checked, don't check the rest
+            break;
+        }
+    }
+
+    if(selectedOption === "1"){
+        // Add USER to Group
+        invite_user.style.display = "none";
+        add_user.style.display = "block";
+
+        let modOfGroupForAdd = document.getElementById("modOfGroupForAdd");
+        let displayMessage = document.getElementById("add_user_group_message");
+
+        fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
+            .then((response) => {
+                return response.json();
+            })
+            .then((groupData) => {
+                modOfGroupForAdd.innerText = "";
+                for(group in groupData){
+                    modOfGroupForAdd.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
+                }
+            })
+            .catch((error) => {
+                displayMessage.innerText = error;
+            })
+
+    } else {
+        // Invite USER to Group
+        add_user.style.display = "none";
+        invite_user.style.display = "block";
+
+        let listOfGroups = document.getElementById("listOfGroups");
+        let displayMessage = document.getElementById("invite_user_group_message");
+
+        fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
+            .then((response) => {
+                return response.json();
+            })
+            .then((groupData) => {
+                listOfGroups.innerText = "";
+                for(group in groupData){
+                    listOfGroups.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
+                }
+            })
+            .catch((error) => {
+                displayMessage.innerText = error;
+            })
+    }
 
 }
+
+function submitAddUserToGroup(){
+    let groupName = document.getElementById("modOfGroupForAdd").value;
+    let usernameToBeAdded = document.addUserForm.username.value;
+    let displayMessage = document.getElementById("add_user_group_message");
+
+    if( groupName !== ""){
+        if(usernameToBeAdded.trim() !== "" ){
+            fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeAdded, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then((response)=>{
+                if(!response.ok){
+                    displayMessage.innerText = "Error while adding user " + usernameToBeAdded + " to " + groupName;
+                } else {
+                    displayMessage.innerText = "Successfully Add user " + usernameToBeAdded + " to " + groupName;
+                }
+            });
+        } else {
+            displayMessage.innerText = "Please input a username."
+        }
+    } else {
+        displayMessage.innerText = "Please select a group."
+    }
+}
+
+function submitInviteUserToGroup(){
+    let groupName = document.getElementById("listOfGroups").value;
+    let usernameToBeInvited = document.inviteUserForm.username.value;
+    let displayMessage = document.getElementById("invite_user_group_message");
+
+    if( groupName !== ""){
+        if(usernameToBeInvited.trim() !== "" ){
+            fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeInvited, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then((response)=>{
+                if(!response.ok){
+                    displayMessage.innerText = "Error while adding user " + usernameToBeInvited + " to " + groupName;
+                } else {
+                    displayMessage.innerText = "Successfully Add user " + usernameToBeInvited + " to " + groupName;
+                }
+            });
+        } else {
+            displayMessage.innerText = "Please input a username."
+        }
+    } else {
+        displayMessage.innerText = "Please select a group."
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 function deleteGroup() {
     closeAllDisplay();
@@ -211,18 +369,18 @@ function viewGroupButton(){
     let groupsParticipation = document.getElementById("groupsParticipation");
     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ localStorage.getItem('username'))
         .then((response) => {
-        return response.json();
-    })
-    .then((groupData) => {
+            return response.json();
+        })
+        .then((groupData) => {
             console.log(groupData);
-        groupsParticipation.innerHTML = "";
-        for(group in groupData){
-            groupsParticipation.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
-        }
-    })
-    .catch((error)=> {
+            groupsParticipation.innerHTML = "";
+            for(group in groupData){
+                groupsParticipation.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
+            }
+        })
+        .catch((error)=> {
             displayMessage.innerText = error;
-    })
+        })
 }
 
 
@@ -237,9 +395,9 @@ function deleteGroupButton(){
         body: JSON.stringify(group_data),
     }).then((response)=>{
         displayMessage.innerText = response.statusText;
-}).catch((error) => {
+    }).catch((error) => {
         displayMessage.innerText = error.toString();
-})
+    })
 }
 
 function submitGroupView(){
@@ -248,24 +406,3 @@ function submitGroupView(){
 
 
 
-function submitAddUserGroupCreation(){
-    let newusername = document.addUserGroupForm.newusername.value;
-    let groupname = document.addUserGroupForm.groupname.value;
-    let displayMessage = document.getElementById("adduser_group_message");
-    if( newusername.trim() !== "" && groupname.trim() !== ""){
-        fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupname + '/' + newusername, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }).then((response)=>{
-            if(!response.ok){
-            displayMessage.innerText = "Error while adding user " + newusername;
-        } else {
-            displayMessage.innerText = "Successfully Add user " + newusername;
-        }
-    }).catch((e)=>{
-            displayMessage.innerText = "Unsuccessfully Created";
-    })
-    }
-}

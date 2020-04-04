@@ -5,6 +5,23 @@ var iterations = 100;
 
 let username = getCookie("username");
 
+/**
+ * Gets the cookie.
+ * @param cname is the cookie name.
+ * @returns {string} the cookie of the username.
+ */
+function getCookie(cname){
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)===' ') c = c.substring(1);
+        if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
     var checkbox = document.querySelector('input[type="checkbox"]');
     checkbox.addEventListener('change', function () {

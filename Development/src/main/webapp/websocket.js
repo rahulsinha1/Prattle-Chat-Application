@@ -3,16 +3,16 @@ var keySize = 256;
 var ivSize = 128;
 var iterations = 100;
 
+let username = getCookie("username");
+
 document.addEventListener('DOMContentLoaded', function () {
     var checkbox = document.querySelector('input[type="checkbox"]');
     checkbox.addEventListener('change', function () {
         if (checkbox.checked) {
             // do this
-            console.log('Checked');
             goOnline();
         } else {
             // do that
-            console.log('Not checked');
             goOffline();
         }
     });
@@ -37,8 +37,6 @@ function connect() {
 }
 
 function goOnline() {
-    console.log('Username:' + localStorage.getItem('username'));
-    var username = localStorage.getItem('username');
     var host = document.location.host;
 
     // var pathname = document.location.pathname;
@@ -46,7 +44,6 @@ function goOnline() {
 
     ws.onmessage = function (event) {
         var log = document.getElementById("log");
-        console.log(event);
         var message = JSON.parse(event.data);
         var decrypted;
         if(message.content === 'Connected!')
@@ -61,6 +58,7 @@ function goOnline() {
             log.innerHTML += message.from + " : " + message.content + "\n";
         }
     };
+
     ws.onclose = function() {
         var log = document.getElementById("log");
         log.innerHTML += username + " : Disconnected!" + "\n";

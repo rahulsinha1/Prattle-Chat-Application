@@ -57,7 +57,24 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public void createGroup(Group group) {
-    create(group);
+    EntityTransaction transaction = null;
+
+    if (isRecordExist(group.getName())) {
+      throw new GroupAlreadyPresentException(String.format("Group already present with name: %s", group.getName()));
+    }
+
+    transaction = manager.getTransaction();
+
+    transaction.begin();
+    Optional<User> user = userService.findUserByName(group.getCreatedBy());
+
+    user.ifPresent(group::setModerators);
+    user.ifPresent(group::setMembers);
+
+    //group.setModerators(userService.findUserByName(group.getCreatedBy()).get());
+    //group.setMembers(userService.findUserByName(group.getCreatedBy()).get());
+    manager.persist(group);
+    transaction.commit();
   }
 
   @Override
@@ -250,31 +267,6 @@ public class GroupServiceImpl implements GroupService {
           throw new GroupDoesNotExistException("Group does not exist");
         }
       }
-
-
-      private void create (Group group){
-        EntityTransaction transaction = null;
-
-
-        if (isRecordExist(group.getName())) {
-          throw new GroupAlreadyPresentException(String.format("Group already present with name: %s", group.getName()));
-        }
-
-        transaction = manager.getTransaction();
-
-            transaction.begin();
-            Optional<User> user = userService.findUserByName(group.getCreatedBy());
-
-            user.ifPresent(group::setModerators);
-            user.ifPresent(group::setMembers);
-
-            //group.setModerators(userService.findUserByName(group.getCreatedBy()).get());
-            //group.setMembers(userService.findUserByName(group.getCreatedBy()).get());
-            manager.persist(group);
-            transaction.commit();
-          }
-
-
 
       private boolean isRecordExist (String groupName){
 

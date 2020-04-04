@@ -83,7 +83,7 @@ public class UserModelTest {
         assertEquals("First", user.getFirstName());
         assertEquals("Last", user.getLastName());
         assertEquals("firstlast", user.getUsername());
-        assertEquals("pass1234", user.getPassword());
+        assertEquals("ssap", user.getPassword());
         assertEquals("GMT", user.getTimezone());
         assertEquals(emptyGroup, user.getGroupParticipant());
     }

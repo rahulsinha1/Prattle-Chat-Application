@@ -1,14 +1,16 @@
 package com.neu.prattle.websocket;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neu.prattle.model.Message;
 
-//import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.lang.reflect.Field;
 import javax.websocket.EncodeException;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,8 +46,8 @@ public class MessageEncoderTest {
   }
 
   @Test
-  public void testEncodeThrowsException() throws IOException, EncodeException {
-    when(objectMapper.writeValueAsString(message)).thenThrow(new IOException());
+  public void testEncodeThrowsException() throws IOException {
+    Mockito.when(objectMapper.writeValueAsString(anyString())).thenThrow(new IOException());
     String result = messageEncoder.encode(message);
     assertEquals("{}",result);
   }

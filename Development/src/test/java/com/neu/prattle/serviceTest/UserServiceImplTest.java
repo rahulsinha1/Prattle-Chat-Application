@@ -138,7 +138,7 @@ public class UserServiceImplTest {
     when(query.getSingleResult()).thenReturn(user);
   }
 
-  private static void setFinalStaticField(Class<?> clazz, String fieldName, Object value)
+  public static void setFinalStaticField(Class<?> clazz, String fieldName, Object value)
           throws ReflectiveOperationException {
     Field field = clazz.getDeclaredField(fieldName);
     field.setAccessible(true);

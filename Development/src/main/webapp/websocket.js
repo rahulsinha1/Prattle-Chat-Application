@@ -3,7 +3,7 @@ var keySize = 256;
 var ivSize = 128;
 var iterations = 100;
 
-let username = getCookie("username");
+let accountName = getCookie("username");
 
 /**
  * Gets the cookie.
@@ -37,27 +37,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 var password = "Secret Password";
 
-
-function connect() {
-    // var username = document.getElementById("username").value;
-    //
-    // var host = document.location.host;
-    // // var pathname = document.location.pathname;
-    //
-    // ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
-    //
-    // ws.onmessage = function(event) {
-    //     var log = document.getElementById("log");
-    //     var message = JSON.parse(event.data);
-    //     log.innerHTML += message.from + " : " + message.content + "\n";
-    // };
-}
-
 function goOnline() {
     var host = document.location.host;
 
     // var pathname = document.location.pathname;
-    ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
+    ws = new WebSocket("ws://" + host + "/prattle/chat/" + accountName);
 
     ws.onmessage = function (event) {
         var log = document.getElementById("log");
@@ -78,13 +62,8 @@ function goOnline() {
 
     ws.onclose = function() {
         var log = document.getElementById("log");
-        log.innerHTML += username + " : Disconnected!" + "\n";
+        log.innerHTML += accountName + " : Disconnected!" + "\n";
     }
-//     ws.onopen = function(event) {
-//     var log = document.getElementById("log");
-//     var message = JSON.parse(event.data);
-//     log.innerHTML += message.from + " : " + message.content + "\n";
-// };
 }
 
 function goOffline() {
@@ -93,11 +72,11 @@ function goOffline() {
 
 function send() {
     var content = document.getElementById("msg").value;
-    var username = document.getElementById("username").value;
+    var usernameTo = document.getElementById("username").value;
 
   var encrypted = encrypt(content, password);
     var json = JSON.stringify({
-        "to": username === "" ? null : username,
+        "to": usernameTo === "" ? null : usernameTo,
         "content": encrypted
     });
 

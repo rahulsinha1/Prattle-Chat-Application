@@ -7,6 +7,11 @@ let addInviteUserGroupForm = document.getElementById("add_invite_user_section");
 
 
 let username = getCookie("username");
+let secret_password = "Secret Password";
+var ws;
+var keySize = 256;
+var iterations = 100;
+
 
 closeAllDisplay();
 
@@ -115,6 +120,7 @@ function updateGroupButton(){
     let modOfGroup = document.getElementById("modOfGroup");
     let displayMessage = document.getElementById("update_group_message");
 
+    // TODO: change fetch code to Modarator
     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
         .then((response) => {
             return response.json();
@@ -195,10 +201,12 @@ function addUserToGroup() {
     document.getElementById("Add").checked = false;
     document.getElementById("Invite").checked = false;
 
-
     addInviteUserGroupForm.style.display = "block";
 }
 
+/**
+ * Select the option for the user.
+ */
 function selectOption(){
     let radios = document.getElementsByName("Add_Invite");
     let add_user = document.getElementById("add_user");
@@ -224,6 +232,7 @@ function selectOption(){
         let modOfGroupForAdd = document.getElementById("modOfGroupForAdd");
         let displayMessage = document.getElementById("add_user_group_message");
 
+        // TODO: change fetch code to Modarator
         fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
             .then((response) => {
                 return response.json();
@@ -260,9 +269,11 @@ function selectOption(){
                 displayMessage.innerText = error;
             })
     }
-
 }
 
+/**
+ * Submits the add user to group.
+ */
 function submitAddUserToGroup(){
     let groupName = document.getElementById("modOfGroupForAdd").value;
     let usernameToBeAdded = document.addUserForm.username.value;
@@ -290,6 +301,9 @@ function submitAddUserToGroup(){
     }
 }
 
+/**
+ * Submit invitation to add user to group.
+ */
 function submitInviteUserToGroup(){
     let groupName = document.getElementById("listOfGroups").value;
     let usernameToBeInvited = document.inviteUserForm.username.value;
@@ -316,8 +330,99 @@ function submitInviteUserToGroup(){
         displayMessage.innerText = "Please select a group."
     }
 
+    notifyUserOfInvite(usernameToBeInvited, groupName);
+    send(username, usernameToBeInvited, groupName);
 }
 
+/**
+ * Notify user in the notification section.
+ * @param usernameToBeInvited use to notify
+ * @param group group to notify.
+ */
+function notifyUserOfInvite(usernameToBeInvited, group){
+    var host = document.location.host;
+
+    // var pathname = document.location.pathname;
+    ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
+
+    // Try onmessage as well.
+    ws.onopen = function (event) {
+        var notification = document.getElementById("notification");
+        var message = JSON.parse(event.data);
+        var decrypted = decrypt(message.content, secret_password);
+
+        notification.innerHTML += decrypted.toString(CryptoJS.enc.Utf8) + "\n";
+    };
+}
+
+/**
+ * Websocket send notification.
+ * @param user is the user who said it.
+ * @param usernameToBeInvited user to sent the invitation to.
+ * @param groupName the group.
+ */
+function send(user, usernameToBeInvited, groupName) {
+    var content = user + " has invited you to join " + groupName;
+
+    var encrypted = encrypt(content, secret_password);
+    var json = JSON.stringify({
+        "to": usernameToBeInvited === "" ? null : usernameToBeInvited,
+        "content": encrypted
+    });
+
+    ws.send(json);
+}
+
+
+/**
+ * Encrypt the message.
+ * @param msg
+ * @param pass
+ * @returns {string}
+ */
+function encrypt(msg, pass) {
+    var salt = CryptoJS.lib.WordArray.random(128 / 8);
+
+    var key = CryptoJS.PBKDF2(pass, salt, {
+        keySize: keySize / 32,
+        iterations: iterations
+    });
+
+    var iv = CryptoJS.lib.WordArray.random(128 / 8);
+
+    var encrypted = CryptoJS.AES.encrypt(msg, key, {
+        iv: iv,
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+    });
+
+    var transitmessage = salt.toString() + iv.toString() + encrypted.toString();
+    return transitmessage;
+}
+
+/**
+ * Decrypt the message.
+ * @param transitmessage
+ * @param pass
+ * @returns {PromiseLike<ArrayBuffer>}
+ */
+function decrypt(transitmessage, pass) {
+    var salt = CryptoJS.enc.Hex.parse(transitmessage.substr(0, 32));
+    var iv = CryptoJS.enc.Hex.parse(transitmessage.substr(32, 32))
+    var encrypted = transitmessage.substring(64);
+
+    var key = CryptoJS.PBKDF2(pass, salt, {
+        keySize: keySize / 32,
+        iterations: iterations
+    });
+    var decrypted = CryptoJS.AES.decrypt(encrypted, key, {
+        iv: iv,
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+
+    })
+    return decrypted;
+}
 
 
 

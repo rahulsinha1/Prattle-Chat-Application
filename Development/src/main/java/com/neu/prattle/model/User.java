@@ -1,5 +1,10 @@
 package com.neu.prattle.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -7,6 +12,7 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,6 +60,11 @@ public class User {
     return groupParticipant;
   }
 
+
+  public List<Group> getGroupModerator() {
+    return groupModerator;
+  }
+
   public void setUsername(String username) {
     this.username = username;
   }
@@ -74,8 +85,14 @@ public class User {
     this.password = password;
   }
 
-  public void setGroupParticipant(List<Group> groupParticipant) {
-    this.groupParticipant.addAll(groupParticipant);
+  public void setGroupParticipant(Group group) {
+    this.groupParticipant.add(group);
+  }
+
+
+
+  public void setGroupModerator(Group group) {
+    this.groupModerator.add(group);
   }
 
 
@@ -103,14 +120,26 @@ public class User {
   @Column(name = "timezone", unique = false)
   private String timezone;
 
-  @ManyToMany(cascade = {CascadeType.MERGE})
+  @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
+  @JsonManagedReference(value="group-participant")
+  //@JsonIgnoreProperties({"members","moderators"})
   private List<Group> groupParticipant;
+
+
+  @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+  @JoinTable(name = "group_mods",
+          joinColumns = @JoinColumn(name = "moderator_id"),
+          inverseJoinColumns = @JoinColumn(name = "group_id"))
+  @JsonManagedReference(value="group-moderator")
+  // @JsonIgnoreProperties({"members","moderators"})
+  private List<Group> groupModerator;
 
   public User() {
     groupParticipant = new ArrayList();
+    groupModerator = new ArrayList<>();
     this.timezone = "default";
     this.firstName = "first_name";
     this.lastName = "last_name";
@@ -121,9 +150,10 @@ public class User {
     this.firstName = firstName;
     this.lastName = lastName;
     this.username = username;
-    this.password = password;
+    this.password = getEncryptedPassword();
     this.timezone = timezone;
     groupParticipant = new ArrayList();
+    groupModerator = new ArrayList<>();
   }
 
   public User(String username) {
@@ -133,6 +163,7 @@ public class User {
     this.lastName = "last_name";
     this.password = getEncryptedPassword();
     groupParticipant = new ArrayList();
+    groupModerator = new ArrayList<>();
   }
 
   /***

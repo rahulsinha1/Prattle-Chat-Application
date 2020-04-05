@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 /***
@@ -30,7 +27,6 @@ public class UserServiceImpl implements UserService {
 
   private static UserService accountService;
   private static final String SELECT_QUERY = "SELECT u FROM User u WHERE u.username = :name";
-  //private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("fse");
   private static final EntityManager manager = EntityManagerObject.getInstance();
 
 
@@ -73,7 +69,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public synchronized void addUser(User user) {
+  public void addUser(User user) {
     create(user);
   }
 
@@ -90,18 +86,10 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List findGroupsByName(String name) {
+  public List<Group> findGroupsByName(String name) {
     if (isRecordExist(name)) {
-      TypedQuery<User> query = manager.createQuery(
-              SELECT_QUERY, User.class);
-
-
-      User user = query.setParameter("name", name).getSingleResult();
-
-      Query query1 = manager.createNativeQuery("Select * from groups where group_id in ( select group_id from group_users where user_id =?)", Group.class)
-              .setParameter(1, user.getUserId());
-      
-      return query1.getResultList();
+      User user = findUserByUsername(name);
+      return user.getGroupParticipant();
     }
     return Collections.emptyList();
 
@@ -116,15 +104,28 @@ public class UserServiceImpl implements UserService {
     transaction = manager.getTransaction();
     transaction.begin();
 
-    manager.createNativeQuery("UPDATE users SET timezone = ?, first_name = ?, last_name = ?, user_password =? WHERE username= ?")
-            .setParameter(1, user.getTimezone())
-            .setParameter(2, user.getFirstName())
-            .setParameter(3, user.getLastName())
-            .setParameter(4, user.getPassword())
-            .setParameter(5, user.getUsername()).executeUpdate();
+    User userObj = findUserByUsername(user.getUsername());
+    userObj.setTimezone(user.getTimezone());
+    userObj.setFirstName(user.getFirstName());
+    userObj.setLastName(user.getLastName());
+    userObj.setPassword(user.getPassword());
 
     transaction.commit();
   }
+
+  @Override
+  public void deleteUser(User user) {
+    if (!isRecordExist(user.getUsername())) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+    User userObj = findUserByUsername(user.getUsername());
+    manager.remove(userObj);
+    transaction.commit();
+  }
+
 
   private void create(User user) {
     EntityTransaction transaction = null;
@@ -138,10 +139,8 @@ public class UserServiceImpl implements UserService {
   }
 
   private boolean isRecordExist(String username) {
-
     TypedQuery<Long> query = manager.createQuery(
             "SELECT count(u) FROM User u WHERE u.username = :name", Long.class);
-
 
     Long count = query.setParameter("name", username).getSingleResult();
     return (!count.equals(0L));

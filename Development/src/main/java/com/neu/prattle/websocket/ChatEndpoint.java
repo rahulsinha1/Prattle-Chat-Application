@@ -7,6 +7,7 @@ package com.neu.prattle.websocket;
  * @version dated 2017-03-05
  */
 
+import com.neu.prattle.main.EntityManagerObject;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Message;
 import com.neu.prattle.model.User;
@@ -66,6 +67,8 @@ public class ChatEndpoint {
 
   /** The users. */
   private static HashMap<String, String> users = new HashMap<>();
+
+  private static final EntityManager manager = EntityManagerObject.getInstance();
 
   /**
    * On open.
@@ -301,9 +304,6 @@ public class ChatEndpoint {
   }
 
   private static void persistMessage(Message message){
-     final EntityManagerFactory entityManagerFactory = Persistence
-            .createEntityManagerFactory("fse");
-    EntityManager manager = entityManagerFactory.createEntityManager();
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
@@ -314,7 +314,6 @@ public class ChatEndpoint {
             .setParameter(4, message.getTimestamp())
             .executeUpdate();
     transaction.commit();
-    manager.close();
   }
 }
 

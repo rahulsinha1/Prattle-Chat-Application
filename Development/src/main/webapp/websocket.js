@@ -24,6 +24,7 @@ function getCookie(cname){
 
 document.addEventListener('DOMContentLoaded', function () {
     var checkbox = document.querySelector('input[type="checkbox"]');
+
     checkbox.addEventListener('change', function () {
         if (checkbox.checked) {
             // do this
@@ -72,11 +73,11 @@ function goOffline() {
 
 function send() {
     var content = document.getElementById("msg").value;
-    var usernameTo = document.getElementById("username").value;
+    var userToSendTo = document.getElementById("username").value;
 
   var encrypted = encrypt(content, password);
     var json = JSON.stringify({
-        "to": usernameTo === "" ? null : usernameTo,
+        "to": userToSendTo === "" ? null : userToSendTo,
         "content": encrypted
     });
 

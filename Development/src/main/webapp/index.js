@@ -8,10 +8,10 @@ let addInviteUserGroupForm = document.getElementById("add_invite_user_section");
 
 let username = getCookie("username");
 let secret_password = "Secret Password";
-var ws;
 var keySize = 256;
 var iterations = 100;
 
+document.getElementById("welcoming").innerHTML = "Welcome " + username;
 
 closeAllDisplay();
 
@@ -310,30 +310,33 @@ function submitInviteUserToGroup(){
     let displayMessage = document.getElementById("invite_user_group_message");
 
     if( groupName !== ""){
-        if(usernameToBeInvited.trim() !== "" ){
-            fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeInvited, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then((response)=>{
-                if(!response.ok){
-                    displayMessage.innerText = "Error while adding user " + usernameToBeInvited + " to " + groupName;
-                } else {
-                    displayMessage.innerText = "Successfully Add user " + usernameToBeInvited + " to " + groupName;
-                }
-            });
-        } else {
-            displayMessage.innerText = "Please input a username."
-        }
+
+        // // REMOVE THIS
+        // if(usernameToBeInvited.trim() !== "" ){
+        //     fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeInvited, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //     }).then((response)=>{
+        //         if(!response.ok){
+        //             displayMessage.innerText = "Error while adding user " + usernameToBeInvited + " to " + groupName;
+        //         } else {
+        //             displayMessage.innerText = "Successfully Add user " + usernameToBeInvited + " to " + groupName;
+        //         }
+        //     });
+        // } else {
+        //     displayMessage.innerText = "Please input a username."
+        // }
+        notifyUserOfInvite(usernameToBeInvited, groupName);
     } else {
         displayMessage.innerText = "Please select a group."
     }
 
-    notifyUserOfInvite(usernameToBeInvited, groupName);
-    send(username, usernameToBeInvited, groupName);
+
 }
 
+let conn;
 /**
  * Notify user in the notification section.
  * @param usernameToBeInvited use to notify
@@ -343,16 +346,23 @@ function notifyUserOfInvite(usernameToBeInvited, group){
     var host = document.location.host;
 
     // var pathname = document.location.pathname;
-    ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
+    conn = new WebSocket("ws://" + host + "/prattle/chat/" + accountName);
+
+    // var pathname = document.location.pathname;
 
     // Try onmessage as well.
-    ws.onopen = function (event) {
+    conn.onmessage = function (event) {
+        console.log(event)
         var notification = document.getElementById("notification");
-        var message = JSON.parse(event.data);
-        var decrypted = decrypt(message.content, secret_password);
+        // var message = JSON.parse(event.data);
+        // var decrypted = decrypt(message.content, secret_password);
 
+        var message = "Test test";
+        var decrypted = decrypt(message.content, secret_password);
         notification.innerHTML += decrypted.toString(CryptoJS.enc.Utf8) + "\n";
     };
+
+    send(username, usernameToBeInvited, group);
 }
 
 /**
@@ -370,7 +380,7 @@ function send(user, usernameToBeInvited, groupName) {
         "content": encrypted
     });
 
-    ws.send(json);
+    conn.send(json);
 }
 
 
@@ -433,81 +443,81 @@ function decrypt(transitmessage, pass) {
 
 
 
-
-
-function deleteGroup() {
-    closeAllDisplay();
-    deleteGroupForm.style.display = "block";
-
-    let displayMessage = document.getElementById("delete_group_message");
-
-    var modOfGroup = new Set();
-    // GET LIST OF GROUPS USER IS MODERATOR OF
-    fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ localStorage.getItem('username'))
-        .then((response) => {
-            return response.json();
-        })
-        .then((groupData) => {
-            console.log(groupData);
-            for ( group in groupData){
-                for(let i = 0; i < groupData[group].moderators.length; i++){
-                    if(groupData[group].moderators[i] === localStorage.getItem('username')) {
-                        modOfGroup.add(group);
-                    }
-                }
-            }
-        })
-        .catch((error)=> {
-            displayMessage.innerText = error;
-        })
-    modOfGroup.forEach((group) =>{
-        moderatorOfGroup.innerHTML += "<option value=" + group.key + ">" + group.value + "</option>";
-    })
-    //Save Selected
-    selectedGroup = moderatorOfGroup.value;
-}
-
-function viewGroupButton(){
-    closeAllDisplay()
-    viewAllGroupUserIsApartOf.style.display = "block";
-    let displayMessage = document.getElementById("view_group_message");
-    let groupsParticipation = document.getElementById("groupsParticipation");
-    fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ localStorage.getItem('username'))
-        .then((response) => {
-            return response.json();
-        })
-        .then((groupData) => {
-            console.log(groupData);
-            groupsParticipation.innerHTML = "";
-            for(group in groupData){
-                groupsParticipation.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
-            }
-        })
-        .catch((error)=> {
-            displayMessage.innerText = error;
-        })
-}
-
-
-function deleteGroupButton(){
-    let displayMessage = document.getElementById("delete_group_message");
-    // DELETE A GROUP
-    fetch('http://localhost:8080/prattle/rest/deleteGroup/' + selectedGroup, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(group_data),
-    }).then((response)=>{
-        displayMessage.innerText = response.statusText;
-    }).catch((error) => {
-        displayMessage.innerText = error.toString();
-    })
-}
-
-function submitGroupView(){
-    console.log(groupsParticipation.value)
-}
-
+//
+//
+// function deleteGroup() {
+//     closeAllDisplay();
+//     deleteGroupForm.style.display = "block";
+//
+//     let displayMessage = document.getElementById("delete_group_message");
+//
+//     var modOfGroup = new Set();
+//     // GET LIST OF GROUPS USER IS MODERATOR OF
+//     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ localStorage.getItem('username'))
+//         .then((response) => {
+//             return response.json();
+//         })
+//         .then((groupData) => {
+//             console.log(groupData);
+//             for ( group in groupData){
+//                 for(let i = 0; i < groupData[group].moderators.length; i++){
+//                     if(groupData[group].moderators[i] === localStorage.getItem('username')) {
+//                         modOfGroup.add(group);
+//                     }
+//                 }
+//             }
+//         })
+//         .catch((error)=> {
+//             displayMessage.innerText = error;
+//         })
+//     modOfGroup.forEach((group) =>{
+//         moderatorOfGroup.innerHTML += "<option value=" + group.key + ">" + group.value + "</option>";
+//     })
+//     //Save Selected
+//     selectedGroup = moderatorOfGroup.value;
+// }
+//
+// function viewGroupButton(){
+//     closeAllDisplay()
+//     viewAllGroupUserIsApartOf.style.display = "block";
+//     let displayMessage = document.getElementById("view_group_message");
+//     let groupsParticipation = document.getElementById("groupsParticipation");
+//     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ localStorage.getItem('username'))
+//         .then((response) => {
+//             return response.json();
+//         })
+//         .then((groupData) => {
+//             console.log(groupData);
+//             groupsParticipation.innerHTML = "";
+//             for(group in groupData){
+//                 groupsParticipation.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
+//             }
+//         })
+//         .catch((error)=> {
+//             displayMessage.innerText = error;
+//         })
+// }
+//
+//
+// function deleteGroupButton(){
+//     let displayMessage = document.getElementById("delete_group_message");
+//     // DELETE A GROUP
+//     fetch('http://localhost:8080/prattle/rest/deleteGroup/' + selectedGroup, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(group_data),
+//     }).then((response)=>{
+//         displayMessage.innerText = response.statusText;
+//     }).catch((error) => {
+//         displayMessage.innerText = error.toString();
+//     })
+// }
+//
+// function submitGroupView(){
+//     console.log(groupsParticipation.value)
+// }
+//
 
 

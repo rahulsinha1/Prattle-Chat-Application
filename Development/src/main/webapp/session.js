@@ -1,7 +1,4 @@
-
-var username=getCookie("username");
-
-if (username == "") {
+if (getCookie("username") === "") {
     window.location.href = '404.html';
 }
 

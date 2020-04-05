@@ -1,12 +1,13 @@
 
 package com.neu.prattle.websocket;
 
+import com.neu.prattle.main.EntityManagerObject;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Message;
-import com.neu.prattle.model.Moderator;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.GroupService;
 import com.neu.prattle.service.UserService;
+import com.neu.prattle.serviceTest.UserServiceImplTest;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,18 +18,20 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 import javax.websocket.EncodeException;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,6 +46,15 @@ public class ChatEndpointTest {
 
   @Mock
   private GroupService groupService;
+
+  @Mock
+  private EntityManager manager;
+
+  @Mock
+  private Query query;
+
+  @Mock
+  private EntityTransaction transaction;
 
   private String username = "username";
 
@@ -61,7 +73,7 @@ public class ChatEndpointTest {
   private Message message;
 
   @Before
-  public void setUp() throws IllegalAccessException, NoSuchFieldException {
+  public void setUp() throws ReflectiveOperationException {
     Field f1 = chatEndpoint.getClass().getDeclaredField("accountService");
     f1.setAccessible(true);
     f1.set(chatEndpoint, userService);
@@ -72,6 +84,8 @@ public class ChatEndpointTest {
 
     group.setMembers(user);
     group.setMembers(user2);
+    UserServiceImplTest.setFinalStaticField(ChatEndpoint.class, "manager", manager);
+    persistMessage();
   }
 
   @Test
@@ -168,6 +182,15 @@ public class ChatEndpointTest {
     message.setContent(username + ":What is the time?");
     message.setTimestamp(username + ":1234567890");
     chatEndpoint.onMessage(session,message);
+  }
+
+  private void persistMessage() {
+      when(manager.getTransaction()).thenReturn(transaction);
+      doNothing().when(transaction).begin();
+      when(manager.createNativeQuery(anyString())).thenReturn(query);
+      when(query.setParameter(anyInt(),anyString())).thenReturn(query);
+      when(query.executeUpdate()).thenReturn(0);
+      doNothing().when(transaction).commit();
   }
 
   @After

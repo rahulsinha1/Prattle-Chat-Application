@@ -16,4 +16,6 @@ public class EntityManagerObject {
   public static EntityManager getInstance() {
     return manager;
   }
+
+  private EntityManagerObject(){}
 }

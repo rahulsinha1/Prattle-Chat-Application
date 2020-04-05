@@ -26,6 +26,7 @@ public class GroupServiceImpl implements GroupService {
 
   private static GroupService groupService;
   private static UserService userService;
+  private static final String GROUP_DOES_NOT_EXIST = "Group does not exist";
 
   private static final EntityManager manager = EntityManagerObject.getInstance();
 
@@ -152,7 +153,7 @@ public class GroupServiceImpl implements GroupService {
   public void deleteGroup(String group) {
 
     if (!isRecordExist(group)) {
-      throw new GroupDoesNotExistException("Group does not exist");
+      throw new GroupDoesNotExistException(GROUP_DOES_NOT_EXIST);
     }
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
@@ -171,7 +172,7 @@ public class GroupServiceImpl implements GroupService {
   @Override
   public void updateGroup(Group group) {
     if (!isRecordExist(group.getName())) {
-      throw new GroupDoesNotExistException("Group does not exist");
+      throw new GroupDoesNotExistException(GROUP_DOES_NOT_EXIST);
     }
 
     EntityTransaction transaction = null;
@@ -210,7 +211,7 @@ public class GroupServiceImpl implements GroupService {
 
       return query.setParameter("name", name).getSingleResult();
     } else {
-      throw new GroupDoesNotExistException("Group does not exist");
+      throw new GroupDoesNotExistException(GROUP_DOES_NOT_EXIST);
     }
   }
 

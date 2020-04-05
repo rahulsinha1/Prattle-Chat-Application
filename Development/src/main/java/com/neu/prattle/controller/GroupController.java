@@ -1,9 +1,6 @@
 package com.neu.prattle.controller;
 
-import com.neu.prattle.exceptions.GroupAlreadyPresentException;
-import com.neu.prattle.exceptions.GroupDoesNotExistException;
-import com.neu.prattle.exceptions.UserAlreadyPresentInGroupException;
-import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.exceptions.*;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.GroupService;
@@ -26,10 +23,11 @@ import javax.ws.rs.core.Response;
 public class GroupController {
 
   // Usually Dependency injection will be used to inject the service at run-time
-  private GroupService groupService = GroupServiceImpl.getInstance();
   private UserService userService = UserServiceImpl.getInstance();
+  private GroupService groupService = GroupServiceImpl.getInstance();
 
-  /***
+
+    /***
    * Handles a HTTP POST request for user creation
    *
    * @param group -> The User object decoded from the payload of POST request.
@@ -62,7 +60,7 @@ public class GroupController {
         List userGroup;
         try{
             userGroup = groupService.getAllGroupsByUsername(username);
-        }catch (GroupDoesNotExistException e ){
+        }catch (UserDoesNotHaveAnyGroup e ){
             return Response.status(409, e.getMessage()).build();
         }
         return Response.status(200).entity(userGroup).build();
@@ -146,8 +144,8 @@ public class GroupController {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response deleteGroup(@PathParam("groupName") String groupName) {
       try{
-          Group group = groupService.getGroupByName(groupName);
-          groupService.deleteGroup(group);
+          groupService.getGroupByName(groupName);
+          groupService.deleteGroup(groupName);
       }catch (GroupDoesNotExistException e){
           return Response.status(409, e.getMessage()).build();
       }
@@ -161,12 +159,7 @@ public class GroupController {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getAllGroups() {
       List listOfAllGroup;
-        try {
-            listOfAllGroup = groupService.getAllGroups();
-        } catch(Exception e){
-            return Response.status(409, e.getMessage()).build();
-        }
-
+      listOfAllGroup = groupService.getAllGroups();
     return Response.status(200).entity(listOfAllGroup).build();
   }
 
@@ -182,7 +175,6 @@ public class GroupController {
         }catch(UserDoesNotExistException e){
             return Response.status(409, e.getMessage()).build();
         }
-
     return Response.status(200).entity(groupByUsername).build();
   }
 

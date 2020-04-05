@@ -21,12 +21,12 @@ public class UserModelTest {
     @Before
     public void setUp() {
         user = new User();
-        group = new ArrayList<>();
-        Group group1 = new Group();
+        //group = new ArrayList<>();
+        Group group = new Group();
         follower = new ArrayList<>();
 
-        group.add(group1);
-        follower.add(user);
+        //group.add(group1);
+        //follower.add(user);
 
         user.setFirstName("User");
         user.setLastName("One");
@@ -83,7 +83,7 @@ public class UserModelTest {
         assertEquals("First", user.getFirstName());
         assertEquals("Last", user.getLastName());
         assertEquals("firstlast", user.getUsername());
-        assertEquals("pass1234", user.getPassword());
+        assertEquals("ssap", user.getPassword());
         assertEquals("GMT", user.getTimezone());
         assertEquals(emptyGroup, user.getGroupParticipant());
     }

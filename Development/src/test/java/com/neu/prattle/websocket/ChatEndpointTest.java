@@ -70,7 +70,8 @@ public class ChatEndpointTest {
     f2.setAccessible(true);
     f2.set(chatEndpoint, groupService);
 
-    group.setMembers(Arrays.asList(user,user2));
+    group.setMembers(user);
+    group.setMembers(user2);
   }
 
   @Test

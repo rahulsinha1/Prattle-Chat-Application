@@ -1,3 +1,4 @@
+
 package com.neu.prattle.websocket;
 
 import com.neu.prattle.model.Group;
@@ -174,3 +175,4 @@ public class ChatEndpointTest {
     chatEndpoint.onClose(session);
   }
 }
+

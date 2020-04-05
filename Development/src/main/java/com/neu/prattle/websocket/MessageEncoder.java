@@ -4,7 +4,6 @@ import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neu.prattle.model.Message;
 import org.codehaus.jackson.map.ObjectMapper;
 

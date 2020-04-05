@@ -156,7 +156,7 @@ public class GroupServiceImplTest {
     groupService.addUser(g, u);
 
     Group group = groupService.getGroupByName(groupName);
-    assertEquals(group.getMembers().size(),2);
+    assertEquals(2,group.getMembers().size());
   }
 
   /**
@@ -217,14 +217,14 @@ public class GroupServiceImplTest {
 
     Group groupObj;
     groupObj = groupService.getGroupByName(groupName);
-    assertEquals(groupObj.getMembers().size(),2);
+    assertEquals(2,groupObj.getMembers().size());
 
     when(mockUserService.findUserByUsername(username2)).thenReturn(user2);
     //TRemoving second user
     groupService.removeUser(g, user2);
     groupObj = groupService.getGroupByName(groupName);
 
-    assertEquals(groupObj.getMembers().size(),1);
+    assertEquals(1,groupObj.getMembers().size());
   }
 
   @Test(expected = CannotRemoveUserException.class)
@@ -256,7 +256,7 @@ public class GroupServiceImplTest {
 
     Group groupObj;
     groupObj = groupService.getGroupByName(groupName);
-    assertEquals(groupObj.getMembers().size(),1);
+    assertEquals(1,groupObj.getMembers().size());
 
     //TRemoving second user
     groupService.removeUser(g, user2);
@@ -289,7 +289,7 @@ public class GroupServiceImplTest {
 
     Group groupObj;
     groupObj = groupService.getGroupByName(groupName);
-    assertEquals(groupObj.getMembers().size(),1);
+    assertEquals(1,groupObj.getMembers().size());
 
     when(mockUserService.findUserByUsername(userName)).thenReturn(u);
     //Trying to remove moderator
@@ -536,7 +536,7 @@ public class GroupServiceImplTest {
     Group group;
     group = groupService.getGroupByName(groupName);
 
-    assertEquals(group.getDescription(),"No description provided");
+    assertEquals("No description provided",group.getDescription());
     g.setDescription("This is a test group");
     groupService.updateGroup(g);
     group = groupService.getGroupByName(groupName);

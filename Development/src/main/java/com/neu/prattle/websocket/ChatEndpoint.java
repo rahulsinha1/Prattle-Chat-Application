@@ -301,9 +301,9 @@ public class ChatEndpoint {
   }
 
   private static void persistMessage(Message message){
-     final EntityManagerFactory ENTITY_MANAGER_FACTORY = Persistence
+     final EntityManagerFactory entityManagerFactory = Persistence
             .createEntityManagerFactory("fse");
-    EntityManager manager = ENTITY_MANAGER_FACTORY.createEntityManager();
+    EntityManager manager = entityManagerFactory.createEntityManager();
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
@@ -313,17 +313,6 @@ public class ChatEndpoint {
             .setParameter(3, message.getContent())
             .setParameter(4, message.getTimestamp())
             .executeUpdate();
-    /*transaction = manager.getTransaction();
-    transaction.begin();
-    Message msg = new Message();
-    msg.setFrom(message.getFrom());
-    msg.setTo(message.getTo());
-    msg.setTimestamp(message.getTimestamp());
-    msg.setContent(message.getContent());
-
-
-    manager.persist(msg);*/
-
     transaction.commit();
     manager.close();
   }

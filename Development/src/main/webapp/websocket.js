@@ -4,6 +4,7 @@ var ivSize = 128;
 var iterations = 100;
 
 let accountName = getCookie("username");
+let idOfEachText = 0;
 
 /**
  * Gets the cookie.
@@ -45,6 +46,9 @@ function goOnline() {
     ws = new WebSocket("ws://" + host + "/prattle/chat/" + accountName);
 
     ws.onmessage = function (event) {
+        idOfEachText++;
+        document.getElementsByClassName(idOfEachText).contentEditable = "true";
+
         var log = document.getElementById("log");
         var message = JSON.parse(event.data);
         var decrypted;
@@ -53,19 +57,37 @@ function goOnline() {
         else
             decrypted = decrypt(message.content, password);
         if (typeof message.timestamp !== 'undefined') {
-            log.innerHTML +=
+            log.innerHTML += "<span id=" + "'" +  idOfEachText + "'>" +
                 message.from + " : " + displayTime(message.timestamp.toString()) + ":"
-                + decrypted.toString(CryptoJS.enc.Utf8) + "\n";
+                + decrypted.toString(CryptoJS.enc.Utf8) + "</span> <button class=" + "'" +  idOfEachText + "' " +
+                "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
+                "<button contenteditable > &#10503 </button>" + "<br />";
         } else {
-            log.innerHTML += message.from + " : " + message.content + "\n";
+            log.innerHTML += "<span id=" + "'" +  idOfEachText + "'>" +
+                message.from + " : " + message.content + "</span> <button class="
+                + "'" +  idOfEachText + "' " + "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
+                "<button contenteditable > &#10503 </button>" + "<br />";
         }
     };
 
     ws.onclose = function() {
         var log = document.getElementById("log");
-        log.innerHTML += accountName + " : Disconnected!" + "\n";
+        log.innerHTML += accountName + " : Disconnected!" + "<br />";
     }
 }
+
+
+function copy(id) {
+    const textToCopy = document.getElementById(id).innerText;
+
+    navigator.clipboard.writeText(textToCopy).then(r => {
+        alert("Copied Successfully");
+    }, function () {
+        alert("Copied Unsuccessfully");
+    }) ;
+}
+
+// <span id="1"> This is a test </span> <button class="1" contenteditable onclick="copy('1')">&#x2398</button> <button contenteditable > &#10503</button>
 
 function goOffline() {
     ws.close();

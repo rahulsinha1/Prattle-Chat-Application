@@ -4,7 +4,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <link rel="stylesheet" href="style.css">
     <!-- TODO: Remove the comment below -->
-<!--    <script src="session.js"></script>-->
+    <script src="session.js"></script>
 </head>
 <body>
 
@@ -30,11 +30,13 @@
     <tr>
         <td>
             <h3>Messages</h3>
-            <textarea readonly="true" rows="10" cols="80" id="log"></textarea>
+            <div class="textarea" contenteditable="false" id="log">
+            </div>
         </td>
         <td>
             <h3>Notification</h3>
-            <textarea readonly="true" rows="10" cols="30" id="notification"></textarea>
+            <div class="textarea" contenteditable="false" id="notification">
+            </div>
         </td>
     </tr>
     <tr>
@@ -44,7 +46,6 @@
         </td>
     </tr>
 </table>
-
 <br>
 <div id="groups">
     <button onclick="createGroupButton()">Create Groups</button>

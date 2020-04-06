@@ -80,7 +80,7 @@ function submitGroupCreation(){
     let groupName = document.createGroupForm.groupName.value;
     let description = document.createGroupForm.description.value;
     let displayMessage = document.getElementById("create_group_message");
-    displayMessage.innerText = "";
+    displayMessage.innerHTML = "";
     if( groupName.trim() !== ""){
         const group_data = {
             "name": groupName,
@@ -97,12 +97,12 @@ function submitGroupCreation(){
             body: JSON.stringify(group_data),
         }).then((response)=>{
             if(!response.ok){
-                displayMessage.innerText = "Unsuccessfully Created";
+                displayMessage.innerHTML = "Unsuccessfully Created" + "<br />";
             } else {
-                displayMessage.innerText = "Successfully Created";
+                displayMessage.innerHTML = "Successfully Created" + "<br />";
             }
         }).catch((e)=>{
-            displayMessage.innerText = "Unsuccessfully Created";
+            displayMessage.innerHTML = "Unsuccessfully Created" + "<br />";
         })
     }
 }
@@ -126,13 +126,13 @@ function updateGroupButton(){
             return response.json();
         })
         .then((groupData) => {
-            modOfGroup.innerText = "";
+            modOfGroup.innerHTML = "";
             for(group in groupData){
                 modOfGroup.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
             }
         })
         .catch((error) => {
-            displayMessage.innerText = error;
+            displayMessage.innerHTML = error + "<br />";
         })
 }
 
@@ -323,10 +323,10 @@ function submitInviteUserToGroup(){
             decrypted = decrypt(message.content, secret_password);
 
             if (typeof notifyMessage.timestamp !== 'undefined') {
-                notification.innerHTML += displayTime(notifyMessage.timestamp.toString()) + " : "
+                notification.innerText += displayTime(notifyMessage.timestamp.toString()) + " : "
                     + decrypted.toString(CryptoJS.enc.Utf8) + "\n";
             } else {
-                notification.innerHTML += notifyMessage.from + " : " + notifyMessage.content + "\n";
+                notification.innerText += notifyMessage.from + " : " + notifyMessage.content + "\n";
             }
         }
     } else {

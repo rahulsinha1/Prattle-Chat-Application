@@ -190,6 +190,8 @@ function submitGroupUpdate() {
 }
 
 //ADD/INVITE USERS SECTION
+let conn = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + accountName);
+
 /**
  * Display the Add/Invite User.
  */
@@ -310,25 +312,23 @@ function submitInviteUserToGroup(){
     let displayMessage = document.getElementById("invite_user_group_message");
 
     if( groupName !== ""){
-
-        // // REMOVE THIS
-        // if(usernameToBeInvited.trim() !== "" ){
-        //     fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeInvited, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //     }).then((response)=>{
-        //         if(!response.ok){
-        //             displayMessage.innerText = "Error while adding user " + usernameToBeInvited + " to " + groupName;
-        //         } else {
-        //             displayMessage.innerText = "Successfully Add user " + usernameToBeInvited + " to " + groupName;
-        //         }
-        //     });
-        // } else {
-        //     displayMessage.innerText = "Please input a username."
-        // }
         notifyUserOfInvite(usernameToBeInvited, groupName);
+
+        conn.onmessage = function(event){
+            let notification = document.getElementById("notification");
+            notification.style.color = "red";
+            let decrypted;
+
+            let notifyMessage = JSON.parse(event.data);
+            decrypted = decrypt(message.content, secret_password);
+
+            if (typeof notifyMessage.timestamp !== 'undefined') {
+                notification.innerHTML += displayTime(notifyMessage.timestamp.toString()) + " : "
+                    + decrypted.toString(CryptoJS.enc.Utf8) + "\n";
+            } else {
+                notification.innerHTML += notifyMessage.from + " : " + notifyMessage.content + "\n";
+            }
+        }
     } else {
         displayMessage.innerText = "Please select a group."
     }
@@ -336,47 +336,17 @@ function submitInviteUserToGroup(){
 
 }
 
-let conn;
 /**
  * Notify user in the notification section.
  * @param usernameToBeInvited use to notify
  * @param group group to notify.
  */
 function notifyUserOfInvite(usernameToBeInvited, group){
-    var host = document.location.host;
+    var message = username + " has invited " + usernameToBeInvited + " to join Group " + group;
+    var encrypted = encrypt(message, secret_password);
 
-    // var pathname = document.location.pathname;
-    conn = new WebSocket("ws://" + host + "/prattle/chat/" + accountName);
-
-    // var pathname = document.location.pathname;
-
-    // Try onmessage as well.
-    conn.onmessage = function (event) {
-        console.log(event)
-        var notification = document.getElementById("notification");
-        // var message = JSON.parse(event.data);
-        // var decrypted = decrypt(message.content, secret_password);
-
-        var message = "Test test";
-        var decrypted = decrypt(message.content, secret_password);
-        notification.innerHTML += decrypted.toString(CryptoJS.enc.Utf8) + "\n";
-    };
-
-    send(username, usernameToBeInvited, group);
-}
-
-/**
- * Websocket send notification.
- * @param user is the user who said it.
- * @param usernameToBeInvited user to sent the invitation to.
- * @param groupName the group.
- */
-function send(user, usernameToBeInvited, groupName) {
-    var content = user + " has invited you to join " + groupName;
-
-    var encrypted = encrypt(content, secret_password);
     var json = JSON.stringify({
-        "to": usernameToBeInvited === "" ? null : usernameToBeInvited,
+        "to": usernameToBeInvited,
         "content": encrypted
     });
 

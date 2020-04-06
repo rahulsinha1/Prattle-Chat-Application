@@ -46,7 +46,7 @@ function goOnline() {
     ws = new WebSocket("ws://" + host + "/prattle/chat/" + accountName);
 
     ws.onmessage = function (event) {
-        idOfEachText++;
+        idOfEachText++; // TODO: CHANGE TO INTEGRATE INTO THE DATABASE
         document.getElementsByClassName(idOfEachText).contentEditable = "true";
 
         var log = document.getElementById("log");

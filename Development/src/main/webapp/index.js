@@ -320,7 +320,7 @@ function submitInviteUserToGroup(){
             let decrypted;
 
             let notifyMessage = JSON.parse(event.data);
-            decrypted = decrypt(message.content, secret_password);
+            decrypted = decrypt(notifyMessage.content, secret_password);
 
             if (typeof notifyMessage.timestamp !== 'undefined') {
                 notification.innerText += displayTime(notifyMessage.timestamp.toString()) + " : "

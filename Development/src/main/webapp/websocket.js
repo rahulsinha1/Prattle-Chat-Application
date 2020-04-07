@@ -1,10 +1,14 @@
-var ws;
 var keySize = 256;
-var ivSize = 128;
+let ivSize = 128;
 var iterations = 100;
 
 let accountName = getCookie("username");
 let idOfEachText = 0;
+
+let ws;
+
+
+// var pathname = document.location.pathname;
 
 /**
  * Gets the cookie.
@@ -22,9 +26,10 @@ function getCookie(cname){
     return "";
 }
 
+let checkbox = document.querySelector('input[type="checkbox"]');
+
 
 document.addEventListener('DOMContentLoaded', function () {
-    var checkbox = document.querySelector('input[type="checkbox"]');
 
     checkbox.addEventListener('change', function () {
         if (checkbox.checked) {
@@ -40,10 +45,12 @@ document.addEventListener('DOMContentLoaded', function () {
 var password = "Secret Password";
 
 function goOnline() {
-    var host = document.location.host;
+    ws = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + accountName);
 
-    // var pathname = document.location.pathname;
-    ws = new WebSocket("ws://" + host + "/prattle/chat/" + accountName);
+    ws.onopen = function() {
+        var log = document.getElementById("log");
+        log.innerHTML += accountName + " : Connected!" + "<br />";
+    }
 
     ws.onmessage = function (event) {
         idOfEachText++; // TODO: CHANGE TO INTEGRATE INTO THE DATABASE
@@ -75,6 +82,7 @@ function goOnline() {
         log.innerHTML += accountName + " : Disconnected!" + "<br />";
     }
 }
+
 
 
 function copy(id) {

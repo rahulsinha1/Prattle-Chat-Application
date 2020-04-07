@@ -36,7 +36,7 @@ public class MessageController {
       listofAllMessages = messageService.getMessages(username);
       return Response.status(200).entity(listofAllMessages).build();
     }
-    throw new UserDoesNotExistException("User does not exist with name" + username);
+    return Response.status(409, "User does not exist").build();
   }
 
   @GET

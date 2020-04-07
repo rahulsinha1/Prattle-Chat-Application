@@ -7,15 +7,15 @@ package com.neu.prattle.websocket;
  * @version dated 2017-03-05
  */
 
-import javax.websocket.Decoder;
-import javax.websocket.EndpointConfig;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neu.prattle.model.Message;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.websocket.Decoder;
+import javax.websocket.EndpointConfig;
 
 /**
  * The Class MessageDecoder.

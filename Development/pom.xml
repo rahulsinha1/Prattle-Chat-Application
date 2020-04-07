@@ -27,8 +27,6 @@
 					<server>TomcatServer</server>
 					<path>/prattle</path>
 					<update>true</update>
-					<username>admin</username>
-					<password>admin</password>
 				</configuration>
 			</plugin>
 		</plugins>

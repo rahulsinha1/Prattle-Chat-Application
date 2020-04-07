@@ -1,7 +1,5 @@
-
 package com.neu.prattle.websocket;
 
-import com.neu.prattle.main.EntityManagerObject;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Message;
 import com.neu.prattle.model.User;

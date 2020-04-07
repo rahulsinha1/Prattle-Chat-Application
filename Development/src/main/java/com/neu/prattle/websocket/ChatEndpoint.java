@@ -32,9 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -307,7 +305,7 @@ public class ChatEndpoint {
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
-    manager.createNativeQuery("INSERT INTO messages(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
+    manager.createNativeQuery("INSERT INTO message(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
             .setParameter(1, message.getFrom())
             .setParameter(2, message.getTo())
             .setParameter(3, message.getContent())

@@ -405,7 +405,24 @@ function decrypt(transitmessage, pass) {
 }
 
 
+function search() {
 
+  var x = document.getElementById("search").value;
+
+  fetch('http://localhost:8080/prattle/rest/user/getUser/'+ x)
+          .then((response) => {
+          return response.json();
+  })
+  .then((userData) => {
+          console.log(userData);
+     document.getElementById("search-result").innerHTML = "";
+          document.getElementById("search-result").innerHTML += userData.firstName+" "+userData.lastName;
+
+  })
+  .catch((error)=> {
+          document.getElementById("search-result").innerHTML = "No users found";
+  })
+  }
 
 
 

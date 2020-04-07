@@ -5,6 +5,14 @@
     <link rel="stylesheet" href="style.css">
     <!-- TODO: Remove the comment below -->
 <!--    <script src="session.js"></script>-->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .search-box button:hover {
+        background: #ccc;
+}
+
+    </style>
 </head>
 <body>
 
@@ -144,6 +152,13 @@
         <div id="invite_user_group_message"></div>
     </div>
 </div>
+
+<div class="search-box">
+    <input type="search" id="search" placeholder="Search for users/groups" name="search">
+    <button onclick="search()" type="submit"><i class="fa fa-search"></i></button>
+</div>
+
+<div id="search-result"></div>
 
 <!--View Group-->
 <!--<div id="view_group_section">-->

@@ -1,21 +1,20 @@
 <html>
 <head>
     <title>Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- TODO: Remove the comment below -->
+    <script src="session.js"></script>
 </head>
 <body>
-<h1 id="welcoming">Welcome </h1>
-<link rel="stylesheet" href="style.css">
-<script src="session.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-<script src="https://code.jquery.com/jquery-3.1.1.min.js"
-        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
+
+
+<h1 id="welcoming"></h1>
+
 <table>
     <tr>
         <td colspan="2">
-            <input type="text" id="username" placeholder="Username"/>
+            <input type="text" id="username" placeholder="Enter A Username"/>
         </td>
         <td colspan="2">
             <!-- Rounded switch -->
@@ -28,10 +27,16 @@
             <button type="button" onclick="logout();" >Logout</button>
         </td>
     </tr>
-    </tr>
     <tr>
         <td>
-            <textarea readonly="true" rows="10" cols="80" id="log"></textarea>
+            <h3>Messages</h3>
+            <div class="textarea" contenteditable="false" id="log">
+            </div>
+        </td>
+        <td>
+            <h3>Notification</h3>
+            <div class="textarea" contenteditable="false" id="notification">
+            </div>
         </td>
     </tr>
     <tr>
@@ -41,54 +46,135 @@
         </td>
     </tr>
 </table>
+<br>
 <div id="groups">
-    <h2>Groups:</h2>
-    <button onclick="createGroup()">Create Groups</button>
-    <button onclick="viewGroupButton()">View Groups</button>
-    <button>Update Groups</button>
-    <button onclick="deleteGroup()">Delete Groups</button>
-    <button onclick="addUserToGroup()">Add new users</button>
-    <button>Join Group</button>
+    <button onclick="createGroupButton()">Create Groups</button>
+    <button onclick="updateGroupButton()">Update Groups</button>
+    <button onclick="addUserToGroup()">Add/Invite User</button>
+    <!--    TODO: <button onclick="viewGroupButton()">View Groups</button>-->
+    <!--              TODO:   <button onclick="deleteGroup()">Delete Groups</button>-->
+
+    <!--             TODO:    <button>Join Group</button>-->
 </div>
+
 <!--Create Group-->
 <div id="create_group_form">
     <form name="createGroupForm">
-        Group Name : <input type="text" name="groupName" />
+        Group Name : <input type="text" name="groupName" placeholder="Enter a group name"/>
         <br>
         Description :
         <br>
-        <textarea name="description" rows="10" cols="30" placeholder="Enter a text"></textarea>
+        <textarea name="description" rows="10" cols="30" placeholder="Enter a description of the group"></textarea>
         <br>
-        <input type="button" value="Submit" onclick="submitGroupCreation()" />
-        <input type="button" value="Clear" onclick="clear()" />
+        <div id="create_group_message"></div>
+        <br>
+        <input type="button" value="Create Group" onclick="submitGroupCreation()" />
+        <input type="reset" value="Reset"/>
     </form>
-    <div id="create_group_message"></div>
+
 </div>
-<!--View Group-->
-<div id="view_group_section">
-    <p>The select the group:</p>
-    <label for="groups">Choose a group:</label>
-    <select id="groupsParticipation"></select>
+
+<!--Update Group-->
+<div id="update_group_section">
     <br>
-    <input type="button" value="Submit" onclick="submitGroupView()"/>
-    <div id="view_group_message"></div>
+    <label for="groups">Choose a group you would like to update:</label>
+    <select id="modOfGroup"></select>
+    <button onclick="selectedGroup()">Select Group</button>
+    <br>
+    <br>
+    <div id="group_to_be_updated">
+        <form name="updateGroup">
+            Group Name :  <span id="groupName"></span>
+            <br>
+            Description :
+            <br>
+            <textarea name="description" rows="10" cols="30"></textarea>
+            <br>
+            Would you like the Group to be private?
+            <br>
+            <input type="radio" id="True" name="isPrivate" value="True">
+            <label for="True">True</label>
+            <input type="radio" id="False" name="isPrivate" value="False" checked>
+            <label for="False">False</label>
+            <br>
+            If Group Is Private, Enter Password: <input type="text" id="groupPassword"
+                                                        name="group_password">
+            <br>
+        </form>
+    </div>
+    <div id="update_group_message"></div>
+    <br>
+    <input type="button" value="Update Group" onclick="submitGroupUpdate()" />
+    <input type="reset" value="Reset"/>
 </div>
+
+<!--Add/Invite Users-->
+<div id="add_invite_user_section">
+    <br>
+    <input type="radio" id="Add" name="Add_Invite" value="1" onchange="selectOption()">
+    <label for="Add">Add User</label>
+    <input type="radio" id="Invite" name="Add_Invite" value="2" onchange="selectOption()">
+    <label for="Invite">Invite User</label>
+
+    <div id="add_user">
+        <form name="addUserForm">
+            <label for="groups">Select a Group:</label>
+            <select id="modOfGroupForAdd"></select>
+            <br>
+            Username : <input type="text" name="username" placeholder="Enter a username"/>
+            <br>
+            <br>
+            <input type="button" value="Add User" onclick="submitAddUserToGroup()" />
+            <input type="reset" value="Reset"/>
+        </form>
+        <div id="add_user_group_message"></div>
+    </div>
+
+    <div id="invite_user">
+        <form name="inviteUserForm">
+            <label for="groups">Select a Group:</label>
+            <select id="listOfGroups"></select>
+            <br>
+            Username : <input type="text" name="username" placeholder="Enter a username"/>
+            <br>
+            <br>
+            <input type="button" value="Invite User" onclick="submitInviteUserToGroup()" />
+            <input type="reset" value="Reset"/>
+        </form>
+        <div id="invite_user_group_message"></div>
+    </div>
+</div>
+
+<!--View Group-->
+<!--<div id="view_group_section">-->
+<!--    <p>The select the group:</p>-->
+<!--    <label for="groups">Choose a group:</label>-->
+<!--    <select id="groupsParticipation"></select>-->
+<!--    <br>-->
+<!--    <input type="button" value="Submit" onclick="submitGroupView()"/>-->
+<!--    <div id="view_group_details"></div>-->
+<!--    <div id="view_group_message"></div>-->
+<!--</div>-->
+
+
+
 <!--Delete Group-->
-<div id="delete_group_form">
-    Group Name : <select id="moderatorOfGroup"></select>
-    <button onclick="deleteGroupButton()">Delete Group</button>
-    <div id="delete_group_message"></div>
-</div>
-<div id="adduser_group_section">
-    <form name="addUserGroupForm">
-        Group Name : <input type="text" name="groupname" />
-        <br>
-        User Name : <input type="text" name="newusername" />
-        <input type="button" value="Submit" onclick="submitAddUserGroupCreation()" />
-        <input type="button" value="Clear" onclick="clear()" />
-        <div id="adduser_group_message"></div>
-    </form>
-</div>
+<!--            <div id="delete_group_form">-->
+<!--                Group Name : <select id="moderatorOfGroup"></select>-->
+<!--                <button onclick="deleteGroupButton()">Delete Group</button>-->
+<!--                <div id="delete_group_message"></div>-->
+<!--            </div>-->
+
+<!--            <div id="adduser_group_section">-->
+<!--                <form name="addUserGroupForm">-->
+<!--                    Group Name : <input type="text" name="groupname" />-->
+<!--                    <br>-->
+<!--                    User Name : <input type="text" name="newusername" />-->
+<!--                    <input type="button" value="Submit" onclick="submitAddUserGroupCreation()" />-->
+<!--                    <input type="button" value="Clear" onclick="clear()" />-->
+<!--                    <div id="adduser_group_message"></div>-->
+<!--                </form>-->
+<!--            </div>-->
 </body>
 <script src="websocket.js"></script>
 <script src="index.js"></script>

@@ -1,20 +1,37 @@
 var ws;
-
-document.getElementById("welcoming").innerText = "Welcome " + localStorage.getItem('username');
 var keySize = 256;
 var ivSize = 128;
 var iterations = 100;
 
+let accountName = getCookie("username");
+let idOfEachText = 0;
+
+/**
+ * Gets the cookie.
+ * @param cname is the cookie name.
+ * @returns {string} the cookie of the username.
+ */
+function getCookie(cname){
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)===' ') c = c.substring(1);
+        if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
     var checkbox = document.querySelector('input[type="checkbox"]');
+
     checkbox.addEventListener('change', function () {
         if (checkbox.checked) {
             // do this
-            console.log('Checked');
             goOnline();
         } else {
             // do that
-            console.log('Not checked');
             goOffline();
         }
     });
@@ -22,33 +39,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 var password = "Secret Password";
 
-
-function connect() {
-    // var username = document.getElementById("username").value;
-    //
-    // var host = document.location.host;
-    // // var pathname = document.location.pathname;
-    //
-    // ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
-    //
-    // ws.onmessage = function(event) {
-    //     var log = document.getElementById("log");
-    //     var message = JSON.parse(event.data);
-    //     log.innerHTML += message.from + " : " + message.content + "\n";
-    // };
-}
-
 function goOnline() {
-    console.log('Username:' + localStorage.getItem('username'));
-    var username = localStorage.getItem('username');
     var host = document.location.host;
 
     // var pathname = document.location.pathname;
-    ws = new WebSocket("ws://" + host + "/prattle/chat/" + username);
+    ws = new WebSocket("ws://" + host + "/prattle/chat/" + accountName);
 
     ws.onmessage = function (event) {
+        idOfEachText++; // TODO: CHANGE TO INTEGRATE INTO THE DATABASE
+        document.getElementsByClassName(idOfEachText).contentEditable = "true";
+
         var log = document.getElementById("log");
-        console.log(event);
         var message = JSON.parse(event.data);
         var decrypted;
         if(message.content === 'Connected!')
@@ -56,23 +57,37 @@ function goOnline() {
         else
             decrypted = decrypt(message.content, password);
         if (typeof message.timestamp !== 'undefined') {
-            log.innerHTML +=
+            log.innerHTML += "<span id=" + "'" +  idOfEachText + "'>" +
                 message.from + " : " + displayTime(message.timestamp.toString()) + ":"
-                + decrypted.toString(CryptoJS.enc.Utf8) + "\n";
+                + decrypted.toString(CryptoJS.enc.Utf8) + "</span> <button class=" + "'" +  idOfEachText + "' " +
+                "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
+                "<button contenteditable > &#10503 </button>" + "<br />";
         } else {
-            log.innerHTML += message.from + " : " + message.content + "\n";
+            log.innerHTML += "<span id=" + "'" +  idOfEachText + "'>" +
+                message.from + " : " + message.content + "</span> <button class="
+                + "'" +  idOfEachText + "' " + "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
+                "<button contenteditable > &#10503 </button>" + "<br />";
         }
     };
+
     ws.onclose = function() {
         var log = document.getElementById("log");
-        log.innerHTML += username + " : Disconnected!" + "\n";
+        log.innerHTML += accountName + " : Disconnected!" + "<br />";
     }
-//     ws.onopen = function(event) {
-//     var log = document.getElementById("log");
-//     var message = JSON.parse(event.data);
-//     log.innerHTML += message.from + " : " + message.content + "\n";
-// };
 }
+
+
+function copy(id) {
+    const textToCopy = document.getElementById(id).innerText;
+
+    navigator.clipboard.writeText(textToCopy).then(r => {
+        alert("Copied Successfully");
+    }, function () {
+        alert("Copied Unsuccessfully");
+    }) ;
+}
+
+// <span id="1"> This is a test </span> <button class="1" contenteditable onclick="copy('1')">&#x2398</button> <button contenteditable > &#10503</button>
 
 function goOffline() {
     ws.close();
@@ -80,20 +95,15 @@ function goOffline() {
 
 function send() {
     var content = document.getElementById("msg").value;
-    var username = document.getElementById("username").value;
+    var userToSendTo = document.getElementById("username").value;
 
-  var encrypted = encrypt(content, password);
+    var encrypted = encrypt(content, password);
     var json = JSON.stringify({
-        "to": username === "" ? null : username,
+        "to": userToSendTo === "" ? null : userToSendTo,
         "content": encrypted
     });
 
     ws.send(json);
-}
-
-function logout() {
-    localStorage.clear();
-    window.location.href = 'login.html';
 }
 
 function encrypt(msg, pass) {

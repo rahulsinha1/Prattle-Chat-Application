@@ -39,21 +39,21 @@ function register(){
                 "password": password
             };
 
-                fetch('http://localhost:8080/prattle/rest/user/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(user_data),
-                }).then((response)=>{
-                    if(!response.ok){
-                        displayMessage.innerText = "Unsuccessfully Registered";
-                    } else {
-                        displayMessage.innerText = "Successfully Registered";
-                    }
-                }).catch((error)=>{
+            fetch('http://localhost:8080/prattle/rest/user/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user_data),
+            }).then((response)=>{
+                if(!response.ok){
                     displayMessage.innerText = "Unsuccessfully Registered";
-                })
+                } else {
+                    displayMessage.innerText = "Successfully Registered";
+                }
+            }).catch((error)=>{
+                displayMessage.innerText = "Unsuccessfully Registered";
+            })
         } else {
             displayMessage.innerText = "Password and Confirm Password are not the same.";
         }

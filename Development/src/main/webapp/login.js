@@ -1,5 +1,5 @@
 function fieldsNotEmpty(username, password) {
-    return username.trim() !== "" && password.trim()  !== "";
+    return username.trim()!== "" && password.trim()!== "";
 }
 
 function login(){
@@ -11,23 +11,28 @@ function login(){
     if(fieldsNotEmpty(username,password)){
         fetch('http://localhost:8080/prattle/rest/user/getUser/'+ username)
             .then((response) => {
+                console.log(response);
                 return response.json();
             })
             .then((data) => {
                 if(data.password === password){
-                    localStorage.setItem("username", username)
+                    setCookie("username",username,365);
                     window.location.href = "index.html";
-                } else {
-                    throw new Error();
                 }
             })
             .catch((error)=> {
-                displayMessage.innerText = "Invalid credential.";
+                displayMessage.innerText = error;
             })
     } else {
         displayMessage.innerText = "Field(s) must not be empty.";
     }
+}
 
+function setCookie(cookie_name, cookie_value, exdays){
+    var dt = new Date();
+    dt.setTime(dt.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+dt.toUTCString();
+    document.cookie = cookie_name + "=" + cookie_value + "; " + expires;
 }
 
 

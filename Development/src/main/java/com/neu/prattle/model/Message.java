@@ -14,7 +14,7 @@ import javax.persistence.Table;
  * @version dated 2019-10-06
  */
 @Entity
-@Table(name = "prattle_messages")
+@Table(name = "message")
 public class Message {
 
     public int getId() {

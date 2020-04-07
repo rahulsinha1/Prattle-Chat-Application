@@ -6,6 +6,8 @@ import com.neu.prattle.model.Message;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 public class MessageServiceImpl implements MessageService {
@@ -28,8 +30,38 @@ public class MessageServiceImpl implements MessageService {
 
   @Override
   public List getMessages(String username) {
-    TypedQuery<Message> query = manager.createQuery("SELECT m FROM Message m" +
-            " WHERE m.from = :username or m.to = :username", Message.class);
-    return query.setParameter("username", username).getResultList();
+    Query q = manager.createNativeQuery("select * from message where sender = ? or receiver = ?",Message.class)
+            .setParameter(1, username)
+            .setParameter(2, username);
+    return q.getResultList();
+  }
+
+  @Override
+  public Message findMessageById(int id) {
+    if (isRecordExist(id)) {
+      Query q = manager.createNativeQuery("select * from message where id = ?",Message.class)
+              .setParameter(1, id);
+      return (Message) q.getSingleResult();
+
+    } else {
+      throw new RuntimeException("Message does not exist.");
+    }
+  }
+
+  @Override
+  public void deleteMessageById(int id) {
+    EntityTransaction transaction;
+    transaction = manager.getTransaction();
+    transaction.begin();
+    Message message = findMessageById(id);
+    manager.remove(message);
+    transaction.commit();
+  }
+
+  private boolean isRecordExist(int id) {
+    Query q = manager.createNativeQuery("select count(*) from message where id = ?")
+            .setParameter(1, id);
+    int count = q.getResultList().size();
+    return count!=0;
   }
 }

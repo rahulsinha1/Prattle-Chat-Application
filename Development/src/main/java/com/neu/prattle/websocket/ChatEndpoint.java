@@ -305,7 +305,7 @@ public class ChatEndpoint {
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
     transaction.begin();
-    manager.createNativeQuery("INSERT INTO prattle_messages(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
+    manager.createNativeQuery("INSERT INTO message(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
             .setParameter(1, message.getFrom())
             .setParameter(2, message.getTo())
             .setParameter(3, message.getContent())

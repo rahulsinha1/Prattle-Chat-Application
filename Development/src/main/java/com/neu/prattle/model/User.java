@@ -1,6 +1,7 @@
 package com.neu.prattle.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +122,8 @@ public class User {
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
-  @JsonManagedReference(value="group-participant")
+  //@JsonManagedReference(value="group-participant")
+  @JsonIgnore
   private List<Group> groupParticipant;
 
 
@@ -129,7 +131,8 @@ public class User {
   @JoinTable(name = "group_mods",
           joinColumns = @JoinColumn(name = "moderator_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
-  @JsonManagedReference(value="group-moderator")
+ // @JsonManagedReference(value="group-moderator")
+  @JsonIgnore
   private List<Group> groupModerator;
 
   public User() {

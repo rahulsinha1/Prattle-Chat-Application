@@ -409,14 +409,15 @@ function search() {
 
   var x = document.getElementById("search").value;
 
-  fetch('http://localhost:8080/prattle/rest/user/getUser/'+ x)
+  fetch('http://localhost:8080/prattle/rest/user/search/'+ x)
           .then((response) => {
           return response.json();
   })
   .then((userData) => {
           console.log(userData);
      document.getElementById("search-result").innerHTML = "";
-          document.getElementById("search-result").innerHTML += userData.firstName+" "+userData.lastName;
+      for(user in userData)
+          document.getElementById("search-result").innerHTML += userData[user].firstName+" "+userData[user].lastName;
 
   })
   .catch((error)=> {

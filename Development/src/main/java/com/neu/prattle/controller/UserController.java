@@ -6,6 +6,8 @@ import com.neu.prattle.model.User;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -71,4 +73,23 @@ public class UserController {
 
         return Response.ok().entity(user).build();
     }
+
+
+  @GET
+  @Path("/search/{keyword}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response searchResult(@PathParam("keyword") String keyword) {
+    List resultUsers;
+    resultUsers = accountService.searchUser(keyword);
+    return Response.ok().entity(resultUsers).build();
+  }
+
+  public static void main(String [] args)
+  {
+    UserController uc = new UserController();
+    System.out.println(uc.searchResult("te").getEntity());
+
+  }
+
 }

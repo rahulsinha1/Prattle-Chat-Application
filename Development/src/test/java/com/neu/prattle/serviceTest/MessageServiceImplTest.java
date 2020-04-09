@@ -10,7 +10,7 @@ public class MessageServiceImplTest {
   MessageService messageService = MessageServiceImpl.getInstance();
 
   @Test
-  public void testGetMessage(){
-    messageService.findMessageById(1);
+  public void testGetMessage() {
+    messageService.getMessages("Test");
   }
 }

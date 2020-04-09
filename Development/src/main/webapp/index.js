@@ -1,10 +1,8 @@
 let createForm = document.getElementById("create_group_form");
 let updateForm = document.getElementById("update_group_section");
 let addInviteUserGroupForm = document.getElementById("add_invite_user_section");
-// let viewAllGroupUserIsApartOf = document.getElementById("view_group_section");
-// let deleteGroupForm = document.getElementById("delete_group_form");
-// let moderatorOfGroup = document.getElementById("moderatorOfGroup");
-
+let deleteGroup = document.getElementById("delete_group_section");
+let detailGroup = document.getElementById("details_group_section");
 
 let username = getCookie("username");
 let secret_password = "Secret Password";
@@ -22,9 +20,8 @@ function closeAllDisplay(){
     createForm.style.display = "none";
     updateForm.style.display = "none";
     addInviteUserGroupForm.style.display = "none";
-
-    // viewAllGroupUserIsApartOf.style.display = "none";
-    //  deleteGroupForm.style.display = "none";
+    deleteGroup.style.display = "none";
+    detailGroup.style.display = "none";
 }
 
 /**
@@ -41,27 +38,6 @@ function getCookie(cname){
         if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
     }
     return "";
-}
-
-/**
- * Sets the cookie once the user logs in.
- * @param cookie_name is the name of the cookie.
- * @param cookie_value is the value of the cookie.
- * @param exdays is the expiration days of the cookie.
- */
-function setCookie(cookie_name, cookie_value, exdays){
-    var dt = new Date();
-    dt.setTime(dt.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+dt.toUTCString();
-    document.cookie = cookie_name + "=" + cookie_value + "; " + expires;
-}
-
-/**
- * Logout the user.
- */
-function logout() {
-    setCookie("username", "", 365);
-    window.location.href = 'login.html';
 }
 
 // CREATING A GROUP SECTION
@@ -120,7 +96,6 @@ function updateGroupButton(){
     let modOfGroup = document.getElementById("modOfGroup");
     let displayMessage = document.getElementById("update_group_message");
 
-    // TODO: change fetch code to Modarator
     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
         .then((response) => {
             return response.json();
@@ -189,8 +164,8 @@ function submitGroupUpdate() {
     }
 }
 
-//ADD/INVITE USERS SECTION
-let conn = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + accountName);
+//ADD&INVITE USERS SECTION
+let conn = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + username);
 
 /**
  * Display the Add/Invite User.
@@ -234,12 +209,12 @@ function selectOption(){
         let modOfGroupForAdd = document.getElementById("modOfGroupForAdd");
         let displayMessage = document.getElementById("add_user_group_message");
 
-        // TODO: change fetch code to Modarator
-        fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
+        fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
             .then((response) => {
                 return response.json();
             })
             .then((groupData) => {
+                console.log(groupData);
                 modOfGroupForAdd.innerText = "";
                 for(group in groupData){
                     modOfGroupForAdd.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
@@ -335,6 +310,146 @@ function submitInviteUserToGroup(){
 
 
 }
+
+// DELETE GROUP
+/**
+ * Displays the Delete Group Section.
+ */
+function deleteGroupButton(){
+    closeAllDisplay();
+    deleteGroup.style.display = "block";
+
+    let modOfGroupToDelete = document.getElementById("modOfGroupToDelete");
+    let displayMessage = document.getElementById("delete_group_message");
+
+    fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
+        .then((response) => {
+            return response.json();
+        })
+        .then((groupData) => {
+            modOfGroupToDelete.innerHTML = "";
+            for(group in groupData){
+                modOfGroupToDelete.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
+            }
+        })
+        .catch((error) => {
+            displayMessage.innerHTML = error + "<br />";
+        })
+
+    console.log(modOfGroupToDelete.value)
+
+}
+
+/**
+ * Submit Group Deletion Button.
+ */
+function submitGroupDeletion() {
+    let selectedGroupToDelete = document.getElementById("modOfGroupToDelete").value;
+    let displayMessage = document.getElementById("delete_group_message");
+
+
+    if(selectedGroupToDelete !== "") {
+        fetch('http://localhost:8080/prattle/rest/group/deleteGroup/' + selectedGroupToDelete, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((response) => {
+            if (!response.ok) {
+                displayMessage.innerText = "Unsuccessfully Deletion";
+            } else {
+                displayMessage.innerText = "Successfully Deletion";
+            }
+        }).catch((e) => {
+            displayMessage.innerText = "Unsuccessfully Deletion";
+        })
+    } else {
+        displayMessage.innerText = "Must Select A Group.";
+    }
+}
+
+// GROUP DETAILS
+/**
+ * Displays all group user is apart of.
+ */
+function detailGroupButton(){
+    closeAllDisplay();
+    detailGroup.style.display = "block";
+
+    let groupDetails = document.getElementById("groupDetails");
+    let displayMessage = document.getElementById("details_group_message");
+
+    fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
+        .then((response) => {
+            return response.json();
+        })
+        .then((groupData) => {
+            groupDetails.innerHTML = "";
+            for(group in groupData){
+                groupDetails.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
+            }
+        })
+        .catch((error) => {
+            displayMessage.innerText = error;
+        })
+}
+
+/**
+ * Request the details of that group which will allow users to remove themselves from the group.
+ */
+function submitGroupDetails(){
+
+    let group = document.getElementById("groupDetails").value;
+    let displayMessage = document.getElementById("details_group_message");
+    let group_info = document.getElementById("group_info");
+
+
+    fetch('http://localhost:8080/prattle/rest/group/getGroupDetails/'+ group)
+        .then((response) => {
+            return response.json();
+        })
+        .then((groupData) => {
+            group_info.innerHTML = '<span>Group Name: ' + groupData.name + '</span>' + "</br>" +
+                '<span> Created By: ' + groupData.createdBy + '</span>' + "</br>" +
+                '<span> Private: ' + groupData.isGroupPrivate + '</span>' + "</br>" +
+                '<span> Description: ' + groupData.description + '</span>' + "</br>" +
+                '<button onclick=leaveGroup(' + '"' + groupData.name + '"' + ')> Leave Group</button>';
+        })
+        .catch((error) => {
+            displayMessage.innerText = error;
+        })
+}
+
+/**
+ * Allows users to leave a group.
+ * @param groupName the name of the group the user wants to leave.
+ */
+function leaveGroup(groupName) {
+    let displayMessage = document.getElementById("details_group_message");
+
+    if(group !== "") {
+        fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + username, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((response) => {
+            if (!response.ok) {
+                displayMessage.innerText = "You Weren't Removed Successfully";
+            } else {
+                displayMessage.innerText = "You Were Removed Successfully";
+            }
+        }).catch((e) => {
+            displayMessage.innerText = "There Was An Error in Removing You.";
+        })
+    } else {
+        displayMessage.innerText = "Must Select A Group.";
+    }
+}
+
+
+
+
 
 /**
  * Notify user in the notification section.

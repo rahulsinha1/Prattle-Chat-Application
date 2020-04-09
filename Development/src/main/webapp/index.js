@@ -406,23 +406,48 @@ function decrypt(transitmessage, pass) {
 
 
 function search() {
-
+   document.getElementById("search-result").innerHTML = "";
   var x = document.getElementById("search").value;
-
+  var table = document.createElement('table');
+   var arrValue = new Array();
+   table.setAttribute('id', 'userTable');
+    var tr = table.insertRow(-1);
+     arrHead = [];
+     arrValue =[];
   fetch('http://localhost:8080/prattle/rest/user/search/'+ x)
           .then((response) => {
           return response.json();
   })
   .then((userData) => {
           console.log(userData);
-     document.getElementById("search-result").innerHTML = "";
+      arrHead = ['UserName', 'First Name', 'Last Name'];
       for(user in userData)
-          document.getElementById("search-result").innerHTML += userData[user].firstName+" "+userData[user].lastName;
+          arrValue.push([userData[user].username,userData[user].firstName,userData[user].lastName]);
 
+    for (var h = 0; h < arrHead.length; h++) {
+                var th = document.createElement('th');
+                th.innerHTML = arrHead[h];
+                tr.appendChild(th);
+            }
+        for (var c = 0; c <= arrValue.length - 1; c++) {
+                    tr = table.insertRow(-1);
+
+                    for (var j = 0; j < arrHead.length; j++) {
+                        var td = document.createElement('td');
+                        td = tr.insertCell(-1);
+                        td.innerHTML = arrValue[c][j];
+                    }
+                }
+
+                document.getElementById("search-result").appendChild(table);
   })
   .catch((error)=> {
           document.getElementById("search-result").innerHTML = "No users found";
   })
+
+
+
+
   }
 
 

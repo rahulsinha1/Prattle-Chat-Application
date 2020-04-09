@@ -83,16 +83,8 @@ public class UserController {
   public Response searchResult(@PathParam("keyword") String keyword) {
     List resultUsers;
     resultUsers = accountService.searchUser(keyword);
-    System.out.println(resultUsers);
-    System.out.println(Response.ok().entity(resultUsers).build().getStatus());
     return Response.ok().entity(resultUsers).build();
   }
 
-  public static void main(String [] args)
-  {
-    UserController uc = new UserController();
-    System.out.println(uc.searchResult("te").getEntity());
-
-  }
 
 }

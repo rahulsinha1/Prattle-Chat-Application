@@ -74,4 +74,9 @@ public interface GroupService {
    * gives group details based on group name
    */
   Group getGroupByName(String name);
+
+  /*
+    Returns a list of groups which are not private
+   */
+  List<Group> searchGroup(String keyword);
 }

@@ -192,4 +192,23 @@ public class GroupController {
 
     return Response.status(200).entity(groupDetails).build();
   }
+
+
+  @GET
+  @Path("/search/{keyword}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response searchResult(@PathParam("keyword") String keyword) {
+    List resultGroups;
+    resultGroups = groupService.searchGroup(keyword);
+    return Response.ok().entity(resultGroups).build();
+  }
+
+  public static void main(String [] args)
+  {
+    GroupController gc = new GroupController();
+    System.out.println(gc.searchResult("tes").getEntity());
+
+  }
+
 }

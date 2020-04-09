@@ -12,6 +12,7 @@ import com.neu.prattle.service.GroupServiceImpl;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -196,4 +197,35 @@ public class GroupController {
 
     return Response.status(200).entity(groupDetails).build();
   }
+
+    /**
+     * Handles a HTTP GET request for user information.
+     *
+     * @param username -> The User's username.
+     * @return -> A Response indicating the user's information.
+     */
+    @GET
+    @Path("/getGroupUserIsModOf/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGroupUserIsModOf(@PathParam("username") String username) {
+        List<Group> groupByUsername;
+        User user;
+        List<Group> listOfModGroup = new ArrayList<>();
+
+        try {
+            user = userService.findUserByUsername(username);
+            groupByUsername = groupService.getAllGroupsByUsername(username);
+
+            for(Group group : groupByUsername){
+                if(group.getModerators().contains(user)){
+                    listOfModGroup.add(group);
+                }
+            }
+
+        }catch (GroupDoesNotExistException e){
+            return Response.status(409, e.getMessage()).build();
+        }
+        return Response.status(200).entity(listOfModGroup).build();
+    }
 }

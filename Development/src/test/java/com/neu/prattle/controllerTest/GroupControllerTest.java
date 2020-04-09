@@ -271,4 +271,51 @@ public class GroupControllerTest {
     Response response = groupController.getGroupDetails("group1");
     assertEquals(409, response.getStatus());
   }
+
+  @Test
+  public void testGetGroupUserIsModOf(){
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    List<Group> groupList = new ArrayList<>();
+    groupList.add(group);
+
+    doReturn(user).when(userService).findUserByUsername("Test");
+    doReturn(groupList).when(groupService).getAllGroupsByUsername("Test");
+
+    Response response = groupController.getGroupUserIsModOf("Test");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testGetGroupUserIsModOfGroupDoesNotExistException(){
+    User user = new User("test","test","Test","Test","GMT");
+
+    doReturn(user).when(userService).findUserByUsername("Test");
+    doThrow(new GroupDoesNotExistException("Group Does Not Exist.")).when(groupService).getAllGroupsByUsername("Test");
+
+    Response response = groupController.getGroupUserIsModOf("Test");
+    assertEquals(409, response.getStatus());
+  }
+
+  @Test
+  public void testSearchResult(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    List<Group> groupList = new ArrayList<>();
+    groupList.add(group);
+
+    doReturn(groupList).when(groupService).searchGroup("gro");
+
+    Response response = groupController.searchResult("gro");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testSearchResultGroupDoesNotExistException(){
+    doThrow(new GroupDoesNotExistException("Group Does Not Exist.")).when(groupService).searchGroup("gro");
+
+    Response response = groupController.searchResult("gro");
+    assertEquals(409, response.getStatus());
+  }
 }

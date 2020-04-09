@@ -1,6 +1,10 @@
 package com.neu.prattle.controller;
 
-import com.neu.prattle.exceptions.*;
+import com.neu.prattle.exceptions.GroupAlreadyPresentException;
+import com.neu.prattle.exceptions.GroupDoesNotExistException;
+import com.neu.prattle.exceptions.UserAlreadyPresentInGroupException;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.exceptions.UserDoesNotHaveAnyGroup;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.GroupService;
@@ -8,6 +12,7 @@ import com.neu.prattle.service.GroupServiceImpl;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -193,22 +198,50 @@ public class GroupController {
     return Response.status(200).entity(groupDetails).build();
   }
 
+    /**
+     * Handles a HTTP GET request for user information.
+     *
+     * @param username -> The User's username.
+     * @return -> A Response indicating the user's information.
+     */
+    @GET
+    @Path("/getGroupUserIsModOf/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGroupUserIsModOf(@PathParam("username") String username) {
+        List<Group> groupByUsername;
+        User user;
+        List<Group> listOfModGroup = new ArrayList<>();
 
-  @GET
-  @Path("/search/{keyword}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response searchResult(@PathParam("keyword") String keyword) {
-    List resultGroups;
-    resultGroups = groupService.searchGroup(keyword);
-    return Response.ok().entity(resultGroups).build();
-  }
+        try {
+            user = userService.findUserByUsername(username);
+            groupByUsername = groupService.getAllGroupsByUsername(username);
 
-  public static void main(String [] args)
-  {
-    GroupController gc = new GroupController();
-    System.out.println(gc.searchResult("tes").getEntity());
+            for(Group group : groupByUsername){
+                if(group.getModerators().contains(user)){
+                    listOfModGroup.add(group);
+                }
+            }
 
-  }
+        }catch (GroupDoesNotExistException e){
+            return Response.status(409, e.getMessage()).build();
+        }
+        return Response.status(200).entity(listOfModGroup).build();
+    }
 
+    @GET
+    @Path("/search/{keyword}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response searchResult(@PathParam("keyword") String keyword) {
+        List<Group> resultGroups;
+
+        try {
+            resultGroups = groupService.searchGroup(keyword);
+        } catch (GroupDoesNotExistException e){
+            return Response.status(409, e.getMessage()).build();
+        }
+
+        return Response.ok().entity(resultGroups).build();
+    }
 }

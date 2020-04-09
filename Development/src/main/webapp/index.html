@@ -2,17 +2,10 @@
 <head>
     <title>Chat</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css">
     <!-- TODO: Remove the comment below -->
-<!--    <script src="session.js"></script>-->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        .search-box button:hover {
-        background: #ccc;
-}
-
-    </style>
+    <script src="session.js"></script>
 </head>
 <body>
 
@@ -25,13 +18,8 @@
             <input type="text" id="username" placeholder="Enter A Username"/>
         </td>
         <td colspan="2">
-            <!-- Rounded switch -->
-            <label class="switch">
-                <input type="checkbox">
-                <span class="slider round"></span>
-            </label>
-        </td>
-        <td colspan="2">
+            <button type="button" id="goOnline">Connect</button>
+            <button type="button" id="goOffline">Disconnect</button>
             <button type="button" onclick="logout();" >Logout</button>
         </td>
     </tr>
@@ -50,23 +38,53 @@
     <tr>
         <td>
             <input type="text" size="51" id="msg" placeholder="Message"/>
-            <button type="button" onclick="send();" >Send</button>
+            <button type="button" onclick="doSend()" >Send</button>
         </td>
     </tr>
 </table>
 <br>
 <div id="groups">
+    <button onclick="searchButton()">Search</button>
     <button onclick="createGroupButton()">Create Groups</button>
     <button onclick="updateGroupButton()">Update Groups</button>
+    <button onclick="detailGroupButton()">Group Details</button>
     <button onclick="addUserToGroup()">Add/Invite User</button>
-    <!--    TODO: <button onclick="viewGroupButton()">View Groups</button>-->
-    <!--              TODO:   <button onclick="deleteGroup()">Delete Groups</button>-->
+    <button onclick="deleteGroupButton()">Delete Groups</button>
+</div>
 
-    <!--             TODO:    <button>Join Group</button>-->
+<!-- Search Field -->
+<div id="search_field_section">
+    <br>
+        <input type="radio" id="User" name="SearchArea" value="1" onchange="selectSearchArea()">
+        <label for="User">Search User</label>
+        <input type="radio" id="Group" name="SearchArea" value="2" onchange="selectSearchArea()">
+        <label for="Group">Search Group</label>
+
+    <br>
+    <br>
+        <div id="search_user">
+            <form name="searchUserForm">
+                <label for="searchUser">Search User:</label>
+                <input type="search" id="searchUser"  name="searchUser" placeholder="Input User Name">
+                <input type="button" value='Search' onclick="userSearch()" />
+            </form>
+        </div>
+
+        <div id="search_group">
+            <form name="searchGroupForm">
+                <label for="searchGroup">Search Group:</label>
+                <input type="search" id="searchGroup"  name="searchGroup" placeholder="Input Group Name">
+                <input type="button" value='Search' onclick="groupSearch()" />
+            </form>
+        </div>
+
+    <div id="search_result"></div>
+    <div id="search_message"></div>
 </div>
 
 <!--Create Group-->
 <div id="create_group_form">
+    <br>
     <form name="createGroupForm">
         Group Name : <input type="text" name="groupName" placeholder="Enter a group name"/>
         <br>
@@ -153,44 +171,33 @@
     </div>
 </div>
 
-<div class="search-box">
-    <input type="search" id="search" placeholder="Search for users/groups" name="search">
-    <button onclick="search()" type="submit"><i class="fa fa-search"></i></button>
+<!-- Deleting A Group -->
+<div id="delete_group_section">
+    <br>
+    <label for="groups">Choose a group you would like to update:</label>
+    <select id="modOfGroupToDelete"></select>
+    <br>
+    <br>
+    <div id="delete_group_message"></div>
+    <br>
+    <input type="button" value="Delete Group" onclick="submitGroupDeletion()" />
+    <input type="reset" value="Reset"/>
 </div>
 
-<div id="search-result"></div>
-<div id="search-result-group"></div>
-
-<!--View Group-->
-<!--<div id="view_group_section">-->
-<!--    <p>The select the group:</p>-->
-<!--    <label for="groups">Choose a group:</label>-->
-<!--    <select id="groupsParticipation"></select>-->
-<!--    <br>-->
-<!--    <input type="button" value="Submit" onclick="submitGroupView()"/>-->
-<!--    <div id="view_group_details"></div>-->
-<!--    <div id="view_group_message"></div>-->
-<!--</div>-->
+<!--Group Details-->
+<div id="details_group_section">
+    <br>
+    <label for="groups">Choose a group you would like to view:</label>
+    <select id="groupDetails"></select>
+    <input type="button" value="Details" onclick="submitGroupDetails()" />
+    <div id="group_info"></div>
+    <br>
+    <div id="details_group_message"></div>
+</div>
 
 
 
-<!--Delete Group-->
-<!--            <div id="delete_group_form">-->
-<!--                Group Name : <select id="moderatorOfGroup"></select>-->
-<!--                <button onclick="deleteGroupButton()">Delete Group</button>-->
-<!--                <div id="delete_group_message"></div>-->
-<!--            </div>-->
 
-<!--            <div id="adduser_group_section">-->
-<!--                <form name="addUserGroupForm">-->
-<!--                    Group Name : <input type="text" name="groupname" />-->
-<!--                    <br>-->
-<!--                    User Name : <input type="text" name="newusername" />-->
-<!--                    <input type="button" value="Submit" onclick="submitAddUserGroupCreation()" />-->
-<!--                    <input type="button" value="Clear" onclick="clear()" />-->
-<!--                    <div id="adduser_group_message"></div>-->
-<!--                </form>-->
-<!--            </div>-->
 </body>
 <script src="websocket.js"></script>
 <script src="index.js"></script>

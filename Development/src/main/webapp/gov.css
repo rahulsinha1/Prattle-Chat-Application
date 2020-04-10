@@ -85,7 +85,6 @@ body {
 .messages {
     flex: 1 1 auto;
     color: rgba(255, 255, 255, .5);
-    overflow: hidden;
     position: relative;
     width: 100%;
     overflow: scroll;
@@ -102,7 +101,6 @@ body {
     resize: both;
     width: 400px;
     font-size:15px;
-    color:#000;
 }
 
 .messages .messages-content {

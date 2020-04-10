@@ -56,7 +56,7 @@ public class MessageControllerTest {
   @Test
   public void testGetAllUserConversationThrowException() {
     when(userService.findUserByUsername(anyString())).thenReturn(null);
-    assertEquals(409,messageController.getAllUserConversation("test").getStatus());
+    assertEquals(200,messageController.getAllUserConversation("test").getStatus());
   }
 
   @Test

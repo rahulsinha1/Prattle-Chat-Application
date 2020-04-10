@@ -69,6 +69,7 @@ function doSend() {
     websocket.send(json);
 }
 
+
 function writeToScreen(message){
     var pre = document.createElement("p");
     pre.style.wordWrap = "break-word";
@@ -76,132 +77,8 @@ function writeToScreen(message){
     log.appendChild(pre);
 }
 
-/**
- * Searches for user.
- */
-function userSearch() {
-    let searchUserInput = document.searchUserForm.searchUser.value.trim();
-    let displayMessage = document.getElementsByName("search_message");
-    let search_result = document.getElementById("search_result");
-
-    fetch('http://localhost:8080/prattle/rest/user/search/'+ searchUserInput)
-        .then((response) => {
-            return response.json();
-        })
-        .then((userData) => {
-
-            search_result.innerHTML = "";
-
-            for (user in userData){
-                search_result.innerHTML += '<span> Username: ' + userData[user].username +  '</span> ' +
-                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>';
-            }
-        })
-        .catch((error) => {
-            displayMessage.innerText = error;
-        });
-}
-
-//MsgWindow
-function messageUser(userToSend){
-    let myWindow =  window.open("",userToSend,"width=500,height=500");
-
-    let header = '<html>' +
-        '<head>' +
-        '    <title>Chat</title>' +
-        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
-        '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
-        '    <link rel="stylesheet" href="style.css">' +
-        '    <script src="session.js"></script>\n' +
-        '</head>' +
-        '<body>';
-
-
-    let writeToDoc = '<h3>Message ' + userToSend + '</h3> ' +
-        '<div class="textarea" contenteditable="false" id="log"></div> ' +
-        '<input type="text" size="51" id="msg" placeholder="Message"/>' +
-        '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
-
-
-    let bottomParts = '</body>' +
-        '<script src="websocket.js"></script>' +
-        '<script src="index.js"></script>' +
-        '<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>' +
-        '</html>';
-
-    myWindow.document.write(header + writeToDoc + bottomParts);
-}
-
-function sentTo(userToSendTo) {
-    var content = document.getElementById("msg").value;
-
-    var encrypted = encrypt(content, secret_password);
-    var json = JSON.stringify({
-        "to": userToSendTo,
-        "content": encrypted
-    });
-
-    websocket.send(json);
-}
-
 
 window.addEventListener("load", init, false);
-
-// let ws = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + accountName);
-
-// ws.onmessage = function (event) {
-//     idOfEachText++; // TODO: CHANGE TO INTEGRATE INTO THE DATABASE
-//     document.getElementsByClassName(idOfEachText).contentEditable = "true";
-//
-//     var log = document.getElementById("log");
-//     var message = JSON.parse(event.data);
-//     var decrypted;
-//
-//     if(message.content === 'Connected!') {
-//         decrypted = 'Connected!';
-//
-//         log.innerHTML += "<span id=" + "'" + idOfEachText + "'>" +
-//             message.from + " : " + displayTime(message.timestamp.toString()) + ":"
-//             + decrypted.toString(CryptoJS.enc.Utf8) + "</span> <button class=" + "'" + idOfEachText + "' " +
-//             "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
-//             "<button contenteditable > &#10503 </button>" + "<br />";
-//     } else {
-//         decrypted = decrypt(message.content, password);
-//
-//         log.innerHTML += "<span id=" + "'" + idOfEachText + "'>" +
-//             message.from + " : " + displayTime(message.timestamp.toString()) + ":"
-//             + decrypted.toString(CryptoJS.enc.Utf8) + "</span> <button class=" + "'" + idOfEachText + "' " +
-//             "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
-//             "<button contenteditable > &#10503 </button>" + "<br />";
-//
-//         // if (typeof message.timestamp !== 'undefined') {
-//         //     log.innerHTML += "<span id=" + "'" + idOfEachText + "'>" +
-//         //         message.from + " : " + displayTime(message.timestamp.toString()) + ":"
-//         //         + decrypted.toString(CryptoJS.enc.Utf8) + "</span> <button class=" + "'" + idOfEachText + "' " +
-//         //         "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
-//         //         "<button contenteditable > &#10503 </button>" + "<br />";
-//         // } else {
-//         //     log.innerHTML += "<span id=" + "'" + idOfEachText + "'>" +
-//         //         message.from + " : " + message.content + "</span> <button class="
-//         //         + "'" + idOfEachText + "' " + "contenteditable onclick=copy(" + idOfEachText + ")>&#x2398</button>" +
-//         //         "<button contenteditable > &#10503 </button>" + "<br />";
-//         // }
-//     }
-// };
-
-// function send() {
-//     var content = document.getElementById("msg").value;
-//     var userToSendTo = document.getElementById("username").value;
-//
-//     var encrypted = encrypt(content, password);
-//     var json = JSON.stringify({
-//         "to": userToSendTo === "" ? null : userToSendTo,
-//         "content": encrypted
-//     });
-//
-//     ws.send(json);
-// }
-
 
 /**
  * Logout the user.

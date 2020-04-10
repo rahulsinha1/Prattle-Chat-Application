@@ -228,4 +228,20 @@ public class GroupController {
         }
         return Response.status(200).entity(listOfModGroup).build();
     }
+
+    @GET
+    @Path("/search/{keyword}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response searchResult(@PathParam("keyword") String keyword) {
+        List<Group> resultGroups;
+
+        try {
+            resultGroups = groupService.searchGroup(keyword);
+        } catch (GroupDoesNotExistException e){
+            return Response.status(409, e.getMessage()).build();
+        }
+
+        return Response.ok().entity(resultGroups).build();
+    }
 }

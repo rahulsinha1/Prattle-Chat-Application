@@ -21,6 +21,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -658,6 +659,22 @@ public class GroupServiceImplTest {
 
     groupObj = groupService.getGroupByName(groupName);
     assertEquals(groupObj.getCreatedBy(),userName);
+  }
+
+  @Test
+  public void testSearchGroupByGroupName()
+  {
+    setMocksForSearchGroup();
+    assertEquals(2,groupService.searchGroup("te").size());
+  }
+
+  private void setMocksForSearchGroup() {
+    Group group = new Group("TestGroup1", "This is a Test.", "TestTest", "Test", false);
+    Group group2 = new Group("TestGroup2", "This is a Test.", "TestTest", "Test", false);
+    List<Group> groupList = new ArrayList<>(Arrays.asList(group,group2));
+    when(mockEntityManager.createQuery("SELECT g FROM Group g WHERE g.name LIKE :name AND g.isGroupPrivate = false", Group.class)).thenReturn(query);
+    when(query.setParameter(anyString(), anyString())).thenReturn(query);
+    when(query.getResultList()).thenReturn(groupList);
   }
 
   private String generateString() {

@@ -38,16 +38,16 @@ public class Group {
   @Column(name = "group_name", unique = true)
   private String name;
 
-  @JsonIgnore
-  //@JsonBackReference(value="group-moderator")
+  @JsonBackReference(value="group-moderator")
   //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
   @ManyToMany(mappedBy = "groupModerator", cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+  @JsonIgnore
   private List<User> moderators;
 
-  @JsonIgnore
   //@JsonBackReference(value="group-participant")
   //@JsonIgnoreProperties({"groupModerator","groupParticipant"})
   @ManyToMany(mappedBy = "groupParticipant", cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+  @JsonIgnore
   private List<User> members = new LinkedList<>();
 
   @Column(name = "is_private", unique = false)

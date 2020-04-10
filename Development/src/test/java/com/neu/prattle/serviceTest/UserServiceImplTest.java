@@ -14,6 +14,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -146,6 +149,23 @@ public class UserServiceImplTest {
     modifiers.setAccessible(true);
     modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
     field.set(null, value);
+  }
+
+  @Test
+  public void testSearchUser()
+  {
+    setMocksForSearchUser();
+    assertEquals(2,userService.searchUser("te").size());
+  }
+
+
+  private void setMocksForSearchUser() {
+    User user = new User("User", "Test", "User", "pass1234", "GMT");
+    User user2 = new User("User2", "Test2", "User2", "pass12342", "GMT");
+    List<User> userList = new ArrayList<>(Arrays.asList(user,user2));
+    when(manager.createQuery("SELECT u FROM User u WHERE u.username LIKE :name", User.class)).thenReturn(query);
+    when(query.setParameter(anyString(), anyString())).thenReturn(query);
+    when(query.getResultList()).thenReturn(userList);
   }
 
   private void setMocksForEntityPersist() {

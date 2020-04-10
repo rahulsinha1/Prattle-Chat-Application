@@ -126,6 +126,16 @@ public class UserServiceImpl implements UserService {
     transaction.commit();
   }
 
+  @Override
+  public List<User> searchUser(String keyword) {
+
+    // Accoording to First and last name
+    //TypedQuery<User> query = manager.createQuery("SELECT u FROM User u WHERE CONCAT(u.firstName, ' ',u.lastName) LIKE :name", User.class);
+    TypedQuery<User> query = manager.createQuery("SELECT u FROM User u WHERE u.username LIKE :name", User.class);
+
+    return query.setParameter("name", keyword+"%").getResultList();
+  }
+
 
   private void create(User user) {
     EntityTransaction transaction = null;
@@ -145,4 +155,5 @@ public class UserServiceImpl implements UserService {
     Long count = query.setParameter("name", username).getSingleResult();
     return (!count.equals(0L));
   }
+
 }

@@ -2,8 +2,10 @@
 <head>
     <title>Chat</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="session.js"></script>
+    <!-- TODO: Remove the comment below -->
+<!--    <script src="session.js"></script>-->
 </head>
 <body>
 
@@ -36,22 +38,53 @@
     <tr>
         <td>
             <input type="text" size="51" id="msg" placeholder="Message"/>
-            <button type="button" onclick="doSend();" >Send</button>
+            <button type="button" onclick="doSend()" >Send</button>
         </td>
     </tr>
 </table>
 <br>
 <div id="groups">
+    <button onclick="searchButton()">Search</button>
     <button onclick="createGroupButton()">Create Groups</button>
     <button onclick="updateGroupButton()">Update Groups</button>
     <button onclick="detailGroupButton()">Group Details</button>
-    <button onclick="addUserToGroup()">Add/Invite User</button>
+    <button onclick="addUserToGroup()">Add/Invite/Remove User</button>
     <button onclick="deleteGroupButton()">Delete Groups</button>
+</div>
 
+<!-- Search Field -->
+<div id="search_field_section">
+    <br>
+        <input type="radio" id="User" name="SearchArea" value="1" onchange="selectSearchArea()">
+        <label for="User">Search User</label>
+        <input type="radio" id="Group" name="SearchArea" value="2" onchange="selectSearchArea()">
+        <label for="Group">Search Group</label>
+
+    <br>
+    <br>
+        <div id="search_user">
+            <form name="searchUserForm">
+                <label for="searchUser">Search User:</label>
+                <input type="search" id="searchUser"  name="searchUser" placeholder="Input User Name">
+                <input type="button" value='Search' onclick="userSearch()" />
+            </form>
+        </div>
+
+        <div id="search_group">
+            <form name="searchGroupForm">
+                <label for="searchGroup">Search Group:</label>
+                <input type="search" id="searchGroup"  name="searchGroup" placeholder="Input Group Name">
+                <input type="button" value='Search' onclick="groupSearch()" />
+            </form>
+        </div>
+
+    <div id="search_result"></div>
+    <div id="search_message"></div>
 </div>
 
 <!--Create Group-->
 <div id="create_group_form">
+    <br>
     <form name="createGroupForm">
         Group Name : <input type="text" name="groupName" placeholder="Enter a group name"/>
         <br>
@@ -101,13 +134,15 @@
     <input type="reset" value="Reset"/>
 </div>
 
-<!--Add/Invite Users-->
+<!--Add/Invite/Remove Users-->
 <div id="add_invite_user_section">
     <br>
     <input type="radio" id="Add" name="Add_Invite" value="1" onchange="selectOption()">
     <label for="Add">Add User</label>
     <input type="radio" id="Invite" name="Add_Invite" value="2" onchange="selectOption()">
     <label for="Invite">Invite User</label>
+    <input type="radio" id="Remove" name="Add_Invite" value="3" onchange="selectOption()">
+    <label for="Remove">Remove User</label>
 
     <div id="add_user">
         <form name="addUserForm">
@@ -136,7 +171,22 @@
         </form>
         <div id="invite_user_group_message"></div>
     </div>
+
+    <div id="remove_user">
+        <form name="removeUserForm">
+            <label for="groups">Select a Group:</label>
+            <select id="modOfGroupForRemove"></select>
+            <br>
+            Username : <input type="text" name="username" placeholder="Enter a username"/>
+            <br>
+            <br>
+            <input type="button" value="Remove User" onclick="submitRemoveUserFromGroup()" />
+            <input type="reset" value="Reset"/>
+        </form>
+        <div id="remove_user_group_message"></div>
+    </div>
 </div>
+
 
 <!-- Deleting A Group -->
 <div id="delete_group_section">
@@ -161,6 +211,9 @@
     <br>
     <div id="details_group_message"></div>
 </div>
+
+
+
 
 </body>
 <script src="websocket.js"></script>

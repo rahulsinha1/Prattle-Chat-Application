@@ -297,4 +297,25 @@ public class GroupControllerTest {
     Response response = groupController.getGroupUserIsModOf("Test");
     assertEquals(409, response.getStatus());
   }
+
+  @Test
+  public void testSearchResult(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    List<Group> groupList = new ArrayList<>();
+    groupList.add(group);
+
+    doReturn(groupList).when(groupService).searchGroup("gro");
+
+    Response response = groupController.searchResult("gro");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testSearchResultGroupDoesNotExistException(){
+    doThrow(new GroupDoesNotExistException("Group Does Not Exist.")).when(groupService).searchGroup("gro");
+
+    Response response = groupController.searchResult("gro");
+    assertEquals(409, response.getStatus());
+  }
 }

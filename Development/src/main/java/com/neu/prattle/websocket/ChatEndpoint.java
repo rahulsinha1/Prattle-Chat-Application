@@ -327,12 +327,6 @@ public class ChatEndpoint {
     transaction = manager.getTransaction();
     try {
       transaction.begin();
-      /*manager.createNativeQuery("INSERT INTO message(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
-              .setParameter(1, message.getFrom())
-              .setParameter(2, message.getTo())
-              .setParameter(3, message.getContent())
-              .setParameter(4, message.getTimestamp())
-              .executeUpdate();*/
       manager.persist(message);
       transaction.commit();
     } catch(Exception e) {

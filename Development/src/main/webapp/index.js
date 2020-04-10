@@ -6,9 +6,6 @@ let detailGroup = document.getElementById("details_group_section");
 let searchAny = document.getElementById("search_field_section");
 
 let username = getCookie("username");
-let secret_password = "Secret Password";
-var keySize = 256;
-var iterations = 100;
 
 document.getElementById("welcoming").innerHTML = "Welcome " + username;
 
@@ -24,22 +21,6 @@ function closeAllDisplay(){
     deleteGroup.style.display = "none";
     detailGroup.style.display = "none";
     searchAny.style.display = "none";
-}
-
-/**
- * Gets the cookie.
- * @param cname is the cookie name.
- * @returns {string} the cookie of the username.
- */
-function getCookie(cname){
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0; i<ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0)===' ') c = c.substring(1);
-        if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
-    }
-    return "";
 }
 
 // SEARCH
@@ -272,7 +253,8 @@ function submitGroupUpdate() {
 }
 
 //ADD&INVITE USERS SECTION
-let conn = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + username);
+// TODO: @Jonathan Chery, the following line causes a problem where the user gets connected twice.
+let conn;// = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + username);
 
 /**
  * Display the Add/Invite/Remove User.
@@ -631,62 +613,20 @@ function notifyUserOfInvite(usernameToBeInvited, group){
     conn.send(json);
 }
 
-
-/**
- * Encrypt the message.
- * @param msg
- * @param pass
- * @returns {string}
- */
-function encrypt(msg, pass) {
-    var salt = CryptoJS.lib.WordArray.random(128 / 8);
-
-    var key = CryptoJS.PBKDF2(pass, salt, {
-        keySize: keySize / 32,
-        iterations: iterations
+function onUserLogin() {
+    fetch('http://localhost:8080/prattle/rest/message/getMessages/'+username)
+        .then((response)=> {
+            return response.json();
+    }).then((messages) => {
+        for(message in messages) {
+            if(messages[message].deleted === false) {
+                printMessage(messages[message]);
+            }
+        }
+    }).catch((error)=> {
+        console.log(error);
     });
-
-    var iv = CryptoJS.lib.WordArray.random(128 / 8);
-
-    var encrypted = CryptoJS.AES.encrypt(msg, key, {
-        iv: iv,
-        padding: CryptoJS.pad.Pkcs7,
-        mode: CryptoJS.mode.CBC
-    });
-
-    var transitmessage = salt.toString() + iv.toString() + encrypted.toString();
-    return transitmessage;
 }
-
-/**
- * Decrypt the message.
- * @param transitmessage
- * @param pass
- * @returns {PromiseLike<ArrayBuffer>}
- */
-function decrypt(transitmessage, pass) {
-    var salt = CryptoJS.enc.Hex.parse(transitmessage.substr(0, 32));
-    var iv = CryptoJS.enc.Hex.parse(transitmessage.substr(32, 32))
-    var encrypted = transitmessage.substring(64);
-
-    var key = CryptoJS.PBKDF2(pass, salt, {
-        keySize: keySize / 32,
-        iterations: iterations
-    });
-    var decrypted = CryptoJS.AES.decrypt(encrypted, key, {
-        iv: iv,
-        padding: CryptoJS.pad.Pkcs7,
-        mode: CryptoJS.mode.CBC
-
-    })
-    return decrypted;
-}
-
-
-
-
-
-
 
 
 //

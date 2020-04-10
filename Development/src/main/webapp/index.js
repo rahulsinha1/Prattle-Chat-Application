@@ -96,31 +96,7 @@ function selectSearchArea(){
     }
 }
 
-/**
- * Searches for user.
- */
-function userSearch() {
-    let searchUserInput = document.searchUserForm.searchUser.value.trim();
-    let displayMessage = document.getElementsByName("search_message");
-    let search_result = document.getElementById("search_result");
 
-    fetch('http://localhost:8080/prattle/rest/user/search/'+ searchUserInput)
-        .then((response) => {
-            return response.json();
-        })
-        .then((userData) => {
-
-            search_result.innerHTML = "";
-
-            for (user in userData){
-                search_result.innerHTML += '<span> Username: ' + userData[user].username +  '</span> ' +
-                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>';
-            }
-        })
-        .catch((error) => {
-            displayMessage.innerText = error;
-        });
-}
 
 function groupSearch() {
     let searchGroupInput = document.searchGroupForm.searchGroup.value;
@@ -168,48 +144,6 @@ function joinGroup(groupName) {
     }
 }
 
-//MsgWindow
-function messageUser(userToSend){
-    let myWindow =  window.open("",userToSend,"width=500,height=500");
-
-    let header = '<html>' +
-        '<head>' +
-        '    <title>Chat</title>' +
-        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
-        '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
-        '    <link rel="stylesheet" href="style.css">' +
-        '    <script src="session.js"></script>\n' +
-        '</head>' +
-        '<body>';
-
-
-    let writeToDoc = '<h3>Message</h3> ' +
-        '<div class="textarea" contenteditable="false" id="log"></div> ' +
-        '<input type="text" size="51" id="msg" placeholder="Message"/>' +
-        '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
-
-
-    let bottomParts = '</body>' +
-        '<script src="websocket.js"></script>' +
-        '<script src="index.js"></script>' +
-        '<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>' +
-        '</html>';
-
-    myWindow.document.write(header + writeToDoc + bottomParts);
-}
-
-function sentTo(userToSendTo) {
-    console.log(userToSendTo)
-    // var content = document.getElementById("msg").value;
-    //
-    // var encrypted = encrypt(content, password);
-    // var json = JSON.stringify({
-    //     "to": userToSendTo,
-    //     "content": encrypted
-    // });
-    //
-    // websocket.send(json);
-}
 
 // CREATING A GROUP SECTION
 /**
@@ -305,6 +239,8 @@ function submitGroupUpdate() {
     let updated_isPrivate = document.updateGroup.isPrivate.value;
     let update_password = document.updateGroup.group_password.value;
 
+    let displayMessage = document.getElementById("update_group_message");
+
 
     if(selectedGroup !== "") {
         const group_data = {
@@ -339,7 +275,7 @@ function submitGroupUpdate() {
 let conn = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + username);
 
 /**
- * Display the Add/Invite User.
+ * Display the Add/Invite/Remove User.
  */
 function addUserToGroup() {
     closeAllDisplay();
@@ -378,6 +314,7 @@ function selectOption(){
     if(selectedOption === "1"){
         // Add USER to Group
         invite_user.style.display = "none";
+        remove_user.style.display = "none";
         add_user.style.display = "block";
 
         let modOfGroupForAdd = document.getElementById("modOfGroupForAdd");
@@ -400,6 +337,7 @@ function selectOption(){
     } else if(selectedOption === "2"){
         // Invite USER to Group
         add_user.style.display = "none";
+        remove_user.style.display = "none";
         invite_user.style.display = "block";
 
         let listOfGroups = document.getElementById("listOfGroups");
@@ -561,8 +499,6 @@ function deleteGroupButton(){
             displayMessage.innerHTML = error + "<br />";
         })
 
-    console.log(modOfGroupToDelete.value)
-
 }
 
 /**
@@ -600,6 +536,8 @@ function submitGroupDeletion() {
 function detailGroupButton(){
     closeAllDisplay();
     detailGroup.style.display = "block";
+    document.getElementById("group_info").innerHTML = "";
+
 
     let groupDetails = document.getElementById("groupDetails");
     let displayMessage = document.getElementById("details_group_message");

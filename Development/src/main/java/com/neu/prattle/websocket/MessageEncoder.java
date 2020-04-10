@@ -1,15 +1,16 @@
 package com.neu.prattle.websocket;
 
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
-import javax.websocket.EndpointConfig;
-
 import com.neu.prattle.model.Message;
+
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.websocket.EncodeException;
+import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
 
 /**
  * The Class MessageEncoder.
@@ -19,7 +20,6 @@ import java.util.logging.Logger;
  */
 public class MessageEncoder implements Encoder.Text<Message> {
 
-    /** @see org.codehaus.jackson.map.ObjectMapper */
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     /** The logger. */
@@ -36,7 +36,7 @@ public class MessageEncoder implements Encoder.Text<Message> {
      * @throws EncodeException   see javax.websocket.EncodeException
      */
     @Override
-    public String encode(Message message) throws EncodeException {
+    public String encode(Message message){
         try {
             return objectMapper.writeValueAsString(message);
         } catch (IOException e) {

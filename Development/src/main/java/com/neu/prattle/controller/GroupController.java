@@ -4,6 +4,7 @@ import com.neu.prattle.exceptions.GroupAlreadyPresentException;
 import com.neu.prattle.exceptions.GroupDoesNotExistException;
 import com.neu.prattle.exceptions.UserAlreadyPresentInGroupException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.exceptions.UserDoesNotHaveAnyGroup;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.GroupService;
@@ -11,6 +12,7 @@ import com.neu.prattle.service.GroupServiceImpl;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -26,10 +28,11 @@ import javax.ws.rs.core.Response;
 public class GroupController {
 
   // Usually Dependency injection will be used to inject the service at run-time
-  private GroupService groupService = GroupServiceImpl.getInstance();
   private UserService userService = UserServiceImpl.getInstance();
+  private GroupService groupService = GroupServiceImpl.getInstance();
 
-  /***
+
+    /***
    * Handles a HTTP POST request for user creation
    *
    * @param group -> The User object decoded from the payload of POST request.
@@ -62,7 +65,7 @@ public class GroupController {
         List userGroup;
         try{
             userGroup = groupService.getAllGroupsByUsername(username);
-        }catch (GroupDoesNotExistException e ){
+        }catch (UserDoesNotHaveAnyGroup e ){
             return Response.status(409, e.getMessage()).build();
         }
         return Response.status(200).entity(userGroup).build();
@@ -146,8 +149,8 @@ public class GroupController {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response deleteGroup(@PathParam("groupName") String groupName) {
       try{
-          Group group = groupService.getGroupByName(groupName);
-          groupService.deleteGroup(group);
+          groupService.getGroupByName(groupName);
+          groupService.deleteGroup(groupName);
       }catch (GroupDoesNotExistException e){
           return Response.status(409, e.getMessage()).build();
       }
@@ -161,12 +164,7 @@ public class GroupController {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getAllGroups() {
       List listOfAllGroup;
-        try {
-            listOfAllGroup = groupService.getAllGroups();
-        } catch(Exception e){
-            return Response.status(409, e.getMessage()).build();
-        }
-
+      listOfAllGroup = groupService.getAllGroups();
     return Response.status(200).entity(listOfAllGroup).build();
   }
 
@@ -182,7 +180,6 @@ public class GroupController {
         }catch(UserDoesNotExistException e){
             return Response.status(409, e.getMessage()).build();
         }
-
     return Response.status(200).entity(groupByUsername).build();
   }
 
@@ -200,4 +197,51 @@ public class GroupController {
 
     return Response.status(200).entity(groupDetails).build();
   }
+
+    /**
+     * Handles a HTTP GET request for user information.
+     *
+     * @param username -> The User's username.
+     * @return -> A Response indicating the user's information.
+     */
+    @GET
+    @Path("/getGroupUserIsModOf/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGroupUserIsModOf(@PathParam("username") String username) {
+        List<Group> groupByUsername;
+        User user;
+        List<Group> listOfModGroup = new ArrayList<>();
+
+        try {
+            user = userService.findUserByUsername(username);
+            groupByUsername = groupService.getAllGroupsByUsername(username);
+
+            for(Group group : groupByUsername){
+                if(group.getModerators().contains(user)){
+                    listOfModGroup.add(group);
+                }
+            }
+
+        }catch (GroupDoesNotExistException e){
+            return Response.status(409, e.getMessage()).build();
+        }
+        return Response.status(200).entity(listOfModGroup).build();
+    }
+
+    @GET
+    @Path("/search/{keyword}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response searchResult(@PathParam("keyword") String keyword) {
+        List<Group> resultGroups;
+
+        try {
+            resultGroups = groupService.searchGroup(keyword);
+        } catch (GroupDoesNotExistException e){
+            return Response.status(409, e.getMessage()).build();
+        }
+
+        return Response.ok().entity(resultGroups).build();
+    }
 }

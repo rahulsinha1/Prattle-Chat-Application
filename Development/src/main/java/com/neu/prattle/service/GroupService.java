@@ -32,7 +32,7 @@ public interface GroupService {
   void removeUser(Group group, User user);
 
   /**
-   * adds moderator to existing group
+   * adds moderator to existing group. Also add as a user to the group if already is not.
    */
   void addModerator(Group group, User moderator);
 
@@ -49,7 +49,7 @@ public interface GroupService {
   /**
    * deletes group from system
    */
-  void deleteGroup(Group group);
+  void deleteGroup(String groupName);
 
   /**
    * gives list of all groups present in the system
@@ -74,4 +74,9 @@ public interface GroupService {
    * gives group details based on group name
    */
   Group getGroupByName(String name);
+
+  /*
+    Returns a list of groups which are not private
+   */
+  List<Group> searchGroup(String keyword);
 }

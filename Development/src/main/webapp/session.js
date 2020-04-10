@@ -1,3 +1,3 @@
-if(localStorage.getItem('username') === null){
+if (getCookie("username") === "") {
     window.location.href = '404.html';
 }

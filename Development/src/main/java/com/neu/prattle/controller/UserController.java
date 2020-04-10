@@ -6,14 +6,17 @@ import com.neu.prattle.model.User;
 import com.neu.prattle.service.UserService;
 import com.neu.prattle.service.UserServiceImpl;
 
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.GET;
-import javax.ws.rs.Consumes;
+
 
 /***
  * A Resource class responsible for handling CRUD operations
@@ -71,4 +74,22 @@ public class UserController {
 
         return Response.ok().entity(user).build();
     }
+
+
+  @GET
+  @Path("/search/{keyword}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response searchResult(@PathParam("keyword") String keyword) {
+    List<User> resultUsers;
+    try{
+        resultUsers = accountService.searchUser(keyword);
+    }catch (UserDoesNotExistException e){
+        return Response.status(409).build();
+    }
+
+    return Response.ok().entity(resultUsers).build();
+  }
+
+
 }

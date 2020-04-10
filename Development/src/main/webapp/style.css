@@ -52,3 +52,19 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+.textarea {
+    border: 1px solid gray;
+    min-height: 150px;
+    max-height: 150px;  /* if you want Flexible textarea/div then give min-height instead of height */
+    overflow: scroll;
+    padding: 2px;
+    resize: both;
+    width: 400px;
+    font-size:15px;
+    color:#000;
+}
+
+.search-box button:hover {
+    background: #ccc;
+}

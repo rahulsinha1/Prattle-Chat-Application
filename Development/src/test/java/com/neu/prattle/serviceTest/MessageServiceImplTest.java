@@ -1,5 +1,6 @@
 package com.neu.prattle.serviceTest;
 
+import com.neu.prattle.controller.MessageController;
 import com.neu.prattle.service.MessageService;
 import com.neu.prattle.service.MessageServiceImpl;
 
@@ -11,6 +12,7 @@ public class MessageServiceImplTest {
 
   @Test
   public void testGetMessage() {
-    messageService.getMessages("Test");
+    //messageService.getMessages("GroupPersTest");
+    new MessageController().getAllUserConversation("GroupPersTest");
   }
 }

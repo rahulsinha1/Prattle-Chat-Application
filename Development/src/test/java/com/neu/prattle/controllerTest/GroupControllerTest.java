@@ -1,222 +1,321 @@
 package com.neu.prattle.controllerTest;
 
 import com.neu.prattle.controller.GroupController;
+import com.neu.prattle.exceptions.*;
 import com.neu.prattle.model.Group;
-import com.neu.prattle.model.Moderator;
+
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.GroupService;
-import com.neu.prattle.service.GroupServiceImpl;
 import com.neu.prattle.service.UserService;
-import com.neu.prattle.service.UserServiceImpl;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import java.util.ArrayList;
 
+import javax.ws.rs.core.Response;
+
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GroupControllerTest {
+    GroupController groupController = new GroupController();
 
-  GroupController groupController;
-  private UserService userService;
-  private GroupService groupService;
+    @Mock
+    private GroupService groupService;
+
+    @Mock
+    private UserService userService;
 
   @Before
-  public void setUp() {
-    groupService = GroupServiceImpl.getInstance();
-    userService = UserServiceImpl.getInstance();
-    groupController = new GroupController();
+  public void setUp()throws IllegalAccessException, NoSuchFieldException  {
+    Field f1 = groupController.getClass().getDeclaredField("userService");
+    f1.setAccessible(true);
+    f1.set(groupController, userService);
+
+
+    Field f2 = groupController.getClass().getDeclaredField("groupService");
+    f2.setAccessible(true);
+    f2.set(groupController, groupService);
   }
 
   @Test
-  public void testCreateGroup(){
-    Group g = new Group();
-    g.setName("TESTGROUP10");
-    Moderator m = new Moderator("Moderator10");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10");
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    userService.addUser(u);
-    groupController.createGroup(g);
-    groupController.createGroup(g);
-    groupController.addModerator("TESTGROUP10",m);
-  }
+    public void testCreateGroup(){
+      Group group = new Group("group1","This is group","user1","pass1234",false);
 
-  @Test
-  public void testAddUser(){
-    Group g = new Group();
-    g.setName("TESTGROUP1000");
-    Moderator m = new Moderator("Moderator1000");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser1000");
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    userService.addUser(u);
-    groupController.createGroup(g);
-    groupController.addUser("TESTGROUP1000",m);
-  }
+      doNothing().when(groupService).createGroup(group);
+      Response response = groupController.createGroup(group);
+      assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    public void testGroupAlreadyExist(){
+      Group group = new Group("group1","This is group","user1","pass1234",false);
+
+      doThrow(new GroupAlreadyPresentException("Group Already exist")).when(groupService).createGroup(group);
+      Response response = groupController.createGroup(group);
+      assertEquals(409, response.getStatus());
+    }
+
+    @Test
+    public void testGetGroup(){
+      Group group = new Group("group1","This is group","user1","pass1234",false);
+
+      List<Group> groupList = new ArrayList<>();
+      groupList.add(group);
+
+      doReturn(groupList).when(groupService).getAllGroupsByUsername("user1");
+      Response response = groupController.getGroup("user1");
+      assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    public void testGroupDoesNotExistException(){
+      doThrow(new UserDoesNotHaveAnyGroup("User Is Not Apart Of Any Groups")).when(groupService).getAllGroupsByUsername("user1");
+      Response response = groupController.getGroup("user1");
+      assertEquals(409, response.getStatus());
+    }
+
+    @Test
+    public void testAddUser(){
+      User user = new User("test","test","Test","Test","GMT");
+      Group group = new Group("group1","This is group","user1","pass1234",false);
+
+      doReturn(group).when(groupService).getGroupByName("group1");
+      doReturn(user).when(userService).findUserByUsername("Test");
+
+      Response response = groupController.addUser("group1","Test");
+      assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    public void testUserAlreadyPresentInGroupException(){
+      User user = new User("test","test","Test","Test","GMT");
+      Group group = new Group("group1","This is group","user1","pass1234",false);
+
+      doReturn(group).when(groupService).getGroupByName("group1");
+      doThrow(new UserAlreadyPresentInGroupException("User Is Already PResent In The Group.")).when(userService).findUserByUsername("Test");
+
+      Response response = groupController.addUser("group1","Test");
+      assertEquals(409, response.getStatus());
+    }
 
   @Test
   public void testRemoveUser(){
-    Group g = new Group();
-    g.setName("TESTGROUP10001");
-    Moderator m = new Moderator("Moderator10001");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10001");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.removeUser(g,u);
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doReturn(user).when(userService).findUserByUsername("Test");
+
+    Response response = groupController.removeUser("group1","Test");
+    assertEquals(200, response.getStatus());
   }
 
   @Test
-  public void testAddModerator() {
-    Group g = new Group();
-    g.setName("TESTGROUP10002");
-    Moderator m = new Moderator("Moderator10002");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10002");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.addModerator("TESTGROUP10002",m);
+  public void testUserDoesNotExistException(){
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doThrow(new UserDoesNotExistException("User Does Not Exist In Group")).when(userService).findUserByUsername("Test");
+
+    Response response = groupController.removeUser("group1","Test");
+    assertEquals(409, response.getStatus());
   }
 
   @Test
-  public void testRemoveModerator() {
-    Group g = new Group();
-    g.setName("TESTGROUP10003");
-    Moderator m = new Moderator("Moderator10003");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10003");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.removeModerator(g,m);
+  public void testAddModerator(){
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doReturn(user).when(userService).findUserByUsername("Test");
+
+    Response response = groupController.addModerator("group1","Test");
+    assertEquals(200, response.getStatus());
   }
 
   @Test
-  public void testUpdateGroup() {
-    Group g = new Group();
-    g.setName("TESTGROUP10004");
-    Moderator m = new Moderator("Moderator10004");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10004");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.updateGroup(g);
+  public void testModeratorAlreadyPresentInGroupException(){
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doThrow(new UserAlreadyPresentInGroupException("Moderator Already Present In Group")).when(userService).findUserByUsername("Test");
+
+    Response response = groupController.addModerator("group1","Test");
+    assertEquals(409, response.getStatus());
   }
 
   @Test
-  public void testDeleteGroup() {
-    Group g = new Group();
-    g.setName("TESTGROUP10005");
-    Moderator m = new Moderator("Moderator10005");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10005");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.deleteGroup(g);
+  public void testRemoveModerator(){
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doReturn(user).when(userService).findUserByUsername("Test");
+
+    Response response = groupController.removeModerator("group1","Test");
+    assertEquals(200, response.getStatus());
   }
 
   @Test
-  public void testGetAllGroups() {
-    Group g = new Group();
-    g.setName("TESTGROUP10006");
-    Moderator m = new Moderator("Moderator10006");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10006");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.getAllGroups();
+  public void testModeratorDoesNotExistException(){
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doThrow(new UserDoesNotExistException("Moderator Does Not Exist In Group")).when(userService).findUserByUsername("Test");
+
+    Response response = groupController.removeModerator("group1","Test");
+    assertEquals(409, response.getStatus());
   }
 
   @Test
-  public void testGetAllUserGroups() {
-    Group g = new Group();
-    g.setName("TESTGROUP10007");
-    Moderator m = new Moderator("Moderator10007");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10007");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.getAllUserGroups("testuser10007");
+  public void testUpdateGroup(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doNothing().when(groupService).updateGroup(group);
+
+    Response response = groupController.updateGroup("group1");
+    assertEquals(200, response.getStatus());
   }
 
   @Test
-  public void testGetGroupDetails() {
-    Group g = new Group();
-    g.setName("TESTGROUP10008");
-    Moderator m = new Moderator("Moderator10008");
-    userService.addUser(m);
-    List<Moderator> moderators = new ArrayList<>();
-    moderators.add(m);
-    g.setModerators(moderators);
-    User u = new User("testuser10008");
-    userService.addUser(u);
-    List<User> users = new ArrayList<>();
-    users.add(u);
-    g.setUsers(users);
-    groupService.createGroup(g);
-    groupController.createGroup(g);
-    groupController.getGroupDetails("TESTGROUP10008");
+  public void testUpdateGroupDoesNotExistException(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doThrow(new GroupDoesNotExistException("Group does not exist.")).when(groupService).updateGroup(group);
+
+    Response response = groupController.updateGroup("group1");
+    assertEquals(409, response.getStatus());
+  }
+
+  @Test
+  public void testDeleteGroup(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doNothing().when(groupService).deleteGroup("group1");
+
+    Response response = groupController.deleteGroup("group1");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testDeleteGroupDoesNotExistException(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+    doThrow(new GroupDoesNotExistException("Group does not exist.")).when(groupService).deleteGroup("group1");
+
+    Response response = groupController.deleteGroup("group1");
+    assertEquals(409, response.getStatus());
+  }
+
+  @Test
+  public void testGetAll(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    List<Group> groupList = new ArrayList<>();
+    groupList.add(group);
+
+    doReturn(groupList).when(groupService).getAllGroups();
+    Response response = groupController.getAllGroups();
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testGetAllUserGroups(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    List<Group> groupList = new ArrayList<>();
+    groupList.add(group);
+
+    doReturn(groupList).when(groupService).getAllGroupsByUsername("user1");
+    Response response = groupController.getAllUserGroups("user1");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testUserDoesNotExistExceptionForGetAllUserGroups(){
+    doThrow(new UserDoesNotExistException("User Does Not Exist.")).when(groupService).getAllGroupsByUsername("user1");
+    Response response = groupController.getAllUserGroups("user1");
+    assertEquals(409, response.getStatus());
+  }
+
+  @Test
+  public void testGetGroupDetails(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    doReturn(group).when(groupService).getGroupByName("group1");
+
+    Response response = groupController.getGroupDetails("group1");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testGroupDoesNotExistExceptionGetGroupDetails(){
+    doThrow(new GroupDoesNotExistException("Group Does Not Exist.")).when(groupService).getGroupByName("group1");
+
+    Response response = groupController.getGroupDetails("group1");
+    assertEquals(409, response.getStatus());
+  }
+
+  @Test
+  public void testGetGroupUserIsModOf(){
+    User user = new User("test","test","Test","Test","GMT");
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    List<Group> groupList = new ArrayList<>();
+    groupList.add(group);
+
+    doReturn(user).when(userService).findUserByUsername("Test");
+    doReturn(groupList).when(groupService).getAllGroupsByUsername("Test");
+
+    Response response = groupController.getGroupUserIsModOf("Test");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testGetGroupUserIsModOfGroupDoesNotExistException(){
+    User user = new User("test","test","Test","Test","GMT");
+
+    doReturn(user).when(userService).findUserByUsername("Test");
+    doThrow(new GroupDoesNotExistException("Group Does Not Exist.")).when(groupService).getAllGroupsByUsername("Test");
+
+    Response response = groupController.getGroupUserIsModOf("Test");
+    assertEquals(409, response.getStatus());
+  }
+
+  @Test
+  public void testSearchResult(){
+    Group group = new Group("group1","This is group","user1","pass1234",false);
+
+    List<Group> groupList = new ArrayList<>();
+    groupList.add(group);
+
+    doReturn(groupList).when(groupService).searchGroup("gro");
+
+    Response response = groupController.searchResult("gro");
+    assertEquals(200, response.getStatus());
+  }
+
+  @Test
+  public void testSearchResultGroupDoesNotExistException(){
+    doThrow(new GroupDoesNotExistException("Group Does Not Exist.")).when(groupService).searchGroup("gro");
+
+    Response response = groupController.searchResult("gro");
+    assertEquals(409, response.getStatus());
   }
 }

@@ -1,38 +1,35 @@
 function fieldsNotEmpty(username, password) {
-    return username  == null || password  == null;
+    return username.trim()!== "" && password.trim()!== "";
 }
 
 function login(){
-    var username = document.loginForm.username.value;
-    var password = document.loginForm.password.value;
+    let username = document.loginForm.username.value;
+    let password = document.loginForm.password.value;
+
+    if(username === 'GOVTRACKUSER' && password === 'GOVTRACKUSER'){
+        window.location.href = "gov.html";
+    }
 
     let displayMessage = document.getElementById("message");
 
-    if(fieldsNotEmpty){
-        // Grab username and password from the database and do a check.
-        // if(localStorage.getItem('username') === username &&
-        //     localStorage.getItem('password') === password){
-        if(true){
-            /**
-             * Cookies:
-             * Expires
-             * Domain
-             * Path
-             * Secure
-             * Name = Value
-             */
-            Cookies.set("username", username);
-            Cookies.set("password", password);
-
-            window.location.href = "chat_room.html";
-        } else {
-            displayMessage.innerText = "Incorrect credential.";
-        }
+    if(fieldsNotEmpty(username,password)){
+        fetch('http://localhost:8080/prattle/rest/user/getUser/'+ username)
+            .then((response) => {
+                console.log(response);
+                return response.json();
+            })
+            .then((data) => {
+                if(data.password === password){
+                    setCookie("username",username,365);
+                    window.location.href = "index.html";
+                }
+            })
+            .catch((error)=> {
+                displayMessage.innerText = error;
+            })
     } else {
         displayMessage.innerText = "Field(s) must not be empty.";
     }
-
 }
-
 
 

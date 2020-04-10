@@ -1,24 +1,70 @@
 package com.neu.prattle.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /***
  * A Basic POJO for Message.
  *
  * @author CS5500 Fall 2019 Teaching staff
  * @version dated 2019-10-06
  */
+@Entity
+@Table(name = "message")
 public class Message {
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private int id;
     /***
      * The name of the user who sent this message.
      */
+    @Column(name = "sender")
     private String from;
     /***
      * The name of the user to whom the message is sent.
      */
+    @Column(name = "receiver")
     private String to;
     /***
      * It represents the contents of the message.
      */
+    @Column(name = "content")
     private String content;
+
+    @Column(name = "time_stamp")
+    private String timestamp;
+
+    @Column(name = "isDeleted")
+    private boolean isDeleted;
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 
     @Override
     public String toString() {
@@ -26,6 +72,7 @@ public class Message {
                 .append("From: ").append(from)
                 .append("To: ").append(to)
                 .append("Content: ").append(content)
+                .append("Timestamp: ").append(timestamp)
                 .toString();
     }
 
@@ -83,6 +130,21 @@ public class Message {
 
         public MessageBuilder setMessageContent(String content)   {
             message.setContent(content);
+            return this;
+        }
+
+        public MessageBuilder setMessageTimestamp(String timestamp)   {
+            message.setTimestamp(timestamp);
+            return this;
+        }
+
+        public MessageBuilder setId(int id)   {
+            message.setId(id);
+            return this;
+        }
+
+        public MessageBuilder setIsDeleted(boolean isDeleted) {
+            message.setDeleted(isDeleted);
             return this;
         }
 

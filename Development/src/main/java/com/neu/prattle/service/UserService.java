@@ -39,4 +39,8 @@ public interface UserService {
     List findGroupsByName(String name);
 
     void updateUser(User user);
+
+    void deleteUser(User user);
+
+    List<User> searchUser (String keyword);
 }

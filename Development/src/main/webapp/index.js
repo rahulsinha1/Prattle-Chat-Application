@@ -446,21 +446,37 @@ function submitAddUserToGroup(){
     let groupName = document.getElementById("modOfGroupForAdd").value;
     let usernameToBeAdded = document.addUserForm.username.value;
     let displayMessage = document.getElementById("add_user_group_message");
+    let addAdMod = document.addUserForm.moderator.checked;
 
     if( groupName !== ""){
         if(usernameToBeAdded.trim() !== "" ){
-            fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeAdded, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then((response)=>{
-                if(!response.ok){
-                    displayMessage.innerText = "Error while adding user " + usernameToBeAdded + " to " + groupName;
-                } else {
-                    displayMessage.innerText = "Successfully Add user " + usernameToBeAdded + " to " + groupName;
-                }
-            });
+            if(addAdMod){
+                fetch('http://localhost:8080/prattle/rest/group/addModerator/' + groupName + '/' + usernameToBeAdded, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while adding Moderator " + usernameToBeAdded + " to " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Added Moderator " + usernameToBeAdded + " to " + groupName;
+                    }
+                });
+            } else {
+                fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeAdded, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while adding user " + usernameToBeAdded + " to " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Added user " + usernameToBeAdded + " to " + groupName;
+                    }
+                });
+            }
         } else {
             displayMessage.innerText = "Please input a username."
         }
@@ -507,21 +523,38 @@ function submitRemoveUserFromGroup(){
     let groupName = document.getElementById("modOfGroupForRemove").value;
     let usernameToBeRemoved = document.removeUserForm.username.value;
     let displayMessage = document.getElementById("remove_user_group_message");
+    let removeAsMod = document.removeUserForm.moderator.checked;
+
 
     if(groupName !== ""){
         if(usernameToBeRemoved.trim() !== "" ){
-            fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + usernameToBeRemoved, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then((response)=>{
-                if(!response.ok){
-                    displayMessage.innerText = "Error while removing user " + usernameToBeRemoved + " from " + groupName;
-                } else {
-                    displayMessage.innerText = "Successfully Removed user " + usernameToBeRemoved + " from " + groupName;
-                }
-            });
+            if(removeAsMod){
+                fetch('http://localhost:8080/prattle/rest/group/removeModerator/' + groupName + '/' + usernameToBeRemoved, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while removing Moderator " + usernameToBeRemoved + " from " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Removed Moderator " + usernameToBeRemoved + " from " + groupName;
+                    }
+                });
+            } else {
+                fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + usernameToBeRemoved, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while removing user " + usernameToBeRemoved + " from " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Removed user " + usernameToBeRemoved + " from " + groupName;
+                    }
+                });
+            }
         } else {
             displayMessage.innerText = "Please input a username."
         }

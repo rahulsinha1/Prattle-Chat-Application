@@ -28,12 +28,4 @@ function login(){
     }
 }
 
-function setCookie(cookie_name, cookie_value, exdays){
-    var dt = new Date();
-    dt.setTime(dt.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+dt.toUTCString();
-    document.cookie = cookie_name + "=" + cookie_value + "; " + expires;
-}
-
-
 

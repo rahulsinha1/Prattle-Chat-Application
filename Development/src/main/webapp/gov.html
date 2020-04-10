@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="gov.css">
+</head>
+<body>
+
+
+<h1 id="welcoming"></h1>
+
+<table>
+    <tr>
+        <td colspan="2">
+            <input type="text" id="username" placeholder="Enter A Username to track"/>
+        </td>
+        <td colspan="2">
+            <button type="button" id="refresh">refresh()</button>
+            <button type="button" onclick="logout();" >Logout</button>
+        </td>
+    </tr>
+</table>
+
+<div class="chat">
+    <div class="chat-title">
+        <h1>GOVT</h1>
+        <h2>tracking in progress</h2>
+        <figure class="avatar">
+            <img src="https://www.aclu.org/sites/default/files/styles/blog_main_wide_580x384/public/field_image/web16-protect-govt-surveillance-1160x768.png?itok=jTj-60dB" /></figure>
+    </div>
+    <div class="messages">
+        <div class="messages-content"></div>
+    </div>
+</div>
+
+</body>
+<script src="gov.js"></script>
+</html>

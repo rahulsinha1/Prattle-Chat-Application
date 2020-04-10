@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -129,6 +130,7 @@ public class ChatEndpoint {
     this.session = session;
     chatEndpoints.add(this);
     /* users is a hashmap between session ids and users */
+    deleteExistingSessions(username);
     users.put(session.getId(), username);
   }
 
@@ -176,6 +178,7 @@ public class ChatEndpoint {
     Message message = new Message();
     message.setFrom(users.get(session.getId()));
     message.setContent("Disconnected!");
+    setMessageTimeStamp(session,message);
     broadcast(message);
   }
 
@@ -202,7 +205,7 @@ public class ChatEndpoint {
    *
    * @param message
    */
-  private static void broadcast(Message message) {
+  private void broadcast(Message message) {
     boolean persistMessage = false;
     for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
@@ -220,21 +223,26 @@ public class ChatEndpoint {
   }
 
   private void sendGroupMessage(Message message) {
+    boolean isPersist = false;
     Set<String> groupUsers = new HashSet<>();
-    chatEndpoints.forEach(endpoint -> {
+    for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
         try {
           if (endpoint.session.getId().equals(getSessionForUser(message.getFrom()))) {
             groupUsers.add(message.getFrom());
+            if (!isPersist) {
+              persistMessage(message);
+            }
+            isPersist = true;
             endpoint.session.getBasicRemote()
                     .sendObject(message);
           }
           List<User> usersInGroup = groupService.getGroupByName(message.getTo()).getMembers();
-          for(User u: usersInGroup) {
-            if(!groupUsers.contains(u.getUsername()) && endpoint.session.getId().equals(getSessionForUser(u.getUsername()))) {
-                groupUsers.add(u.getUsername());
-                endpoint.session.getBasicRemote()
-                        .sendObject(message);
+          for (User u : usersInGroup) {
+            if (!groupUsers.contains(u.getUsername()) && endpoint.session.getId().equals(getSessionForUser(u.getUsername()))) {
+              groupUsers.add(u.getUsername());
+              endpoint.session.getBasicRemote()
+                      .sendObject(message);
             }
           }
         } catch (IOException | EncodeException e) {
@@ -244,10 +252,10 @@ public class ChatEndpoint {
           logger.log(Level.SEVERE, e.getMessage());
         }
       }
-    });
+    }
   }
 
-  private static void sendOneMessage(Message message) {
+  private void sendOneMessage(Message message) {
     boolean persistMessage = false;
     for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
@@ -271,7 +279,7 @@ public class ChatEndpoint {
     }
   }
 
-  private static String getSessionForUser(String username) {
+  private String getSessionForUser(String username) {
     for (Map.Entry<String, String> e : users.entrySet()) {
       if (e.getValue().equals(username)) {
         return e.getKey();
@@ -301,17 +309,37 @@ public class ChatEndpoint {
     return error;
   }
 
-  private static void persistMessage(Message message){
+  private void deleteExistingSessions(String username) {
+    Set<Map.Entry<String, String>> setOfEntries = users.entrySet();
+    Iterator<Map.Entry<String, String>> iterator = setOfEntries.iterator();
+
+    while (iterator.hasNext()) {
+      Map.Entry<String, String> entry = iterator.next();
+      String value = entry.getValue();
+      if (value.equals(username)) {
+        iterator.remove();
+      }
+    }
+  }
+
+  private void persistMessage(Message message){
     EntityTransaction transaction = null;
     transaction = manager.getTransaction();
-    transaction.begin();
-    manager.createNativeQuery("INSERT INTO message(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
-            .setParameter(1, message.getFrom())
-            .setParameter(2, message.getTo())
-            .setParameter(3, message.getContent())
-            .setParameter(4, message.getTimestamp())
-            .executeUpdate();
-    transaction.commit();
+    try {
+      transaction.begin();
+      /*manager.createNativeQuery("INSERT INTO message(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
+              .setParameter(1, message.getFrom())
+              .setParameter(2, message.getTo())
+              .setParameter(3, message.getContent())
+              .setParameter(4, message.getTimestamp())
+              .executeUpdate();*/
+      manager.persist(message);
+      transaction.commit();
+    } catch(Exception e) {
+      if(transaction.isActive()) {
+        transaction.rollback();
+      }
+    }
   }
 }
 

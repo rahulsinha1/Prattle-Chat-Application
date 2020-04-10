@@ -26,7 +26,7 @@ public class Message {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id;
     /***
      * The name of the user who sent this message.

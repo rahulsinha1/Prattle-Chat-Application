@@ -16,6 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -53,6 +54,9 @@ public class ChatEndpointTest {
 
   @Mock
   private EntityTransaction transaction;
+
+  @Mock
+  private static HashMap<String, String> users;
 
   private String username = "username";
 
@@ -103,7 +107,11 @@ public class ChatEndpointTest {
   }
 
   @Test
-  public void testOnClose() {
+  public void testOnClose() throws IOException, EncodeException{
+    when(userService.findUserByName(username)).thenReturn(Optional.of(user));
+    when(session.getBasicRemote()).thenReturn(basic);
+    doNothing().when(basic).sendObject(any());
+    chatEndpoint.onOpen(session,username);
     chatEndpoint.onClose(session);
   }
 
@@ -112,7 +120,12 @@ public class ChatEndpointTest {
     message = new Message();
     message.setFrom(username);
     message.setContent("What is the time?");
+    message.setTimestamp(username + ":1234567890");
     when(userService.findUserByName(username)).thenReturn(Optional.of(user));
+    when(session.getBasicRemote()).thenReturn(basic);
+    when(session.getId()).thenReturn("1234");
+    doNothing().when(basic).sendObject(any());
+    chatEndpoint.onOpen(session,username);
     chatEndpoint.onMessage(session,message);
   }
 
@@ -133,12 +146,18 @@ public class ChatEndpointTest {
   }
 
   @Test
-  public void testOnMessageDirectNotPresent() throws IOException, EncodeException {
+  public void testOnMessageDirectNotPresent() throws IOException, EncodeException, NoSuchFieldException, IllegalAccessException {
+    Field f3 = chatEndpoint.getClass().getDeclaredField("users");
+    f3.setAccessible(true);
+    f3.set(chatEndpoint, users);
     message = new Message();
     message.setFrom(username);
     message.setTo(username);
     message.setContent(username + ":What is the time?");
+    message.setTimestamp(username + ":1234567890");
     when(session.getBasicRemote()).thenReturn(basic);
+    when(session.getId()).thenReturn("1234");
+    when(users.get(anyString())).thenReturn(username);
     doNothing().when(basic).sendObject(any());
     when(userService.findUserByName(username)).thenReturn(Optional.ofNullable(null));
     chatEndpoint.onMessage(session,message);

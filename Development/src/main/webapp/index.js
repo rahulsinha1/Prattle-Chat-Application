@@ -137,7 +137,8 @@ function groupSearch() {
             for (group in groupData){
                 search_result.innerHTML += '<span> Group Name: ' + groupData[group].name +  '<br>' +
                     'Group Description: ' + groupData[group].description +  '<br>' +
-                    'Created By: ' + groupData[group].createdBy + '</span> <br> <button>Join Group</button> <br>';
+                    'Created By: ' + groupData[group].createdBy + '</span> <br> ' +
+                    '<button onclick=joinGroup(' + '"' + groupData[group].name  + '"' + ')>Join Group</button> <br>';
             }
         })
         .catch((error) => {
@@ -146,36 +147,55 @@ function groupSearch() {
 
 }
 
+function joinGroup(groupName) {
+    let displayMessage = document.getElementsByName("search_message");
+
+    if( groupName !== ""){
+            fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + username, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then((response)=>{
+                if(!response.ok){
+                    displayMessage.innerText = "Error while adding user " + username + " to " + groupName;
+                } else {
+                    displayMessage.innerText = "Successfully Added user " + username + " to " + groupName;
+                }
+            });
+        } else {
+        displayMessage.innerText = "Please select a group."
+    }
+}
+
 //MsgWindow
 function messageUser(userToSend){
-    // let myWindow =  window.open("",userToSend,"width=500,height=500");
-    //
-    // let header = '<html>' +
-    //     '<head>' +
-    //     '    <title>Chat</title>' +
-    //     '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
-    //     '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
-    //     '    <link rel="stylesheet" href="style.css">' +
-    //     '    <script src="session.js"></script>\n' +
-    //     '</head>' +
-    //     '<body>';
-    //
-    // myWindow.document.write(header)
-    //
-    // let writeToDoc = '<h3>Message</h3> ' +
-    //     '<div class="textarea" contenteditable="false" id="log"></div> ' +
-    //     '<input type="text" size="51" id="msg" placeholder="Message"/>' +
-    //     '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
-    //
-    // myWindow.document.write(writeToDoc);
-    //
-    // let bottomParts = '</body>' +
-    //     '<script src="websocket.js"></script>' +
-    //     '<script src="index.js"></script>' +
-    //     '<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>' +
-    //     '</html>';
-    //
-    // myWindow.document.write(bottomParts);
+    let myWindow =  window.open("",userToSend,"width=500,height=500");
+
+    let header = '<html>' +
+        '<head>' +
+        '    <title>Chat</title>' +
+        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
+        '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
+        '    <link rel="stylesheet" href="style.css">' +
+        '    <script src="session.js"></script>\n' +
+        '</head>' +
+        '<body>';
+
+
+    let writeToDoc = '<h3>Message</h3> ' +
+        '<div class="textarea" contenteditable="false" id="log"></div> ' +
+        '<input type="text" size="51" id="msg" placeholder="Message"/>' +
+        '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
+
+
+    let bottomParts = '</body>' +
+        '<script src="websocket.js"></script>' +
+        '<script src="index.js"></script>' +
+        '<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>' +
+        '</html>';
+
+    myWindow.document.write(header + writeToDoc + bottomParts);
 }
 
 function sentTo(userToSendTo) {
@@ -247,7 +267,7 @@ function updateGroupButton(){
     let modOfGroup = document.getElementById("modOfGroup");
     let displayMessage = document.getElementById("update_group_message");
 
-    fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
+    fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
         .then((response) => {
             return response.json();
         })
@@ -325,9 +345,11 @@ function addUserToGroup() {
     closeAllDisplay();
     document.getElementById("add_user").style.display = "none";
     document.getElementById("invite_user").style.display = "none";
+    document.getElementById("remove_user").style.display = "none";
 
     document.getElementById("Add").checked = false;
     document.getElementById("Invite").checked = false;
+    document.getElementById("Remove").checked = false;
 
     addInviteUserGroupForm.style.display = "block";
 }
@@ -339,6 +361,7 @@ function selectOption(){
     let radios = document.getElementsByName("Add_Invite");
     let add_user = document.getElementById("add_user");
     let invite_user = document.getElementById("invite_user");
+    let remove_user = document.getElementById("remove_user");
 
     let selectedOption;
 
@@ -365,7 +388,6 @@ function selectOption(){
                 return response.json();
             })
             .then((groupData) => {
-                console.log(groupData);
                 modOfGroupForAdd.innerText = "";
                 for(group in groupData){
                     modOfGroupForAdd.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
@@ -375,7 +397,7 @@ function selectOption(){
                 displayMessage.innerText = error;
             })
 
-    } else {
+    } else if(selectedOption === "2"){
         // Invite USER to Group
         add_user.style.display = "none";
         invite_user.style.display = "block";
@@ -396,6 +418,29 @@ function selectOption(){
             .catch((error) => {
                 displayMessage.innerText = error;
             })
+    } else {
+        // Remove USER to Group
+        invite_user.style.display = "none";
+        add_user.style.display = "none";
+        remove_user.style.display = "block";
+
+        let modOfGroupForRemove = document.getElementById("modOfGroupForRemove");
+        let displayMessage = document.getElementById("remove_user_group_message");
+
+        fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
+            .then((response) => {
+                return response.json();
+            })
+            .then((groupData) => {
+                modOfGroupForRemove.innerText = "";
+                for(group in groupData){
+                    modOfGroupForRemove.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
+                }
+            })
+            .catch((error) => {
+                displayMessage.innerText = error;
+            })
+
     }
 }
 
@@ -458,8 +503,37 @@ function submitInviteUserToGroup(){
     } else {
         displayMessage.innerText = "Please select a group."
     }
+}
 
+/**
+ * Submit remove user from group.
+ */
+function submitRemoveUserFromGroup(){
+    let groupName = document.getElementById("modOfGroupForRemove").value;
+    let usernameToBeRemoved = document.removeUserForm.username.value;
+    let displayMessage = document.getElementById("remove_user_group_message");
 
+    if(groupName !== ""){
+        if(usernameToBeRemoved.trim() !== "" ){
+            fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + usernameToBeRemoved, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then((response)=>{
+                if(!response.ok){
+                    displayMessage.innerText = "Error while removing user " + usernameToBeRemoved + " from " + groupName;
+                } else {
+                    displayMessage.innerText = "Successfully Removed user " + usernameToBeRemoved + " from " + groupName;
+                }
+            });
+        } else {
+            displayMessage.innerText = "Please input a username."
+        }
+
+    }else {
+        displayMessage.innerText = "Please select a group."
+    }
 }
 
 // DELETE GROUP

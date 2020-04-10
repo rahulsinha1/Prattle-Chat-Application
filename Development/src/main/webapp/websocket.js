@@ -4,7 +4,7 @@ var iterations = 100;
 
 let accountName = getCookie("username");
 let idOfEachText = 0;
-
+let websocket;
 let password = "Secret Password";
 
 var wsUri = "ws://" + document.location.host + "/prattle/chat/" + accountName;

@@ -202,7 +202,7 @@ public class ChatEndpoint {
    *
    * @param message
    */
-  private static void broadcast(Message message) {
+  private void broadcast(Message message) {
     boolean persistMessage = false;
     for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
@@ -247,7 +247,7 @@ public class ChatEndpoint {
     });
   }
 
-  private static void sendOneMessage(Message message) {
+  private void sendOneMessage(Message message) {
     boolean persistMessage = false;
     for (ChatEndpoint endpoint : chatEndpoints) {
       synchronized (endpoint) {
@@ -271,7 +271,7 @@ public class ChatEndpoint {
     }
   }
 
-  private static String getSessionForUser(String username) {
+  private String getSessionForUser(String username) {
     for (Map.Entry<String, String> e : users.entrySet()) {
       if (e.getValue().equals(username)) {
         return e.getKey();
@@ -301,9 +301,8 @@ public class ChatEndpoint {
     return error;
   }
 
-  private static void persistMessage(Message message){
-    EntityTransaction transaction = null;
-    transaction = manager.getTransaction();
+  void persistMessage(Message message){
+    EntityTransaction transaction = manager.getTransaction();
     transaction.begin();
     manager.createNativeQuery("INSERT INTO message(sender,receiver,content,time_stamp) VALUES(?,?,?,?)")
             .setParameter(1, message.getFrom())

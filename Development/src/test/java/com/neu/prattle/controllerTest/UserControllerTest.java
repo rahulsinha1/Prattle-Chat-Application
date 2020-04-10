@@ -1,8 +1,10 @@
 package com.neu.prattle.controllerTest;
 
 import com.neu.prattle.controller.UserController;
+import com.neu.prattle.exceptions.GroupDoesNotExistException;
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
+import com.neu.prattle.model.Group;
 import com.neu.prattle.model.User;
 
 import com.neu.prattle.service.UserService;
@@ -14,6 +16,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -64,6 +68,27 @@ public class UserControllerTest {
     public void testGetUserThatDoesNotExist(){
         doThrow(new UserDoesNotExistException("User Does Not Exist")).when(userService).findUserByUsername("User");
         Response response = userController.getUser("DoNotExit");
+        assertEquals(409, response.getStatus());
+    }
+
+    @Test
+    public void testSearchResult(){
+        User user1 = new User("User", "Test","User","pass1234","GMT");
+
+        List<User> userList = new ArrayList<>();
+        userList.add(user1);
+
+        doReturn(userList).when(userService).searchUser("Te");
+
+        Response response = userController.searchResult("Te");
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    public void testSearchResultGroupDoesNotExistException(){
+        doThrow(new UserDoesNotExistException("User Does Not Exist.")).when(userService).searchUser("Te");
+
+        Response response = userController.searchResult("Te");
         assertEquals(409, response.getStatus());
     }
 

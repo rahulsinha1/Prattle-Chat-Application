@@ -215,6 +215,13 @@ public class GroupServiceImpl implements GroupService {
     }
   }
 
+  @Override
+  public List<Group> searchGroup(String keyword) {
+    TypedQuery<Group> query = manager.createQuery("SELECT g FROM Group g WHERE g.name LIKE :name AND g.isGroupPrivate = false", Group.class);
+
+    return query.setParameter("name", keyword+"%").getResultList();
+  }
+
   private boolean isRecordExist(String groupName) {
 
     TypedQuery<Long> query = manager.createQuery(

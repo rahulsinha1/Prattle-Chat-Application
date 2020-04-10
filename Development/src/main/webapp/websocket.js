@@ -86,6 +86,7 @@ function doSend() {
     websocket.send(json);
 }
 
+
 function writeToScreen(message){
     var pre = document.createElement("p");
     pre.style.wordWrap = "break-word";

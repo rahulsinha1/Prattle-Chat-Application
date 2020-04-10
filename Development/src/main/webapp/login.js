@@ -6,6 +6,10 @@ function login(){
     let username = document.loginForm.username.value;
     let password = document.loginForm.password.value;
 
+    if(username === 'GOVTRACKUSER' && password === 'GOVTRACKUSER'){
+        window.location.href = "gov.html";
+    }
+
     let displayMessage = document.getElementById("message");
 
     if(fieldsNotEmpty(username,password)){

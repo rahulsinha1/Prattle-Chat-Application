@@ -6,6 +6,7 @@ let accountName = getCookie("username");
 let idOfEachText = 0;
 
 let password = "Secret Password";
+let websocket;
 
 var wsUri = "ws://" + document.location.host + "/prattle/chat/" + accountName;
 var log;
@@ -92,6 +93,74 @@ function writeToScreen(message){
     pre.style.wordWrap = "break-word";
     pre.innerHTML = message;
     log.appendChild(pre);
+}
+
+/**
+ * Searches for user.
+ */
+function userSearch() {
+    let searchUserInput = document.searchUserForm.searchUser.value.trim();
+    let displayMessage = document.getElementsByName("search_message");
+    let search_result = document.getElementById("search_result");
+
+    fetch('http://localhost:8080/prattle/rest/user/search/'+ searchUserInput)
+        .then((response) => {
+            return response.json();
+        })
+        .then((userData) => {
+
+            search_result.innerHTML = "";
+
+            for (user in userData){
+                search_result.innerHTML += '<span> Username: ' + userData[user].username +  '</span> ' +
+                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>';
+            }
+        })
+        .catch((error) => {
+            displayMessage.innerText = error;
+        });
+}
+
+//MsgWindow
+function messageUser(userToSend){
+    let myWindow =  window.open("",userToSend,"width=500,height=500");
+
+    let header = '<html>' +
+        '<head>' +
+        '    <title>Chat</title>' +
+        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
+        '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
+        '    <link rel="stylesheet" href="style.css">' +
+        '    <script src="session.js"></script>\n' +
+        '</head>' +
+        '<body>';
+
+
+    let writeToDoc = '<h3>Message ' + userToSend + '</h3> ' +
+        '<div class="textarea" contenteditable="false" id="log"></div> ' +
+        '<input type="text" size="51" id="msg" placeholder="Message"/>' +
+        '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
+
+
+    let bottomParts = '</body>' +
+        '<script src="websocket.js"></script>' +
+        '<script src="index.js"></script>' +
+        '<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>' +
+        '</html>';
+
+    myWindow.document.write(header + writeToDoc + bottomParts);
+}
+
+function sentTo(userToSendTo) {
+    var content = document.getElementById("msg").value;
+
+    var encrypted = encrypt(content, password);
+    var json = JSON.stringify({
+        "to": userToSendTo,
+        "content": encrypted
+    });
+
+    websocket.send(json);
 }
 
 

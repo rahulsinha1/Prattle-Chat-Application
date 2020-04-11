@@ -1,7 +1,4 @@
 package com.neu.prattle.controller;
-
-import com.neu.prattle.exceptions.UserDoesNotExistException;
-import com.neu.prattle.model.Message;
 import com.neu.prattle.model.User;
 import com.neu.prattle.service.MessageService;
 import com.neu.prattle.service.MessageServiceImpl;

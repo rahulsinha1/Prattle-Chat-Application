@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -145,6 +144,7 @@ public class User {
 
   @Column(name = "status", unique = false)
   private String status;
+  private static final String DEFAULT_STATUS = "Hey, I'm on Prattle";
 
 
   @ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.LAZY)
@@ -186,10 +186,10 @@ public class User {
     this.firstName = "first_name";
     this.lastName = "last_name";
     this.password = getEncryptedPassword();
-    this.status = "Hey, I'm on Prattle";
+    this.status = DEFAULT_STATUS;
   }
 
-  public User(String firstName, String lastName, String username, String password, String timezone) {
+  public User(String firstName, String lastName, String username,String password, String timezone) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.username = username;
@@ -199,7 +199,7 @@ public class User {
     groupModerator = new ArrayList<>();
     followers = new ArrayList<>();
     following = new ArrayList<>();
-    this.status = "Hey, I'm on Prattle";
+    this.status = DEFAULT_STATUS;
   }
 
   public User(String username) {
@@ -212,7 +212,7 @@ public class User {
     groupModerator = new ArrayList<>();
     followers = new ArrayList<>();
     following = new ArrayList<>();
-    this.status = "Hey, I'm on Prattle";
+    this.status = DEFAULT_STATUS;
   }
 
   /***

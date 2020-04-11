@@ -1,5 +1,6 @@
 package com.neu.prattle.controller;
 
+import com.neu.prattle.exceptions.FollowException;
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.model.User;
@@ -99,7 +100,7 @@ public class UserController {
       User follower = accountService.findUserByUsername(followerName);
       User toFollow = accountService.findUserByUsername(userToFollow);
       accountService.followUser(follower, toFollow);
-    }  catch (RuntimeException e){
+    }  catch (FollowException e){
       return Response.status(409, e.getMessage()).build();
     }
     return Response.status(200,"User Successfully Followed and is now in your circle.").build();
@@ -114,7 +115,7 @@ public class UserController {
       User follower = accountService.findUserByUsername(followerName);
       User toUnfollow = accountService.findUserByUsername(userToUnfollow);
       accountService.followUser(follower, toUnfollow);
-    }  catch (RuntimeException e){
+    }  catch (FollowException e){
       return Response.status(409, e.getMessage()).build();
     }
     return Response.status(200,"User Successfully UnFollowed and is no longer in your circle.").build();

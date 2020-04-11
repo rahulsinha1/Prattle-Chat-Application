@@ -1,5 +1,6 @@
 package com.neu.prattle.service;
 
+import com.neu.prattle.exceptions.FollowException;
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.main.EntityManagerObject;
@@ -129,10 +130,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<User> searchUser(String keyword) {
 
-    // Accoording to First and last name
-    //TypedQuery<User> query = manager.createQuery("SELECT u FROM User u WHERE CONCAT(u.firstName, ' ',u.lastName) LIKE :name", User.class);
     TypedQuery<User> query = manager.createQuery("SELECT u FROM User u WHERE u.username LIKE :name", User.class);
-
     return query.setParameter("name", keyword+"%").getResultList();
   }
 
@@ -148,7 +146,7 @@ public class UserServiceImpl implements UserService {
     }
     User user = findUserByUsername(followed.getUsername());
     if (user.getFollowers().contains(follower)) {
-      throw new RuntimeException("Already follwing this user");
+      throw new FollowException("Already follwing this user");
     }
     user.addFollower(follower);
     manager.persist(user);
@@ -169,7 +167,7 @@ public class UserServiceImpl implements UserService {
     User user = findUserByUsername(followed.getUsername());
     User followerObj = findUserByUsername(follower.getUsername());
     if (!user.getFollowers().contains(follower)) {
-      throw new RuntimeException("Not following this user");
+      throw new FollowException("Not following this user");
     }
 
     user.getFollowers().remove(followerObj);

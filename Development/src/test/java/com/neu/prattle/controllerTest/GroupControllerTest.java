@@ -186,7 +186,7 @@ public class GroupControllerTest {
     doReturn(group).when(groupService).getGroupByName("group1");
     doNothing().when(groupService).updateGroup(group);
 
-    Response response = groupController.updateGroup("group1");
+    Response response = groupController.updateGroup("group1",group);
     assertEquals(200, response.getStatus());
   }
 
@@ -197,7 +197,7 @@ public class GroupControllerTest {
     doReturn(group).when(groupService).getGroupByName("group1");
     doThrow(new GroupDoesNotExistException("Group does not exist.")).when(groupService).updateGroup(group);
 
-    Response response = groupController.updateGroup("group1");
+    Response response = groupController.updateGroup("group1",group);
     assertEquals(409, response.getStatus());
   }
 

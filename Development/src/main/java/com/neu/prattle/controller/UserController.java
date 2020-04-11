@@ -114,7 +114,7 @@ public class UserController {
     try {
       User follower = accountService.findUserByUsername(followerName);
       User toUnfollow = accountService.findUserByUsername(userToUnfollow);
-      accountService.followUser(follower, toUnfollow);
+      accountService.unfollowUser(follower, toUnfollow);
     }  catch (FollowException e){
       return Response.status(409, e.getMessage()).build();
     }
@@ -132,7 +132,7 @@ public class UserController {
       followers= accountService.getFollowers(username);
     }
     catch (UserDoesNotExistException e){
-      return Response.status(500,e.getMessage()).build();
+      return Response.status(409,e.getMessage()).build();
     }
 
     return Response.ok().entity(followers).build();
@@ -150,7 +150,7 @@ public class UserController {
       followers= accountService.getFollowing(username);
     }
     catch (UserDoesNotExistException e){
-      return Response.status(500,e.getMessage()).build();
+      return Response.status(409,e.getMessage()).build();
     }
 
     return Response.ok().entity(followers).build();

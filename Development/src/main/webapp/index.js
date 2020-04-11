@@ -119,20 +119,6 @@ function messageUser(userToSend){
     websocket.send(json);
 }
 
-
-function sentTo(userToSendTo) {
-    var content = document.getElementById("msg").value;
-
-    var encrypted = encrypt(content, secret_password);
-    var json = JSON.stringify({
-        "to": userToSendTo,
-        "content": encrypted
-    });
-
-    websocket.send(json);
-}
-
-
 /**
  * Search group.
  */

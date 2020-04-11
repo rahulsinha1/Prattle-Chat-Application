@@ -108,47 +108,16 @@ function userSearch() {
  * @param userToSend
  */
 function messageUser(userToSend){
-    let myWindow =  window.open("",userToSend,"width=500,height=500");
+    let promptMessage = prompt("What would you like to tell " + userToSend + " :");
 
-    let header = '<html>' +
-        '<head>' +
-        '    <title>Chat</title>' +
-        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
-        '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
-        '    <link rel="stylesheet" href="style.css">' +
-        '     <script src="cookiehelper.js"></script>\n' +
-        '    <script src="session.js"></script>' +
-        '    <script src="cookiehelper.js"></script>\n' +
-        '    <script src="cryptography.js"></script>\n' +
-        '   <script src="messageprinter.js"></script>\n' +
-        '   <script src="websocket.js"></script>\n' +
-        '   <script src="index.js"></script>\n' +
-        '   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>'
-        '</head>' +
-        '<body onload="onUserLogin();">';
-
-
-    let writeToDoc = '<h3>Message ' + userToSend + '</h3> ' +
-        '<div class="textarea" contenteditable="false" id="log"></div> ' +
-        '<input type="text" size="51" id="msg" placeholder="Message"/>' +
-        '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
-
-
-    myWindow.document.write(header + writeToDoc);
-}
-
-function sentTo(userToSendTo) {
-    var content = document.getElementById("msg").value;
-
-    var encrypted = encrypt(content, secret_password);
+    var encrypted = encrypt(promptMessage, secret_password);
     var json = JSON.stringify({
-        "to": userToSendTo,
+        "to": userToSend,
         "content": encrypted
     });
 
     websocket.send(json);
 }
-
 
 /**
  * Search group.

@@ -113,12 +113,35 @@ function userSearch() {
 
             for (user in userData){
                 search_result.innerHTML += '<span> Username: ' + userData[user].username +  '</span> ' +
-                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>';
+                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>' +
+                     '</span> ' +'<button onclick=followUser('+'"'+userData[user].username+'"'+')> Follow User</button> <br>';
             }
         })
         .catch((error) => {
             displayMessage.innerText = error;
         });
+}
+
+
+function followUser(username)
+{
+    let displayMessage = document.getElementsByName("search_message");
+    let accountName = getCookie("username");
+    fetch('http://localhost:8080/prattle/rest/user/followUser/' + accountName  + '/' + username, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        }).then((response)=>{
+                            if(!response.ok){
+                                displayMessage.innerText = "Error while following ";
+                            } else {
+                                displayMessage.innerText = "Successfully followed User ";
+                            }
+                        }).catch((e)=>{
+                displayMessage.innerHTML = "Error in following user" + "<br />";
+            })
+
 }
 
 //MsgWindow

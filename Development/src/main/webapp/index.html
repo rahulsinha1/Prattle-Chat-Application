@@ -110,7 +110,7 @@
 <!--Create Group-->
 <div id="create_group_form">
     <br>
-    <form name="createGroupForm">
+    <form name="`GroupForm">
         Group Name : <input type="text" name="groupName" placeholder="Enter a group name"/>
         <br>
         Description :
@@ -235,6 +235,20 @@
     <div id="group_info"></div>
     <br>
     <div id="details_group_message"></div>
+</div>
+
+
+<div id="update_status_form">
+    <br>
+    <form name="`StatusForm">
+        Status : <input type="text" id="status" name="status" placeholder="Enter Status here"/>
+        <br>
+        <div id="update_status_message"></div>
+        <br>
+        <input type="button" value="Update Status" onclick="updateUserStatus()" />
+        <input type="reset" value="Reset"/>
+    </form>
+
 </div>
 
 <div class = "followers" id = "followers">

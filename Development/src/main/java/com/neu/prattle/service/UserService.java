@@ -52,4 +52,6 @@ public interface UserService {
 
     public List<User> getFollowing(String username);
 
+    public void setStatus(String username, String status);
+
 }

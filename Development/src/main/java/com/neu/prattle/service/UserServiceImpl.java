@@ -187,6 +187,7 @@ public class UserServiceImpl implements UserService {
       throw new UserDoesNotExistException("User does not exist");
     }
 
+
     User user = findUserByUsername(username);
     return user.getFollowers();
   }
@@ -200,6 +201,22 @@ public class UserServiceImpl implements UserService {
 
     User user = findUserByUsername(username);
     return user.getFollowing();
+  }
+
+  @Override
+  public void setStatus(String username, String status) {
+    if (!isRecordExist(username)) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    User user = findUserByUsername(username);
+    user.setStatus(status);
+    manager.persist(user);
+    transaction.commit();
+
   }
 
 
@@ -224,20 +241,4 @@ public class UserServiceImpl implements UserService {
 
 
 
- /* public static void main(String [] args)
-  {
-   *//* User user = new User("User", "Test", "follower3", "pass1234", "GMT");
-    User user2 = new User("User", "Test", "followed3", "pass1234", "GMT");
-
-    us.addUser(user);
-    us.addUser(user2);*//*
-    UserService us = UserServiceImpl.getInstance();
-    us.unfollowUser(us.findUserByUsername("followed3"),us.findUserByUsername("follower3"));
-
-    *//*System.out.println(user.getFollowers());
-    System.out.println(user.getFollowing());
-    System.out.println(user2.getFollowers());
-    System.out.println(user2.getFollowing());*//*
-
-  }*/
 }

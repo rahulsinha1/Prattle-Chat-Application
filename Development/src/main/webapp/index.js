@@ -4,6 +4,7 @@ let addInviteUserGroupForm = document.getElementById("add_invite_user_section");
 let deleteGroup = document.getElementById("delete_group_section");
 let detailGroup = document.getElementById("details_group_section");
 let searchAny = document.getElementById("search_field_section");
+let updateStatus = document.getElementById("update_status_form");
 
 let username = getCookie("username");
 let secret_password = "Secret Password";
@@ -698,7 +699,7 @@ fetch('http://localhost:8080/prattle/rest/user/getFollowers/'+ accountName)
 
             for (user in userData){
                 followers.innerHTML += userData[user].username +
-                    '<button> Remove </button> <br>';
+                    '::' + userData[user].status+ "<br />";
             }
         })
         .catch((error) => {
@@ -714,7 +715,7 @@ fetch('http://localhost:8080/prattle/rest/user/getFollowing/'+ accountName)
 
             for (user in followData){
                 following.innerHTML += followData[user].username +
-                    '<button> Unfollow </button> <br>';
+                     '::' + followData[user].status+ "<br />";
             }
         })
         .catch((error) => {
@@ -723,6 +724,30 @@ fetch('http://localhost:8080/prattle/rest/user/getFollowing/'+ accountName)
 
 }
 
+
+
+function updateUserStatus(){
+    let accountName = getCookie("username");
+    let status = document.getElementById("status").value;
+    let displayMessage = document.getElementById("update_status_message");
+    displayMessage.innerHTML = "";
+
+        fetch('http://localhost:8080/prattle/rest/user/setStatus/' + accountName  + '/' + status, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }).then((response)=>{
+                        if(!response.ok){
+                            displayMessage.innerText = "Error while updating status ";
+                        } else {
+                            displayMessage.innerText = "Successfully updated status ";
+                        }
+                    }).catch((e)=>{
+            displayMessage.innerHTML = "Error in updating status" + "<br />";
+        })
+
+    }
 
 
 

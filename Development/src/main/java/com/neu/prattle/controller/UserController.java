@@ -156,11 +156,17 @@ public class UserController {
   }
 
 
-  public static void main(String [] args){
-
-      UserController uc = new UserController();
-      System.out.println(uc.followUser("followed3","rahul").getStatus());
-
+  @POST
+  @Path("/setStatus/{username}/{status}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response setStatus(@PathParam("username") String username, @PathParam("status") String status) {
+    try {
+      accountService.setStatus(username, status);
+    }  catch (UserDoesNotExistException e){
+      return Response.status(409, e.getMessage()).build();
+    }
+    return Response.status(200,"User Successfully updated Status").build();
   }
+
 
 }

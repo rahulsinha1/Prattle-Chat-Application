@@ -133,11 +133,11 @@ public class GroupController {
   @POST
   @Path("/updateGroup/{groupName}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response updateGroup(@PathParam("groupName") String groupName) {
+  public Response updateGroup(@PathParam("groupName") String groupName, Group reqGroup) {
       try{
-          Group group = groupService.getGroupByName(groupName);
-          groupService.updateGroup(group);
-      }catch (GroupDoesNotExistException e){
+          groupService.getGroupByName(groupName);
+          groupService.updateGroup(reqGroup);
+      } catch (GroupDoesNotExistException e){
           return Response.status(409, e.getMessage()).build();
       }
 

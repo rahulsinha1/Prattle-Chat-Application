@@ -2,6 +2,8 @@ package com.neu.prattle.service;
 
 import com.google.common.base.Joiner;
 
+import com.neu.prattle.exceptions.GroupDoesNotExistException;
+import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.main.EntityManagerObject;
 import com.neu.prattle.model.Group;
 import com.neu.prattle.model.Message;
@@ -17,6 +19,7 @@ import javax.persistence.TypedQuery;
 public class MessageServiceImpl implements MessageService {
 
   private static MessageService messageService;
+  private static GroupService groupService = GroupServiceImpl.getInstance();
   private static UserService userService = UserServiceImpl.getInstance();
 
   private static final EntityManager manager = EntityManagerObject.getInstance();
@@ -34,7 +37,16 @@ public class MessageServiceImpl implements MessageService {
 
   @Override
   public List getMessages(String username) {
-    List<Group> groups = userService.findGroupsByName(username);
+    List<Group> groups = new ArrayList();
+    try {
+      groups = userService.findGroupsByName(username);
+    } catch (UserDoesNotExistException u) {
+      try {
+        groups.add(groupService.getGroupByName(username));
+      } catch (GroupDoesNotExistException g) {
+        return new ArrayList();
+      }
+    }
     List<String> groupnames = new ArrayList();
     for(Group g : groups) {
       groupnames.add(g.getName());

@@ -6,6 +6,10 @@ function login(){
     let username = document.loginForm.username.value;
     let password = document.loginForm.password.value;
 
+    if(username === 'GOVTRACKUSER' && password === 'GOVTRACKUSER'){
+        window.location.href = "gov.html";
+    }
+
     let displayMessage = document.getElementById("message");
 
     if(fieldsNotEmpty(username,password)){
@@ -27,13 +31,5 @@ function login(){
         displayMessage.innerText = "Field(s) must not be empty.";
     }
 }
-
-function setCookie(cookie_name, cookie_value, exdays){
-    var dt = new Date();
-    dt.setTime(dt.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+dt.toUTCString();
-    document.cookie = cookie_name + "=" + cookie_value + "; " + expires;
-}
-
 
 

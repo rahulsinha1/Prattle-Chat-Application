@@ -31,8 +31,10 @@
     overflow-y: scroll;
 }
 </style>
+    <script src="cookiehelper.js"></script>
+    <script src="session.js"></script>
 </head>
-<body onload="getCircle()">
+<body onload="onUserLogin();">
 
 
 <h1 id="welcoming"></h1>
@@ -176,6 +178,8 @@
             <br>
             Username : <input type="text" name="username" placeholder="Enter a username"/>
             <br>
+            <input type="checkbox" id="addModerator" name="moderator" value="1">
+            <label for="addModerator"> Add As Moderator</label><br>
             <br>
             <input type="button" value="Add User" onclick="submitAddUserToGroup()" />
             <input type="reset" value="Reset"/>
@@ -204,6 +208,8 @@
             <br>
             Username : <input type="text" name="username" placeholder="Enter a username"/>
             <br>
+            <input type="checkbox" id="removeModerator" name="moderator" value="2">
+            <label for="removeModerator"> Remove As Moderator</label><br>
             <br>
             <input type="button" value="Remove User" onclick="submitRemoveUserFromGroup()" />
             <input type="reset" value="Reset"/>
@@ -259,6 +265,9 @@
 
 
 </body>
+<script src="cookiehelper.js"></script>
+<script src="cryptography.js"></script>
+<script src="messageprinter.js"></script>
 <script src="websocket.js"></script>
 <script src="index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>

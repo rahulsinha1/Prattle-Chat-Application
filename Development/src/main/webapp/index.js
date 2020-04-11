@@ -7,9 +7,6 @@ let searchAny = document.getElementById("search_field_section");
 let updateStatus = document.getElementById("update_status_form");
 
 let username = getCookie("username");
-let secret_password = "Secret Password";
-var keySize = 256;
-var iterations = 100;
 
 document.getElementById("welcoming").innerHTML = "Welcome " + username;
 
@@ -25,22 +22,6 @@ function closeAllDisplay(){
     deleteGroup.style.display = "none";
     detailGroup.style.display = "none";
     searchAny.style.display = "none";
-}
-
-/**
- * Gets the cookie.
- * @param cname is the cookie name.
- * @returns {string} the cookie of the username.
- */
-function getCookie(cname){
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0; i<ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0)===' ') c = c.substring(1);
-        if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
-    }
-    return "";
 }
 
 // SEARCH
@@ -97,8 +78,82 @@ function selectSearchArea(){
     }
 }
 
+/**
+ * Searches for user.
+ */
+function userSearch() {
+    let searchUserInput = document.searchUserForm.searchUser.value.trim();
+    let displayMessage = document.getElementsByName("search_message");
+    let search_result = document.getElementById("search_result");
+
+    fetch('http://localhost:8080/prattle/rest/user/search/'+ searchUserInput)
+        .then((response) => {
+            return response.json();
+        })
+        .then((userData) => {
+
+            search_result.innerHTML = "";
+
+            for (user in userData){
+                search_result.innerHTML += '<span> Username: ' + userData[user].username +  '</span> ' +
+                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>';
+            }
+        })
+        .catch((error) => {
+            displayMessage.innerText = error;
+        });
+}
+
+/**
+ * Messages user.
+ * @param userToSend
+ */
+function messageUser(userToSend){
+    let myWindow =  window.open("",userToSend,"width=500,height=500");
+
+    let header = '<html>' +
+        '<head>' +
+        '    <title>Chat</title>' +
+        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
+        '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
+        '    <link rel="stylesheet" href="style.css">' +
+        '     <script src="cookiehelper.js"></script>\n' +
+        '    <script src="session.js"></script>' +
+        '    <script src="cookiehelper.js"></script>\n' +
+        '    <script src="cryptography.js"></script>\n' +
+        '   <script src="messageprinter.js"></script>\n' +
+        '   <script src="websocket.js"></script>\n' +
+        '   <script src="index.js"></script>\n' +
+        '   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>'
+        '</head>' +
+        '<body onload="onUserLogin();">';
 
 
+    let writeToDoc = '<h3>Message ' + userToSend + '</h3> ' +
+        '<div class="textarea" contenteditable="false" id="log"></div> ' +
+        '<input type="text" size="51" id="msg" placeholder="Message"/>' +
+        '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
+
+
+    myWindow.document.write(header + writeToDoc);
+}
+
+function sentTo(userToSendTo) {
+    var content = document.getElementById("msg").value;
+
+    var encrypted = encrypt(content, secret_password);
+    var json = JSON.stringify({
+        "to": userToSendTo,
+        "content": encrypted
+    });
+
+    websocket.send(json);
+}
+
+
+/**
+ * Search group.
+ */
 function groupSearch() {
     let searchGroupInput = document.searchGroupForm.searchGroup.value;
 
@@ -124,6 +179,10 @@ function groupSearch() {
 
 }
 
+/**
+ * Join group
+ * @param groupName
+ */
 function joinGroup(groupName) {
     let displayMessage = document.getElementsByName("search_message");
 
@@ -273,8 +332,6 @@ function submitGroupUpdate() {
 }
 
 //ADD&INVITE USERS SECTION
-let conn = new WebSocket("ws://" + document.location.host + "/prattle/chat/" + username);
-
 /**
  * Display the Add/Invite/Remove User.
  */
@@ -390,21 +447,37 @@ function submitAddUserToGroup(){
     let groupName = document.getElementById("modOfGroupForAdd").value;
     let usernameToBeAdded = document.addUserForm.username.value;
     let displayMessage = document.getElementById("add_user_group_message");
+    let addAdMod = document.addUserForm.moderator.checked;
 
     if( groupName !== ""){
         if(usernameToBeAdded.trim() !== "" ){
-            fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeAdded, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then((response)=>{
-                if(!response.ok){
-                    displayMessage.innerText = "Error while adding user " + usernameToBeAdded + " to " + groupName;
-                } else {
-                    displayMessage.innerText = "Successfully Add user " + usernameToBeAdded + " to " + groupName;
-                }
-            });
+            if(addAdMod){
+                fetch('http://localhost:8080/prattle/rest/group/addModerator/' + groupName + '/' + usernameToBeAdded, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while adding Moderator " + usernameToBeAdded + " to " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Added Moderator " + usernameToBeAdded + " to " + groupName;
+                    }
+                });
+            } else {
+                fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeAdded, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while adding user " + usernameToBeAdded + " to " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Added user " + usernameToBeAdded + " to " + groupName;
+                    }
+                });
+            }
         } else {
             displayMessage.innerText = "Please input a username."
         }
@@ -422,9 +495,7 @@ function submitInviteUserToGroup(){
     let displayMessage = document.getElementById("invite_user_group_message");
 
     if( groupName !== ""){
-        notifyUserOfInvite(usernameToBeInvited, groupName);
-
-        conn.onmessage = function(event){
+        websocket.onmessage = function(event){
             let notification = document.getElementById("notification");
             notification.style.color = "red";
             let decrypted;
@@ -439,6 +510,8 @@ function submitInviteUserToGroup(){
                 notification.innerText += notifyMessage.from + " : " + notifyMessage.content + "\n";
             }
         }
+
+        notifyUserOfInvite(usernameToBeInvited, groupName);
     } else {
         displayMessage.innerText = "Please select a group."
     }
@@ -451,21 +524,38 @@ function submitRemoveUserFromGroup(){
     let groupName = document.getElementById("modOfGroupForRemove").value;
     let usernameToBeRemoved = document.removeUserForm.username.value;
     let displayMessage = document.getElementById("remove_user_group_message");
+    let removeAsMod = document.removeUserForm.moderator.checked;
+
 
     if(groupName !== ""){
         if(usernameToBeRemoved.trim() !== "" ){
-            fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + usernameToBeRemoved, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then((response)=>{
-                if(!response.ok){
-                    displayMessage.innerText = "Error while removing user " + usernameToBeRemoved + " from " + groupName;
-                } else {
-                    displayMessage.innerText = "Successfully Removed user " + usernameToBeRemoved + " from " + groupName;
-                }
-            });
+            if(removeAsMod){
+                fetch('http://localhost:8080/prattle/rest/group/removeModerator/' + groupName + '/' + usernameToBeRemoved, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while removing Moderator " + usernameToBeRemoved + " from " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Removed Moderator " + usernameToBeRemoved + " from " + groupName;
+                    }
+                });
+            } else {
+                fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + usernameToBeRemoved, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response)=>{
+                    if(!response.ok){
+                        displayMessage.innerText = "Error while removing user " + usernameToBeRemoved + " from " + groupName;
+                    } else {
+                        displayMessage.innerText = "Successfully Removed user " + usernameToBeRemoved + " from " + groupName;
+                    }
+                });
+            }
         } else {
             displayMessage.innerText = "Please input a username."
         }
@@ -612,9 +702,6 @@ function leaveGroup(groupName) {
 }
 
 
-
-
-
 /**
  * Notify user in the notification section.
  * @param usernameToBeInvited use to notify
@@ -629,58 +716,23 @@ function notifyUserOfInvite(usernameToBeInvited, group){
         "content": encrypted
     });
 
-    conn.send(json);
+    websocket.send(json);
 }
 
-
-/**
- * Encrypt the message.
- * @param msg
- * @param pass
- * @returns {string}
- */
-function encrypt(msg, pass) {
-    var salt = CryptoJS.lib.WordArray.random(128 / 8);
-
-    var key = CryptoJS.PBKDF2(pass, salt, {
-        keySize: keySize / 32,
-        iterations: iterations
+function onUserLogin() {
+    getCircle();
+    fetch('http://localhost:8080/prattle/rest/message/getMessages/'+username)
+        .then((response)=> {
+            return response.json();
+    }).then((messages) => {
+        for(message in messages) {
+            if(messages[message].deleted === false) {
+                printMessage(messages[message]);
+            }
+        }
+    }).catch((error)=> {
+        console.log(error);
     });
-
-    var iv = CryptoJS.lib.WordArray.random(128 / 8);
-
-    var encrypted = CryptoJS.AES.encrypt(msg, key, {
-        iv: iv,
-        padding: CryptoJS.pad.Pkcs7,
-        mode: CryptoJS.mode.CBC
-    });
-
-    var transitmessage = salt.toString() + iv.toString() + encrypted.toString();
-    return transitmessage;
-}
-
-/**
- * Decrypt the message.
- * @param transitmessage
- * @param pass
- * @returns {PromiseLike<ArrayBuffer>}
- */
-function decrypt(transitmessage, pass) {
-    var salt = CryptoJS.enc.Hex.parse(transitmessage.substr(0, 32));
-    var iv = CryptoJS.enc.Hex.parse(transitmessage.substr(32, 32))
-    var encrypted = transitmessage.substring(64);
-
-    var key = CryptoJS.PBKDF2(pass, salt, {
-        keySize: keySize / 32,
-        iterations: iterations
-    });
-    var decrypted = CryptoJS.AES.decrypt(encrypted, key, {
-        iv: iv,
-        padding: CryptoJS.pad.Pkcs7,
-        mode: CryptoJS.mode.CBC
-
-    })
-    return decrypted;
 }
 
 function getCircle()
@@ -748,87 +800,4 @@ function updateUserStatus(){
         })
 
     }
-
-
-
-
-
-
-
-//
-//
-// function deleteGroup() {
-//     closeAllDisplay();
-//     deleteGroupForm.style.display = "block";
-//
-//     let displayMessage = document.getElementById("delete_group_message");
-//
-//     var modOfGroup = new Set();
-//     // GET LIST OF GROUPS USER IS MODERATOR OF
-//     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ localStorage.getItem('username'))
-//         .then((response) => {
-//             return response.json();
-//         })
-//         .then((groupData) => {
-//             console.log(groupData);
-//             for ( group in groupData){
-//                 for(let i = 0; i < groupData[group].moderators.length; i++){
-//                     if(groupData[group].moderators[i] === localStorage.getItem('username')) {
-//                         modOfGroup.add(group);
-//                     }
-//                 }
-//             }
-//         })
-//         .catch((error)=> {
-//             displayMessage.innerText = error;
-//         })
-//     modOfGroup.forEach((group) =>{
-//         moderatorOfGroup.innerHTML += "<option value=" + group.key + ">" + group.value + "</option>";
-//     })
-//     //Save Selected
-//     selectedGroup = moderatorOfGroup.value;
-// }
-//
-// function viewGroupButton(){
-//     closeAllDisplay()
-//     viewAllGroupUserIsApartOf.style.display = "block";
-//     let displayMessage = document.getElementById("view_group_message");
-//     let groupsParticipation = document.getElementById("groupsParticipation");
-//     fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ localStorage.getItem('username'))
-//         .then((response) => {
-//             return response.json();
-//         })
-//         .then((groupData) => {
-//             console.log(groupData);
-//             groupsParticipation.innerHTML = "";
-//             for(group in groupData){
-//                 groupsParticipation.innerHTML += "<option value=" + groupData[group].name + ">" + groupData[group].name + "</option>";
-//             }
-//         })
-//         .catch((error)=> {
-//             displayMessage.innerText = error;
-//         })
-// }
-//
-//
-// function deleteGroupButton(){
-//     let displayMessage = document.getElementById("delete_group_message");
-//     // DELETE A GROUP
-//     fetch('http://localhost:8080/prattle/rest/deleteGroup/' + selectedGroup, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(group_data),
-//     }).then((response)=>{
-//         displayMessage.innerText = response.statusText;
-//     }).catch((error) => {
-//         displayMessage.innerText = error.toString();
-//     })
-// }
-//
-// function submitGroupView(){
-//     console.log(groupsParticipation.value)
-// }
-//
 

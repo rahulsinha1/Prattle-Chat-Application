@@ -89,7 +89,13 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<Group> findGroupsByName(String name) {
     if (isRecordExist(name)) {
-      User user = findUserByUsername(name);
+      User user;
+      try {
+        user = findUserByUsername(name);
+      }
+      catch (UserDoesNotExistException u) {
+        throw new UserDoesNotExistException(u.getMessage());
+      }
       return user.getGroupParticipant();
     }
     return Collections.emptyList();

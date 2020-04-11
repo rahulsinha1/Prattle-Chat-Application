@@ -27,13 +27,13 @@ public class MessageController {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getAllUserConversation(@PathParam("username") String username) {
-    User user = userService.findUserByUsername(username);
-    if(user!=null) {
+    //User user = userService.findUserByUsername(username);
+    //if(user!=null) {
       List listofAllMessages;
       listofAllMessages = messageService.getMessages(username);
       return Response.status(200).entity(listofAllMessages).build();
-    }
-    return Response.status(409, "User does not exist").build();
+    //}
+    //return Response.status(409, "User does not exist").build();
   }
 
   @GET

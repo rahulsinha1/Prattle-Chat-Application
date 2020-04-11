@@ -682,6 +682,47 @@ function decrypt(transitmessage, pass) {
     return decrypted;
 }
 
+function getCircle()
+{
+let accountName = getCookie("username");
+let followers = document.getElementById("followers");
+let following = document.getElementById("following");
+followers.innerHTML ="<h3><u>" + "Followers" + "</u></h3>";
+following.innerHTML ="<h3><u>" + "Following" + "</u></h3>";
+
+fetch('http://localhost:8080/prattle/rest/user/getFollowers/'+ accountName)
+        .then((response) => {
+            return response.json();
+        })
+        .then((userData) => {
+
+            for (user in userData){
+                followers.innerHTML += userData[user].username +
+                    '<button> Remove </button> <br>';
+            }
+        })
+        .catch((error) => {
+            followers.innerText = "Error";
+        });
+
+
+fetch('http://localhost:8080/prattle/rest/user/getFollowing/'+ accountName)
+        .then((response) => {
+            return response.json();
+        })
+        .then((followData) => {
+
+            for (user in followData){
+                following.innerHTML += followData[user].username +
+                    '<button> Unfollow </button> <br>';
+            }
+        })
+        .catch((error) => {
+            following.innerText = "Error";
+        });
+
+}
+
 
 
 

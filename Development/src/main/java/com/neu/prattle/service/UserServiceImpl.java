@@ -136,6 +136,72 @@ public class UserServiceImpl implements UserService {
     return query.setParameter("name", keyword+"%").getResultList();
   }
 
+  @Override
+  public void followUser(User follower, User followed) {
+
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    if(!isRecordExist(follower.getUsername()) || !isRecordExist(followed.getUsername())) {
+      throw new UserDoesNotExistException("User record does not exist");
+    }
+    User user = findUserByUsername(followed.getUsername());
+    if (user.getFollowers().contains(follower)) {
+      throw new RuntimeException("Already follwing this user");
+    }
+    user.addFollower(follower);
+    manager.persist(user);
+    transaction.commit();
+  }
+  
+
+  @Override
+  public void unfollowUser(User follower, User followed) {
+
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    if(!isRecordExist(follower.getUsername()) || !isRecordExist(followed.getUsername())) {
+      throw new UserDoesNotExistException("User record does not exist");
+    }
+    User user = findUserByUsername(followed.getUsername());
+    User followerObj = findUserByUsername(follower.getUsername());
+    if (!user.getFollowers().contains(follower)) {
+      throw new RuntimeException("Not following this user");
+    }
+
+    user.getFollowers().remove(followerObj);
+    followerObj.getFollowing().remove(user);
+    manager.persist(user);
+    transaction.commit();
+
+
+  }
+
+  @Override
+  public List<User> getFollowers(String username) {
+
+    if (!isRecordExist(username)) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+
+    User user = findUserByUsername(username);
+    return user.getFollowers();
+  }
+
+  @Override
+  public List<User> getFollowing(String username) {
+
+    if (!isRecordExist(username)) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+
+    User user = findUserByUsername(username);
+    return user.getFollowing();
+  }
+
 
   private void create(User user) {
     EntityTransaction transaction = null;
@@ -156,4 +222,22 @@ public class UserServiceImpl implements UserService {
     return (!count.equals(0L));
   }
 
+
+
+ /* public static void main(String [] args)
+  {
+   *//* User user = new User("User", "Test", "follower3", "pass1234", "GMT");
+    User user2 = new User("User", "Test", "followed3", "pass1234", "GMT");
+
+    us.addUser(user);
+    us.addUser(user2);*//*
+    UserService us = UserServiceImpl.getInstance();
+    us.unfollowUser(us.findUserByUsername("followed3"),us.findUserByUsername("follower3"));
+
+    *//*System.out.println(user.getFollowers());
+    System.out.println(user.getFollowing());
+    System.out.println(user2.getFollowers());
+    System.out.println(user2.getFollowing());*//*
+
+  }*/
 }

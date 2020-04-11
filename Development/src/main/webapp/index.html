@@ -6,8 +6,33 @@
     <link rel="stylesheet" href="style.css">
     <!-- TODO: Remove the comment below -->
 <!--    <script src="session.js"></script>-->
+    <style>
+    div.followers {
+    width:250px;
+    height: 400 px;
+    margin: auto;
+    border-style: double;
+    position: absolute;
+    top:180;
+    right:150;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+ div.following {
+    width:250px;
+    height: 400 px;
+    margin: auto;
+    border-style: double;
+    position: absolute;
+    top:500;
+    right:150;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+</style>
 </head>
-<body>
+<body onload="getCircle()">
 
 
 <h1 id="welcoming"></h1>
@@ -212,7 +237,11 @@
     <div id="details_group_message"></div>
 </div>
 
+<div class = "followers" id = "followers">
+</div>
 
+<div class = "following" id = "following">
+</div>
 
 
 </body>

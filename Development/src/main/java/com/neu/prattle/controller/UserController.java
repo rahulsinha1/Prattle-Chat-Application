@@ -91,5 +91,76 @@ public class UserController {
     return Response.ok().entity(resultUsers).build();
   }
 
+  @POST
+  @Path("/followUser/{followerName}/{userToFollow}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response followUser(@PathParam("followerName") String followerName, @PathParam("userToFollow") String userToFollow) {
+    try {
+      User follower = accountService.findUserByUsername(followerName);
+      User toFollow = accountService.findUserByUsername(userToFollow);
+      accountService.followUser(follower, toFollow);
+    }  catch (RuntimeException e){
+      return Response.status(409, e.getMessage()).build();
+    }
+    return Response.status(200,"User Successfully Followed and is now in your circle.").build();
+  }
+
+
+  @POST
+  @Path("/followUser/{followerName}/{userToUnfollow}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response unfollowUser(@PathParam("followerName") String followerName, @PathParam("userToUnfollow") String userToUnfollow) {
+    try {
+      User follower = accountService.findUserByUsername(followerName);
+      User toUnfollow = accountService.findUserByUsername(userToUnfollow);
+      accountService.followUser(follower, toUnfollow);
+    }  catch (RuntimeException e){
+      return Response.status(409, e.getMessage()).build();
+    }
+    return Response.status(200,"User Successfully UnFollowed and is no longer in your circle.").build();
+  }
+
+
+  @GET
+  @Path("/getFollowers/{user}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response getFollowers(@PathParam("user") String username) {
+      List<User> followers;
+    try{
+      followers= accountService.getFollowers(username);
+    }
+    catch (UserDoesNotExistException e){
+      return Response.status(500,e.getMessage()).build();
+    }
+
+    return Response.ok().entity(followers).build();
+  }
+
+
+
+  @GET
+  @Path("/getFollowing/{user}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response getFollowing(@PathParam("user") String username) {
+    List<User> followers;
+    try{
+      followers= accountService.getFollowing(username);
+    }
+    catch (UserDoesNotExistException e){
+      return Response.status(500,e.getMessage()).build();
+    }
+
+    return Response.ok().entity(followers).build();
+  }
+
+
+  public static void main(String [] args){
+
+      UserController uc = new UserController();
+      System.out.println(uc.followUser("followed3","rahul").getStatus());
+
+  }
 
 }

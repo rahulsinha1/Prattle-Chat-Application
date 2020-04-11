@@ -4,6 +4,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css">
+    <!-- TODO: Remove the comment below -->
+<!--    <script src="session.js"></script>-->
+    <style>
+    div.followers {
+    width:250px;
+    height: 400 px;
+    margin: auto;
+    border-style: double;
+    position: absolute;
+    top:180;
+    right:150;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+ div.following {
+    width:250px;
+    height: 400 px;
+    margin: auto;
+    border-style: double;
+    position: absolute;
+    top:500;
+    right:150;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+</style>
     <script src="cookiehelper.js"></script>
     <script src="session.js"></script>
 </head>
@@ -215,6 +242,27 @@
     <br>
     <div id="details_group_message"></div>
 </div>
+
+
+<div id="update_status_form">
+    <br>
+    <form name="`StatusForm">
+        Status : <input type="text" id="status" name="status" placeholder="Enter Status here"/>
+        <br>
+        <div id="update_status_message"></div>
+        <br>
+        <input type="button" value="Update Status" onclick="updateUserStatus()" />
+        <input type="reset" value="Reset"/>
+    </form>
+
+</div>
+
+<div class = "followers" id = "followers">
+</div>
+
+<div class = "following" id = "following">
+</div>
+
 
 </body>
 <script src="cookiehelper.js"></script>

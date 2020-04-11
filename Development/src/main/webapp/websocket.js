@@ -78,6 +78,7 @@ function writeToScreen(message){
 }
 
 
+
 window.addEventListener("load", init, false);
 
 /**

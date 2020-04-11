@@ -1,5 +1,6 @@
 package com.neu.prattle.service;
 
+import com.neu.prattle.exceptions.FollowException;
 import com.neu.prattle.exceptions.UserAlreadyPresentException;
 import com.neu.prattle.exceptions.UserDoesNotExistException;
 import com.neu.prattle.main.EntityManagerObject;
@@ -135,11 +136,91 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<User> searchUser(String keyword) {
 
-    // Accoording to First and last name
-    //TypedQuery<User> query = manager.createQuery("SELECT u FROM User u WHERE CONCAT(u.firstName, ' ',u.lastName) LIKE :name", User.class);
     TypedQuery<User> query = manager.createQuery("SELECT u FROM User u WHERE u.username LIKE :name", User.class);
-
     return query.setParameter("name", keyword+"%").getResultList();
+  }
+
+  @Override
+  public void followUser(User follower, User followed) {
+
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    if(!isRecordExist(follower.getUsername()) || !isRecordExist(followed.getUsername())) {
+      throw new UserDoesNotExistException("User record does not exist");
+    }
+    User user = findUserByUsername(followed.getUsername());
+    if (user.getFollowers().contains(follower)) {
+      throw new FollowException("Already follwing this user");
+    }
+    user.addFollower(follower);
+    manager.persist(user);
+    transaction.commit();
+  }
+  
+
+  @Override
+  public void unfollowUser(User follower, User followed) {
+
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    if(!isRecordExist(follower.getUsername()) || !isRecordExist(followed.getUsername())) {
+      throw new UserDoesNotExistException("User record does not exist");
+    }
+    User user = findUserByUsername(followed.getUsername());
+    User followerObj = findUserByUsername(follower.getUsername());
+    if (!user.getFollowers().contains(follower)) {
+      throw new FollowException("Not following this user");
+    }
+
+    user.getFollowers().remove(followerObj);
+    followerObj.getFollowing().remove(user);
+    manager.persist(user);
+    transaction.commit();
+
+
+  }
+
+  @Override
+  public List<User> getFollowers(String username) {
+
+    if (!isRecordExist(username)) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+
+
+    User user = findUserByUsername(username);
+    return user.getFollowers();
+  }
+
+  @Override
+  public List<User> getFollowing(String username) {
+
+    if (!isRecordExist(username)) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+
+    User user = findUserByUsername(username);
+    return user.getFollowing();
+  }
+
+  @Override
+  public void setStatus(String username, String status) {
+    if (!isRecordExist(username)) {
+      throw new UserDoesNotExistException("User does not exist");
+    }
+    EntityTransaction transaction = null;
+    transaction = manager.getTransaction();
+    transaction.begin();
+
+    User user = findUserByUsername(username);
+    user.setStatus(status);
+    manager.persist(user);
+    transaction.commit();
+
   }
 
 
@@ -161,5 +242,7 @@ public class UserServiceImpl implements UserService {
     Long count = query.setParameter("name", username).getSingleResult();
     return (!count.equals(0L));
   }
+
+
 
 }

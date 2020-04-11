@@ -43,4 +43,15 @@ public interface UserService {
     void deleteUser(User user);
 
     List<User> searchUser (String keyword);
+
+    public void followUser(User follower, User followed);
+
+    public void unfollowUser(User follower, User followed);
+
+    public List<User> getFollowers(String username);
+
+    public List<User> getFollowing(String username);
+
+    public void setStatus(String username, String status);
+
 }

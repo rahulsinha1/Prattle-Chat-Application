@@ -1,7 +1,10 @@
-gauravjain94
-jainhar
-jchery25
-Rahul Sinha
+## TEAM 10 
 
+# Team Members:
 
-This is the Readme for the CS 5500 Project 
+# Link To Live System:
+
+# Unlisted YouTube videos:
+~ Final Presentation:
+~ System Demo:
+

@@ -4,6 +4,7 @@ let addInviteUserGroupForm = document.getElementById("add_invite_user_section");
 let deleteGroup = document.getElementById("delete_group_section");
 let detailGroup = document.getElementById("details_group_section");
 let searchAny = document.getElementById("search_field_section");
+let updateStatus = document.getElementById("update_status_form");
 
 let username = getCookie("username");
 
@@ -95,7 +96,8 @@ function userSearch() {
 
             for (user in userData){
                 search_result.innerHTML += '<span> Username: ' + userData[user].username +  '</span> ' +
-                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>';
+                    '<button onclick=messageUser(' + '"' + userData[user].username  + '"' + ')> Message User</button> <br>' +
+                     '</span> ' +'<button onclick=followUser('+'"'+userData[user].username+'"'+')> Follow User</button> <br>';
             }
         })
         .catch((error) => {
@@ -103,52 +105,43 @@ function userSearch() {
         });
 }
 
+
+function followUser(username)
+{
+    let displayMessage = document.getElementsByName("search_message");
+    let accountName = getCookie("username");
+    fetch('http://localhost:8080/prattle/rest/user/followUser/' + accountName  + '/' + username, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        }).then((response)=>{
+                            if(!response.ok){
+                                displayMessage.innerText = "Error while following ";
+                            } else {
+                                displayMessage.innerText = "Successfully followed User ";
+                            }
+                        }).catch((e)=>{
+                displayMessage.innerHTML = "Error in following user" + "<br />";
+            })
+
+}
+
 /**
  * Messages user.
  * @param userToSend
  */
 function messageUser(userToSend){
-    let myWindow =  window.open("",userToSend,"width=500,height=500");
+    let promptMessage = prompt("What would you like to tell " + userToSend + " :");
 
-    let header = '<html>' +
-        '<head>' +
-        '    <title>Chat</title>' +
-        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>' +
-        '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">' +
-        '    <link rel="stylesheet" href="style.css">' +
-        '     <script src="cookiehelper.js"></script>\n' +
-        '    <script src="session.js"></script>' +
-        '    <script src="cookiehelper.js"></script>\n' +
-        '    <script src="cryptography.js"></script>\n' +
-        '   <script src="messageprinter.js"></script>\n' +
-        '   <script src="websocket.js"></script>\n' +
-        '   <script src="index.js"></script>\n' +
-        '   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>'
-        '</head>' +
-        '<body onload="onUserLogin();">';
-
-
-    let writeToDoc = '<h3>Message ' + userToSend + '</h3> ' +
-        '<div class="textarea" contenteditable="false" id="log"></div> ' +
-        '<input type="text" size="51" id="msg" placeholder="Message"/>' +
-        '<button onclick=sentTo(' + '"' + userToSend + '"' + ')>Send</button>';
-
-
-    myWindow.document.write(header + writeToDoc);
-}
-
-function sentTo(userToSendTo) {
-    var content = document.getElementById("msg").value;
-
-    var encrypted = encrypt(content, secret_password);
+    var encrypted = encrypt(promptMessage, secret_password);
     var json = JSON.stringify({
-        "to": userToSendTo,
+        "to": userToSend,
         "content": encrypted
     });
 
     websocket.send(json);
 }
-
 
 /**
  * Search group.
@@ -719,6 +712,7 @@ function notifyUserOfInvite(usernameToBeInvited, group){
 }
 
 function onUserLogin() {
+    getCircle();
     fetch('http://localhost:8080/prattle/rest/message/getMessages/'+username)
         .then((response)=> {
             return response.json();
@@ -733,4 +727,69 @@ function onUserLogin() {
     });
 }
 
+function getCircle()
+{
+let accountName = getCookie("username");
+let followers = document.getElementById("followers");
+let following = document.getElementById("following");
+followers.innerHTML ="<h3><u>" + "Followers" + "</u></h3>";
+following.innerHTML ="<h3><u>" + "Following" + "</u></h3>";
+
+fetch('http://localhost:8080/prattle/rest/user/getFollowers/'+ accountName)
+        .then((response) => {
+            return response.json();
+        })
+        .then((userData) => {
+
+            for (user in userData){
+                followers.innerHTML += userData[user].username +
+                    '::' + userData[user].status+ "<br />";
+            }
+        })
+        .catch((error) => {
+            followers.innerText = "Error";
+        });
+
+
+fetch('http://localhost:8080/prattle/rest/user/getFollowing/'+ accountName)
+        .then((response) => {
+            return response.json();
+        })
+        .then((followData) => {
+
+            for (user in followData){
+                following.innerHTML += followData[user].username +
+                     '::' + followData[user].status+ "<br />";
+            }
+        })
+        .catch((error) => {
+            following.innerText = "Error";
+        });
+
+}
+
+
+
+function updateUserStatus(){
+    let accountName = getCookie("username");
+    let status = document.getElementById("status").value;
+    let displayMessage = document.getElementById("update_status_message");
+    displayMessage.innerHTML = "";
+
+        fetch('http://localhost:8080/prattle/rest/user/setStatus/' + accountName  + '/' + status, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }).then((response)=>{
+                        if(!response.ok){
+                            displayMessage.innerText = "Error while updating status ";
+                        } else {
+                            displayMessage.innerText = "Successfully updated status ";
+                        }
+                    }).catch((e)=>{
+            displayMessage.innerHTML = "Error in updating status" + "<br />";
+        })
+
+    }
 

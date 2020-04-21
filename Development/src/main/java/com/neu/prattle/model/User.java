@@ -33,7 +33,7 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 
 public class User {
-  
+
   public String getUsername() {
     return username;
   }
@@ -56,6 +56,14 @@ public class User {
 
   public List<Group> getGroupParticipant() {
     return groupParticipant;
+  }
+
+  public List<User> getFollowers() {
+    return followers;
+  }
+
+  public List<User> getFollowing() {
+    return following;
   }
 
 
@@ -88,9 +96,17 @@ public class User {
   }
 
 
-
   public void setGroupModerator(Group group) {
     this.groupModerator.add(group);
+  }
+
+  public void addFollower(User follower) {
+    followers.add(follower);
+    follower.following.add(this);
+  }
+
+  public void addFollowing(User followed) {
+    followed.addFollower(this);
   }
 
 
@@ -118,7 +134,20 @@ public class User {
   @Column(name = "timezone", unique = false)
   private String timezone;
 
-  @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  @Column(name = "status", unique = false)
+  private String status;
+  private static final String DEFAULT_STATUS = "Hey, I'm on Prattle";
+
+
+  @ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.LAZY)
   @JoinTable(name = "group_users",
           joinColumns = @JoinColumn(name = "user_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
@@ -127,24 +156,40 @@ public class User {
   private List<Group> groupParticipant;
 
 
-  @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+  @ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.LAZY)
   @JoinTable(name = "group_mods",
           joinColumns = @JoinColumn(name = "moderator_id"),
           inverseJoinColumns = @JoinColumn(name = "group_id"))
- // @JsonManagedReference(value="group-moderator")
+  // @JsonManagedReference(value="group-moderator")
   @JsonIgnore
   private List<Group> groupModerator;
+
+
+  @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.LAZY)
+  @JoinTable(name = "USER_RELATIONS",
+          joinColumns = @JoinColumn(name = "FOLLOWED_ID"),
+          inverseJoinColumns = @JoinColumn(name = "FOLLOWER_ID"))
+  @JsonIgnore
+  private List<User> followers;
+
+  @JsonIgnore
+  @ManyToMany(mappedBy = "followers",cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+  private List<User> following;
+
 
   public User() {
     groupParticipant = new ArrayList();
     groupModerator = new ArrayList<>();
+    followers = new ArrayList<>();
+    following = new ArrayList<>();
     this.timezone = "default";
     this.firstName = "first_name";
     this.lastName = "last_name";
     this.password = getEncryptedPassword();
+    this.status = DEFAULT_STATUS;
   }
 
-  public User(String firstName, String lastName, String username, String password, String timezone) {
+  public User(String firstName, String lastName, String username,String password, String timezone) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.username = username;
@@ -152,6 +197,9 @@ public class User {
     this.timezone = timezone;
     groupParticipant = new ArrayList();
     groupModerator = new ArrayList<>();
+    followers = new ArrayList<>();
+    following = new ArrayList<>();
+    this.status = DEFAULT_STATUS;
   }
 
   public User(String username) {
@@ -162,6 +210,9 @@ public class User {
     this.password = getEncryptedPassword();
     groupParticipant = new ArrayList();
     groupModerator = new ArrayList<>();
+    followers = new ArrayList<>();
+    following = new ArrayList<>();
+    this.status = DEFAULT_STATUS;
   }
 
   /***

@@ -10,7 +10,7 @@ function logout() {
 function refresh() {
     messages.innerHTML = "";
     username = document.getElementById("username").value;
-    fetch('http://localhost:8080/prattle/rest/message/getMessages/'+username)
+    fetch('rest/message/getMessages/'+username)
         .then((response)=> {
         return response.json();
 }).then((messages) => {

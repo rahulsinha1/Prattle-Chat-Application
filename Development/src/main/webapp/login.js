@@ -13,7 +13,7 @@ function login(){
     let displayMessage = document.getElementById("message");
 
     if(fieldsNotEmpty(username,password)){
-        fetch('http://localhost:8080/prattle/rest/user/getUser/'+ username)
+        fetch('rest/user/getUser/'+ username)
             .then((response) => {
                 console.log(response);
                 return response.json();

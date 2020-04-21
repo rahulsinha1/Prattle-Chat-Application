@@ -90,7 +90,7 @@ function logout() {
 }
 
 function copy(id) {
-    fetch('http://localhost:8080/prattle/rest/message/getMessage/'+id)
+    fetch('rest/message/getMessage/'+id)
         .then((response)=> {
         return response.json();
     }).then((message) => {
@@ -113,7 +113,7 @@ function copy(id) {
 function deleteMessage(id) {
     var spanToDelete = document.getElementById(id);
 
-    fetch('http://localhost:8080/prattle/rest/message/deleteMessage/'+id, {
+    fetch('rest/message/deleteMessage/'+id, {
         method: 'POST'
     }).then((response)=>{
         if(!response.ok){
@@ -133,7 +133,7 @@ function displayTime(currentUserTimePreference) {
 }
 
 function forwardMessage(id) {
-    var message = fetch('http://localhost:8080/prattle/rest/message/getMessage/'+id)
+    var message = fetch('rest/message/getMessage/'+id)
         .then((response) => {
         return response.json();
     }).catch((error) => {

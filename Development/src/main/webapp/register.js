@@ -39,7 +39,7 @@ function register(){
                 "password": password
             };
 
-            fetch('http://localhost:8080/prattle/rest/user/create', {
+            fetch('rest/user/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

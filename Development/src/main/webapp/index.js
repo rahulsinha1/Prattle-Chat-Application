@@ -86,7 +86,7 @@ function userSearch() {
     let displayMessage = document.getElementsByName("search_message");
     let search_result = document.getElementById("search_result");
 
-    fetch('http://localhost:8080/prattle/rest/user/search/'+ searchUserInput)
+    fetch('rest/user/search/'+ searchUserInput)
         .then((response) => {
             return response.json();
         })
@@ -110,7 +110,7 @@ function followUser(username)
 {
     let displayMessage = document.getElementsByName("search_message");
     let accountName = getCookie("username");
-    fetch('http://localhost:8080/prattle/rest/user/followUser/' + accountName  + '/' + username, {
+    fetch('rest/user/followUser/' + accountName  + '/' + username, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ function messageUser(userToSend){
 function groupSearch() {
     let searchGroupInput = document.searchGroupForm.searchGroup.value;
 
-    fetch('http://localhost:8080/prattle/rest/group/search/'+ searchGroupInput)
+    fetch('rest/group/search/'+ searchGroupInput)
         .then((response) => {
             return response.json();
         })
@@ -179,7 +179,7 @@ function joinGroup(groupName) {
     let displayMessage = document.getElementsByName("search_message");
 
     if( groupName !== ""){
-            fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + username, {
+            fetch('rest/group/addUser/' + groupName + '/' + username, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -222,7 +222,7 @@ function submitGroupCreation(){
             "isGroupPrivate": false,
             "password": "",
         };
-        fetch('http://localhost:8080/prattle/rest/group/create', {
+        fetch('rest/group/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ function updateGroupButton(){
     let modOfGroup = document.getElementById("modOfGroup");
     let displayMessage = document.getElementById("update_group_message");
 
-    fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
+    fetch('rest/group/getGroupUserIsModOf/'+ username)
         .then((response) => {
             return response.json();
         })
@@ -303,7 +303,7 @@ function submitGroupUpdate() {
             "password": update_password,
         };
 
-        fetch('http://localhost:8080/prattle/rest/group/updateGroup/' + selectedGroup, {
+        fetch('rest/group/updateGroup/' + selectedGroup, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -370,7 +370,7 @@ function selectOption(){
         let modOfGroupForAdd = document.getElementById("modOfGroupForAdd");
         let displayMessage = document.getElementById("add_user_group_message");
 
-        fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
+        fetch('rest/group/getGroupUserIsModOf/'+ username)
             .then((response) => {
                 return response.json();
             })
@@ -393,7 +393,7 @@ function selectOption(){
         let listOfGroups = document.getElementById("listOfGroups");
         let displayMessage = document.getElementById("invite_user_group_message");
 
-        fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
+        fetch('rest/group/getAllUserGroups/'+ username)
             .then((response) => {
                 return response.json();
             })
@@ -415,7 +415,7 @@ function selectOption(){
         let modOfGroupForRemove = document.getElementById("modOfGroupForRemove");
         let displayMessage = document.getElementById("remove_user_group_message");
 
-        fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
+        fetch('rest/group/getGroupUserIsModOf/'+ username)
             .then((response) => {
                 return response.json();
             })
@@ -444,7 +444,7 @@ function submitAddUserToGroup(){
     if( groupName !== ""){
         if(usernameToBeAdded.trim() !== "" ){
             if(addAdMod){
-                fetch('http://localhost:8080/prattle/rest/group/addModerator/' + groupName + '/' + usernameToBeAdded, {
+                fetch('rest/group/addModerator/' + groupName + '/' + usernameToBeAdded, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -457,7 +457,7 @@ function submitAddUserToGroup(){
                     }
                 });
             } else {
-                fetch('http://localhost:8080/prattle/rest/group/addUser/' + groupName + '/' + usernameToBeAdded, {
+                fetch('rest/group/addUser/' + groupName + '/' + usernameToBeAdded, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -522,7 +522,7 @@ function submitRemoveUserFromGroup(){
     if(groupName !== ""){
         if(usernameToBeRemoved.trim() !== "" ){
             if(removeAsMod){
-                fetch('http://localhost:8080/prattle/rest/group/removeModerator/' + groupName + '/' + usernameToBeRemoved, {
+                fetch('rest/group/removeModerator/' + groupName + '/' + usernameToBeRemoved, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -535,7 +535,7 @@ function submitRemoveUserFromGroup(){
                     }
                 });
             } else {
-                fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + usernameToBeRemoved, {
+                fetch('rest/group/removeUser/' + groupName + '/' + usernameToBeRemoved, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -568,7 +568,7 @@ function deleteGroupButton(){
     let modOfGroupToDelete = document.getElementById("modOfGroupToDelete");
     let displayMessage = document.getElementById("delete_group_message");
 
-    fetch('http://localhost:8080/prattle/rest/group/getGroupUserIsModOf/'+ username)
+    fetch('rest/group/getGroupUserIsModOf/'+ username)
         .then((response) => {
             return response.json();
         })
@@ -593,7 +593,7 @@ function submitGroupDeletion() {
 
 
     if(selectedGroupToDelete !== "") {
-        fetch('http://localhost:8080/prattle/rest/group/deleteGroup/' + selectedGroupToDelete, {
+        fetch('rest/group/deleteGroup/' + selectedGroupToDelete, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -625,7 +625,7 @@ function detailGroupButton(){
     let groupDetails = document.getElementById("groupDetails");
     let displayMessage = document.getElementById("details_group_message");
 
-    fetch('http://localhost:8080/prattle/rest/group/getAllUserGroups/'+ username)
+    fetch('rest/group/getAllUserGroups/'+ username)
         .then((response) => {
             return response.json();
         })
@@ -650,7 +650,7 @@ function submitGroupDetails(){
     let group_info = document.getElementById("group_info");
 
 
-    fetch('http://localhost:8080/prattle/rest/group/getGroupDetails/'+ group)
+    fetch('rest/group/getGroupDetails/'+ group)
         .then((response) => {
             return response.json();
         })
@@ -674,7 +674,7 @@ function leaveGroup(groupName) {
     let displayMessage = document.getElementById("details_group_message");
 
     if(group !== "") {
-        fetch('http://localhost:8080/prattle/rest/group/removeUser/' + groupName + '/' + username, {
+        fetch('rest/group/removeUser/' + groupName + '/' + username, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -713,7 +713,7 @@ function notifyUserOfInvite(usernameToBeInvited, group){
 
 function onUserLogin() {
     getCircle();
-    fetch('http://localhost:8080/prattle/rest/message/getMessages/'+username)
+    fetch('rest/message/getMessages/'+username)
         .then((response)=> {
             return response.json();
     }).then((messages) => {
@@ -735,7 +735,7 @@ let following = document.getElementById("following");
 followers.innerHTML ="<h3><u>" + "Followers" + "</u></h3>";
 following.innerHTML ="<h3><u>" + "Following" + "</u></h3>";
 
-fetch('http://localhost:8080/prattle/rest/user/getFollowers/'+ accountName)
+fetch('rest/user/getFollowers/'+ accountName)
         .then((response) => {
             return response.json();
         })
@@ -751,7 +751,7 @@ fetch('http://localhost:8080/prattle/rest/user/getFollowers/'+ accountName)
         });
 
 
-fetch('http://localhost:8080/prattle/rest/user/getFollowing/'+ accountName)
+fetch('rest/user/getFollowing/'+ accountName)
         .then((response) => {
             return response.json();
         })
@@ -776,7 +776,7 @@ function updateUserStatus(){
     let displayMessage = document.getElementById("update_status_message");
     displayMessage.innerHTML = "";
 
-        fetch('http://localhost:8080/prattle/rest/user/setStatus/' + accountName  + '/' + status, {
+        fetch('rest/user/setStatus/' + accountName  + '/' + status, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
